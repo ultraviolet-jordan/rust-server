@@ -8,7 +8,6 @@ use crate::param::{decode_params, ParamValue};
 pub struct ObjProvider {
     names: HashMap<String, usize>,
     objs: Vec<ObjType>,
-    members: bool,
 }
 
 impl ObjProvider {
@@ -60,24 +59,46 @@ impl ObjProvider {
                     objs.push(obj);
                 }
 
-                for obj in objs.iter_mut().take(count) {
-                    // If certtemplate is present, convert to certificate
-                    if obj.certtemplate.is_some() {
-                        obj.to_certificate();
+                for id in 0..count {
+                    if let Some(certtemplate) = objs.get(id).and_then(|obj| obj.certtemplate) {
+                        match objs.get(certtemplate as usize) {
+                            None => panic!("Obj not found for a certtemplate!"),
+                            Some(template) => {
+                                let model: u16 = template.model;
+                                let zoom2d: u16 = template.zoom2d;
+                                let xan2d: u16 = template.xan2d;
+                                let yan2d: u16 = template.yan2d;
+                                let zan2d: u16 = template.zan2d;
+                                let xof2d: i16 = template.xof2d;
+                                let yof2d: i16 = template.yof2d;
+                                let recol_s: Option<Vec<u16>> = template.recol_s.clone();
+                                let recol_d: Option<Vec<u16>> = template.recol_d.clone();
+                                if let Some(obj) = objs.get_mut(id) {
+                                    obj.cert_template(model, zoom2d, xan2d, yan2d, zan2d, xof2d, yof2d, recol_s, recol_d);
+                                }
+                            }
+                        }
                     }
-
-                    // If the obj is a members object but the server is non-members
-                    if !members && obj.members {
-                        obj.tradeable = false;
-                        obj.op = None;
-                        obj.iop = None;
-
-                        // TODO: autodisable params here
+                    if let Some(certlink) = objs.get(id).and_then(|obj| obj.certlink) {
+                        match objs.get(certlink as usize) {
+                            None => panic!("Obj not found for a certlink!"),
+                            Some(link) => {
+                                let name: Option<String> = link.name.clone();
+                                let members: bool = link.members;
+                                let cost: i32 = link.cost;
+                                let tradeable: bool = link.tradeable;
+                                if let Some(obj) = objs.get_mut(id) {
+                                    obj.cert_link(name, members, cost, tradeable);
+                                }
+                            }
+                        }
+                    }
+                    if let Some(obj) = objs.get_mut(id) {
+                        obj.disable(members);
                     }
                 }
-
                 println!("Loaded objs in: {:?}", start.elapsed());
-                return ObjProvider { names, objs, members };
+                return ObjProvider { names, objs };
             }
             _ => panic!("Could not load objs!"),
         }
@@ -395,5 +416,144 @@ impl ObjType {
         }
     }
 
-    fn to_certificate(&self) {}
+    /// Configures the obj with the given certificate template parameters.
+    ///
+    /// This method sets various properties of the obj based on the provided certificate
+    /// template values, such as model and 2D coordinates. It also updates the recolor settings
+    /// if provided.
+    ///
+    /// # Parameters
+    ///
+    /// - `model`: A `u16` representing the model ID of the certificate.
+    /// - `zoom2d`: A `u16` value for the zoom level in 2D space.
+    /// - `xan2d`: A `u16` value representing the X-axis rotation in 2D space.
+    /// - `yan2d`: A `u16` value representing the Y-axis rotation in 2D space.
+    /// - `zan2d`: A `u16` value representing the Z-axis rotation in 2D space.
+    /// - `xof2d`: An `i16` value representing the X-offset in 2D space.
+    /// - `yof2d`: An `i16` value representing the Y-offset in 2D space.
+    /// - `recol_s`: An `Option<Vec<u16>>` that specifies the source recoloring values.
+    /// - `recol_d`: An `Option<Vec<u16>>` that specifies the destination recoloring values.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. It modifies the obj in place.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the parameters
+    /// provided are valid.
+    ///
+    /// # Side Effects
+    ///
+    /// - Updates the properties of the obj to reflect the certificate template configuration.
+    fn cert_template(
+        &mut self,
+        model: u16,
+        zoom2d: u16,
+        xan2d: u16,
+        yan2d: u16,
+        zan2d: u16,
+        xof2d: i16,
+        yof2d: i16,
+        recol_s: Option<Vec<u16>>,
+        recol_d: Option<Vec<u16>>,
+    ) {
+        self.model = model;
+        self.zoom2d = zoom2d;
+        self.xan2d = xan2d;
+        self.yan2d = yan2d;
+        self.zan2d = zan2d;
+        self.xof2d = xof2d;
+        self.yof2d = yof2d;
+        self.recol_s = recol_s;
+        self.recol_d = recol_d;
+    }
+
+    /// Configures the obj based on a certificate link.
+    ///
+    /// This method updates various properties of the obj, including its name, membership status,
+    /// cost, and tradeability. It also sets the stackable property and generates a description based
+    /// on the name provided.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: An `Option<String>` representing the name of the obj. If `None`, the name will
+    ///   not be set.
+    /// - `members`: A `bool` indicating whether the obj is for members only.
+    /// - `cost`: An `i32` representing the cost associated with the obj.
+    /// - `tradeable`: A `bool` indicating whether the obj is tradeable.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. It modifies the obj in place.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal
+    /// state of the obj is valid.
+    ///
+    /// # Side Effects
+    ///
+    /// - Updates the properties of the obj and generates a description if a name is provided.
+    fn cert_link(&mut self, name: Option<String>, members: bool, cost: i32, tradeable: bool) {
+        self.name = name;
+        self.members = members;
+        self.cost = cost;
+        self.tradeable = tradeable;
+        self.stackable = true;
+        if let Some(name) = &self.name {
+            if let Some(char) = name.chars().next() {
+                let article: &str = if "AEIOU".contains(char) { "an" } else { "a" };
+                self.desc = Some(format!(
+                    "Swap this note at any bank for {} {}.",
+                    article, name
+                ));
+            }
+        }
+    }
+
+    /// Disables the obj if it is a members-only obj on a non-members server.
+    ///
+    /// This method checks the membership status of the obj and, if the server does not support
+    /// members and the obj is designated for members, it disables tradeability and clears any
+    /// op properties associated with the obj.
+    ///
+    /// # Parameters
+    ///
+    /// - `members`: A `bool` indicating whether the server supports members.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. It modifies the obj in place.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the obj’s
+    /// properties are in a valid state.
+    ///
+    /// # Side Effects
+    ///
+    /// - Modifies the obj's tradeability and op properties based on the membership status.
+    fn disable(&mut self, members: bool) {
+        // If the obj is a members obj but the server is non-members
+        if !members && self.members {
+            self.tradeable = false;
+            self.op = None;
+            self.iop = None;
+
+            // TODO: autodisable params here
+        }
+    }
 }
