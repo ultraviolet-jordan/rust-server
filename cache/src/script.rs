@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::time::Instant;
 
 use io::Packet;
 
@@ -122,6 +123,7 @@ pub struct ScriptProvider {
 
 impl ScriptProvider {
     pub fn io(dir: &str) -> ScriptProvider {
+        let start: Instant = Instant::now();
         let mut dat: Packet = Packet::io(format!("{}/server/script.dat", dir));
         let mut idx: Packet = Packet::io(format!("{}/server/script.idx", dir));
 
@@ -158,7 +160,7 @@ impl ScriptProvider {
             }
             scripts.push(script);
         }
-
+        println!("Loaded scripts in: {:?}", start.elapsed());
         return ScriptProvider {
             names,
             scripts,
@@ -452,6 +454,20 @@ impl ScriptFile {
         };
     }
 
+    fn is_large_operand(code: u16) -> bool {
+        if code > 100 {
+            return false;
+        }
+        return match ScriptOpcode::from(code) {
+            ScriptOpcode::Return => false,
+            ScriptOpcode::PopIntDiscard => false,
+            ScriptOpcode::PopStringDiscard => false,
+            ScriptOpcode::GoSub => false,
+            ScriptOpcode::Jump => false,
+            _ => true,
+        };
+    }
+
     fn decode(&mut self, mut buf: Packet) {
         let length: usize = buf.len();
         if length < 16 {
@@ -538,19 +554,5 @@ impl ScriptFile {
         self.codes = Some(opcodes);
         self.int_operands = Some(int_operands);
         self.string_operands = Some(string_operands)
-    }
-
-    fn is_large_operand(code: u16) -> bool {
-        if code > 100 {
-            return false;
-        }
-        return match ScriptOpcode::from(code) {
-            ScriptOpcode::Return => false,
-            ScriptOpcode::PopIntDiscard => false,
-            ScriptOpcode::PopStringDiscard => false,
-            ScriptOpcode::GoSub => false,
-            ScriptOpcode::Jump => false,
-            _ => true,
-        };
     }
 }
