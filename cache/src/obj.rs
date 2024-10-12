@@ -7,7 +7,7 @@ use crate::param::{decode_params, ParamValue};
 
 pub struct ObjProvider {
     names: HashMap<String, usize>,
-    configs: Vec<ObjType>,
+    objs: Vec<ObjType>,
     members: bool,
 }
 
@@ -47,7 +47,7 @@ impl ObjProvider {
                 client.pos += 2;
 
                 let mut names: HashMap<String, usize> = HashMap::new();
-                let mut configs: Vec<ObjType> = Vec::with_capacity(count);
+                let mut objs: Vec<ObjType> = Vec::with_capacity(count);
 
                 for id in 0..count {
                     let mut obj: ObjType = ObjType::new(id);
@@ -57,10 +57,10 @@ impl ObjProvider {
                     if let Some(debugname) = &obj.debugname {
                         names.insert(debugname.clone(), id);
                     }
-                    configs.push(obj);
+                    objs.push(obj);
                 }
 
-                for obj in configs.iter_mut().take(count) {
+                for obj in objs.iter_mut().take(count) {
                     // If certtemplate is present, convert to certificate
                     if obj.certtemplate.is_some() {
                         obj.to_certificate();
@@ -77,7 +77,7 @@ impl ObjProvider {
                 }
 
                 println!("Loaded objs in: {:?}", start.elapsed());
-                return ObjProvider { names, configs, members };
+                return ObjProvider { names, objs, members };
             }
             _ => panic!("Could not load objs!"),
         }
@@ -144,7 +144,7 @@ impl ObjProvider {
         F: FnOnce(&ObjType),
         E: FnOnce(),
     {
-        if let Some(obj) = self.configs.get(id) {
+        if let Some(obj) = self.objs.get(id) {
             on_found(obj);
         } else {
             on_not_found();
@@ -314,82 +314,82 @@ impl ObjType {
     }
 
     #[rustfmt::skip]
-    fn decode(&mut self, buf: &mut Packet) {
-        while buf.remaining() > 0 {
-            let code: u8 = buf.g1();
+    fn decode(&mut self, dat: &mut Packet) {
+        while dat.remaining() > 0 {
+            let code: u8 = dat.g1();
             match code {
                 0 => break,
-                1 => self.model = buf.g2(),
-                2 => self.name = Some(buf.gjstr(10)),
-                3 => self.desc = Some(buf.gjstr(10)),
-                4 => self.zoom2d = buf.g2(),
-                5 => self.xan2d = buf.g2(),
-                6 => self.yan2d = buf.g2(),
+                1 => self.model = dat.g2(),
+                2 => self.name = Some(dat.gjstr(10)),
+                3 => self.desc = Some(dat.gjstr(10)),
+                4 => self.zoom2d = dat.g2(),
+                5 => self.xan2d = dat.g2(),
+                6 => self.yan2d = dat.g2(),
                 7 => {
-                    let mut xof2d: i32 = buf.g2() as i32;
+                    let mut xof2d: i32 = dat.g2() as i32;
                     if xof2d > 32767 {
                         xof2d -= 65536;
                     }
                     self.xof2d = xof2d as i16;
                 }
                 8 => {
-                    let mut yof2d: i32 = buf.g2() as i32;
+                    let mut yof2d: i32 = dat.g2() as i32;
                     if yof2d > 32767 {
                         yof2d -= 65536;
                     }
                     self.xof2d = yof2d as i16;
                 }
                 9 => self.code9 = true, // animHasAlpha from code10?
-                10 => self.code10 = Some(buf.g2()), // seq?
+                10 => self.code10 = Some(dat.g2()), // seq?
                 11 => self.stackable = true,
-                12 => self.cost = buf.g4s(),
-                13 => self.wearpos = Some(buf.g1()),
-                14 => self.wearpos2 = Some(buf.g1()),
+                12 => self.cost = dat.g4s(),
+                13 => self.wearpos = Some(dat.g1()),
+                14 => self.wearpos2 = Some(dat.g1()),
                 16 => self.members = true,
                 23 => {
-                    self.manwear = Some(buf.g2());
-                    self.manweary = buf.g1s();
+                    self.manwear = Some(dat.g2());
+                    self.manweary = dat.g1s();
                 }
-                24 => self.manwear2 = Some(buf.g2()),
+                24 => self.manwear2 = Some(dat.g2()),
                 25 => {
-                    self.womanwear = Some(buf.g2());
-                    self.womanweary = buf.g1s();
+                    self.womanwear = Some(dat.g2());
+                    self.womanweary = dat.g1s();
                 }
-                26 => self.womanwear2 = Some(buf.g2()),
-                27 => self.wearpos3 = Some(buf.g1()),
-                30..=34 => self.op.get_or_insert_with(|| vec![None; 5])[code as usize - 30] = Some(buf.gjstr(10)),
-                35..=39 => self.iop.get_or_insert_with(|| vec![None; 5])[code as usize - 35] = Some(buf.gjstr(10)),
+                26 => self.womanwear2 = Some(dat.g2()),
+                27 => self.wearpos3 = Some(dat.g1()),
+                30..=34 => self.op.get_or_insert_with(|| vec![None; 5])[code as usize - 30] = Some(dat.gjstr(10)),
+                35..=39 => self.iop.get_or_insert_with(|| vec![None; 5])[code as usize - 35] = Some(dat.gjstr(10)),
                 40 => {
-                    let count: usize = buf.g1() as usize;
+                    let count: usize = dat.g1() as usize;
                     let mut recol_s: Vec<u16> = vec![0; count];
                     let mut recol_d: Vec<u16> = vec![0; count];
                     for index in 0..count {
-                        recol_s[index] = buf.g2();
-                        recol_d[index] = buf.g2();
+                        recol_s[index] = dat.g2();
+                        recol_d[index] = dat.g2();
                     }
                     self.recol_s = Some(recol_s);
                     self.recol_d = Some(recol_d);
                 }
-                75 => self.weight = buf.g2s(),
-                78 => self.manwear3 = Some(buf.g2()),
-                79 => self.womanwear3 = Some(buf.g2()),
-                90 => self.manhead = Some(buf.g2()),
-                91 => self.womanhead = Some(buf.g2()),
-                92 => self.manhead2 = Some(buf.g2()),
-                93 => self.womanhead2 = Some(buf.g2()),
-                94 => self.category = Some(buf.g2()),
-                95 => self.zan2d = buf.g2(),
-                96 => self.dummyitem = buf.g1(),
-                97 => self.certlink = Some(buf.g2()),
-                98 => self.certtemplate = Some(buf.g2()),
+                75 => self.weight = dat.g2s(),
+                78 => self.manwear3 = Some(dat.g2()),
+                79 => self.womanwear3 = Some(dat.g2()),
+                90 => self.manhead = Some(dat.g2()),
+                91 => self.womanhead = Some(dat.g2()),
+                92 => self.manhead2 = Some(dat.g2()),
+                93 => self.womanhead2 = Some(dat.g2()),
+                94 => self.category = Some(dat.g2()),
+                95 => self.zan2d = dat.g2(),
+                96 => self.dummyitem = dat.g1(),
+                97 => self.certlink = Some(dat.g2()),
+                98 => self.certtemplate = Some(dat.g2()),
                 100..=109 => {
-                    self.countobj.get_or_insert_with(|| vec![0; 10])[code as usize - 100] = buf.g2();
-                    self.countco.get_or_insert_with(|| vec![0; 10])[code as usize - 100] = buf.g2();
+                    self.countobj.get_or_insert_with(|| vec![0; 10])[code as usize - 100] = dat.g2();
+                    self.countco.get_or_insert_with(|| vec![0; 10])[code as usize - 100] = dat.g2();
                 }
                 200 => self.tradeable = true,
-                201 => self.respawnrate = buf.g2(),
-                249 => decode_params(buf, self.params.get_or_insert_with(|| HashMap::new())),
-                250 => self.debugname = Some(buf.gjstr(10)),
+                201 => self.respawnrate = dat.g2(),
+                249 => decode_params(dat, self.params.get_or_insert_with(|| HashMap::new())),
+                250 => self.debugname = Some(dat.gjstr(10)),
                 _ => panic!("Error unrecognised obj config code: {}", code),
             }
         }

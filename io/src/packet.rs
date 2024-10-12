@@ -72,7 +72,7 @@ impl Packet {
     /// ```
     #[inline(always)]
     pub fn remaining(&self) -> i32 {
-        return (self.length() - self.pos) as i32;
+        return (self.len() - self.pos) as i32;
     }
 
     /// Returns the total usize (length) of this `Packet` allocated for storage of bytes.
@@ -83,10 +83,10 @@ impl Packet {
     /// use io::Packet;
     ///
     /// let mut packet: Packet = Packet::new(1);
-    /// assert_eq!(1, packet.length());
+    /// assert_eq!(1, packet.len());
     /// ```
     #[inline(always)]
-    pub fn length(&self) -> usize {
+    pub fn len(&self) -> usize {
         return self.data.len();
     }
 
