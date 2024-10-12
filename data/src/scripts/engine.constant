@@ -1,0 +1,25 @@
+^true = 1
+^false = 0
+
+^min_32bit_int = -2147483648
+^max_32bit_int = 2147483647
+
+// for exactmove
+^exact_north = 0
+^exact_east = 1
+^exact_south = 2
+^exact_west = 3
+
+// for directions procs
+^exact_northeast = 4
+^exact_southeast = 5
+^exact_southwest = 6
+^exact_northwest = 7
+
+// for locangle
+^loc_west = 0
+^loc_north = 1
+^loc_east = 2
+^loc_south = 3
+
+^string_empty =

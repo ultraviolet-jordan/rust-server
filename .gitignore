@@ -1,0 +1,45 @@
+/target
+
+data/pack/
+
+# since these are generated for the server only, we don't have to share them
+data/src/pack/script.pack
+data/src/pack/param.pack
+data/src/pack/category.pack
+data/src/pack/enum.pack
+data/src/pack/struct.pack
+data/src/pack/mesanim.pack
+data/src/pack/dbtable.pack
+data/src/pack/dbrow.pack
+data/src/pack/hunt.pack
+data/src/pack/varn.pack
+data/src/pack/vars.pack
+
+data/players/
+data/symbols/
+
+data/config/worlds.json
+data/config/login.json
+data/config/friend.json
+
+dump/
+
+# keep these precompiled files out of the repo
+RuneScriptCompiler.jar
+
+# intellij
+.idea/
+
+# these are artifacts generated from other repos
+public/loader.jar
+public/runescape*.jar
+public/downloads/LostCityInstaller.msi
+
+### Windows ###
+Thumbs.db
+[Dd]esktop.ini
+*.lnk
+
+### macOS ###
+.DS_Store
+._*

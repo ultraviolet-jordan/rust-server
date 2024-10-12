@@ -1,0 +1,94 @@
+[queue,duel_arena_finish]
+if (getqueue(duel_arena_finish) > 0) {
+    clearqueue(duel_arena_finish);
+}
+if (~in_duel_arena(coord) = false) {
+    %duelstatus = 0;
+    %duelpartner = null;
+    return;
+}
+// get arrows back
+def_int $i = 0;
+while ($i < inv_size(tempinv)) {
+    if (inv_getobj(tempinv, $i) ! null) {
+        inv_movefromslot(tempinv, inv, $i);
+    }
+    $i = calc($i + 1);
+}
+
+p_telejump(~duel_arena_finish_coord(coord));
+anim(null, 0);
+p_stopaction;
+
+~stat_reset_all;
+healenergy(10000);
+~combat_clearqueue;
+clearqueue(player_death);
+~clear_poison;
+~update_all(inv_getobj(worn, ^wearpos_rhand));
+hint_stop;
+
+if (.finduid(%duelpartner) = true & (%duelstatus = ^duelstatus_victory | %duelstatus = ^duelstatus_opponent_resigned)) {
+    if (%duelstatus = ^duelstatus_opponent_resigned) {
+        if_settext(duel_win:com_99, "You are victorious! Your opponent resigned!"); // 2006
+        mes("Well done! <.displayname> resigned!"); // 2006
+    } else {
+        if_settext(duel_win:com_99, "You are victorious!");
+        mes("Well done! You have defeated <.displayname>!");
+    }
+    midi_jingle(^duel_win_2_jingle, ^duel_win_2_jingle_millis);
+    if_openmain(duel_win);
+    ~duel_adjust_scoreboard(displayname, ~player_combat_level, .displayname, ~.player_combat_level);
+    if_settext(duel_win:displayname, .displayname);
+    if_settext(duel_win:combat_level, tostring(~.player_combat_level));
+
+    $i = 0;
+    while ($i < inv_size(stakeinv)) {
+        if (inv_getobj(stakeinv, $i) ! null) {
+            //mes("<oc_debugname(inv_getobj(stakeinv, $i))>: <tostring(inv_getnum(tempinv, $i))>");
+            inv_movefromslot(stakeinv, inv, $i);
+        }
+        $i = calc($i + 1);
+    }
+    inv_clear(stakeinv);
+    // take stuff from other player's stakeinv
+    .both_moveinv(stakeinv, stakeinv);
+    // .%duelpartner = null;
+    // display spoils
+    inv_transmit(stakeinv, duel_win:spoils);
+}
+
+%duelstatus = 0;
+%duelpartner = null;
+
+[if_close,duel_win]
+def_int $i = 0;
+while ($i < inv_size(stakeinv)) {
+    if (inv_getobj(stakeinv, $i) ! null) {
+        inv_movefromslot(stakeinv, inv, $i);
+    }
+    $i = calc($i + 1);
+}
+inv_clear(stakeinv);
+inv_stoptransmit(duel_win:spoils);
+
+// https://youtu.be/QggKGBAl_X8?t=111
+[proc,duel_arena_finish_coord](coord $coord)(coord)
+def_coord $coord1 = 0_52_51_27_3;
+def_coord $coord2 = 0_52_51_51_15;
+
+def_int $x1 = coordx($coord1);
+def_int $x2 = coordx($coord2);
+def_int $z1 = coordz($coord1);
+def_int $z2 = coordz($coord2);
+def_int $i = 0;
+def_coord $random_coord = movecoord($coord1, random(sub($x2, $x1)), 0, random(sub($z2, $z1)));
+
+while (map_blocked($random_coord) = true) {
+    $random_coord = movecoord($coord1, random(sub($x2, $x1)), 0, random(sub($z2, $z1)));
+    $i = calc($i + 1);
+    if ($i = 50) {
+        return($coord); // no way this is reached
+    }
+}
+return($random_coord);

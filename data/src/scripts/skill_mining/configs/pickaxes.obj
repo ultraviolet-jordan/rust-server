@@ -1,0 +1,219 @@
+[bronze_pickaxe]
+cost=1
+name=Bronze pickaxe
+desc=Used for mining.
+model=model_2529_obj
+recol1s=15855
+recol1d=8354
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=5lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,4
+param=slashattack,-2
+param=crushattack,2
+param=slashdefence,1
+param=strengthbonus,5
+param=levelrequire,0
+param=mining_rate,7
+param=mining_animation,human_mining_bronze_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,bronze_pickaxe_broken
+param=pickaxe_head,bronze_pickaxe_head
+
+[iron_pickaxe]
+cost=140
+name=Iron pickaxe
+desc=Used for mining.
+model=model_2529_obj
+recol1s=15855
+recol1d=8456
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=5lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,5
+param=slashattack,-2
+param=crushattack,3
+param=slashdefence,1
+param=strengthbonus,7
+param=levelrequire,0
+param=mining_rate,6
+param=mining_animation,human_mining_iron_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,iron_pickaxe_broken
+param=pickaxe_head,iron_pickaxe_head
+
+[steel_pickaxe]
+cost=500
+name=Steel pickaxe
+desc=Used for mining.
+model=model_2529_obj
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=5lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,8
+param=slashattack,-2
+param=crushattack,6
+param=slashdefence,1
+param=strengthbonus,9
+param=levelrequire,6
+param=mining_rate,5
+param=mining_animation,human_mining_steel_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,steel_pickaxe_broken
+param=pickaxe_head,steel_pickaxe_head
+
+[adamant_pickaxe]
+cost=3200
+name=Adamant pickaxe
+desc=Used for mining.
+model=model_2529_obj
+recol1s=15855
+recol1d=6438
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=6lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,17
+param=slashattack,-2
+param=crushattack,15
+param=slashdefence,1
+param=strengthbonus,19
+param=levelrequire,31
+param=mining_rate,3
+param=mining_animation,human_mining_adamant_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,adamant_pickaxe_broken
+param=pickaxe_head,adamant_pickaxe_head
+
+[mithril_pickaxe]
+cost=1300
+name=Mithril pickaxe
+desc=Used for mining.
+model=model_2529_obj
+recol1s=15855
+recol1d=6346
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=4lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,12
+param=slashattack,-2
+param=crushattack,10
+param=slashdefence,1
+param=strengthbonus,13
+param=levelrequire,21
+param=mining_rate,4
+param=mining_animation,human_mining_mithril_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,mithril_pickaxe_broken
+param=pickaxe_head,mithril_pickaxe_head
+
+[rune_pickaxe]
+cost=32000
+name=Rune pickaxe
+desc=Used for mining.
+model=model_2529_obj
+recol1s=15855
+recol1d=6476
+manwear=model_509_obj_wear,0
+womanwear=model_509_obj_wear,6
+2dxof=-2
+2dyof=-19
+2dzoom=1070
+2dyan=1056
+2dxan=224
+weight=5lb
+wearpos=righthand
+iop2=Wield
+category=weapon_pickaxe
+tradeable=yes
+param=stabattack,26
+param=slashattack,-2
+param=crushattack,24
+param=slashdefence,1
+param=strengthbonus,29
+param=levelrequire,41
+param=mining_rate,2
+param=mining_animation,human_mining_rune_pickaxe
+param=attackrate,5
+param=stabattack_anim,human_blunt_stab
+param=crushattack_anim,human_blunt_crush
+// osrs defend anim seq_397
+param=stab_sound,baxe_crush
+param=crush_sound,baxe_slash
+// swapped stab and crush attack animations + sounds
+param=broken,rune_pickaxe_broken
+param=pickaxe_head,rune_pickaxe_head

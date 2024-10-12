@@ -1,0 +1,3 @@
+[gnome_food_cooking]
+column=gnome_food,obj
+column=step,namedobj,namedobj,namedobj,namedobj

@@ -1,0 +1,88 @@
+[ai_queue3,count_draynor] // do nothing
+[ai_queue4,count_draynor] gosub(npc_death);
+
+[opnpc2,count_draynor]
+if (~player_in_combat_check = false) {
+    return;
+}
+if (%vampire_progress = ^vampire_complete) {
+    mes("You've done enough vampire slaying.");
+    return;
+}
+// osrs wiki says manually casting spells doesnt work but autocast does. So its probably here
+if (inv_total(inv, garlic) > 0) {
+    if (npc_stat(hitpoints) = npc_basestat(hitpoints)) { // osrs https://archive.is/djWKq
+        npc_statsub(hitpoints, 10, 0);
+        npc_statsub(attack, 10, 0);
+        npc_statsub(strength, 10, 0);
+        npc_statsub(defence, 40, 0);
+        mes("The vampire seems to weaken.");
+    } else if (random(16) = 0) {
+        mes("The vampire seems to weaken.");
+    }
+}
+
+@player_combat_start;
+[apnpc2,count_draynor]
+if (~player_in_combat_check = false) {
+    return;
+}
+if (%vampire_progress = ^vampire_complete) {
+    mes("You've done enough vampire slaying.");
+    return;
+}
+// osrs wiki says manually casting spells doesnt work but autocast does. So its probably here
+if (inv_total(inv, garlic) > 0) {
+    if (npc_stat(hitpoints) = npc_basestat(hitpoints)) { // osrs https://archive.is/djWKq
+        npc_statsub(hitpoints, 10, 0);
+        npc_statsub(attack, 10, 0);
+        npc_statsub(strength, 10, 0);
+        npc_statsub(defence, 40, 0);
+        mes("The vampire seems to weaken.");
+    } else if (random(16) = 0) {
+        mes("The vampire seems to weaken.");
+    }
+}
+@player_combat_start_ap;
+
+[ai_queue2,count_draynor]
+~npc_default_damage(last_int);
+if (npc_stat(hitpoints) = 0) {
+    if (npc_findhero = true) {
+        if (p_finduid(uid) = true) {
+            @count_draynor_use_stake;
+        }
+    }
+    npc_statheal(hitpoints, 1, 0);
+}
+
+[label,count_draynor_use_stake]
+if (inv_total(inv, stake) = 0) {
+    mes("The vampire seems to regenerate!");
+    npc_statheal(hitpoints, npc_basestat(hitpoints), 0);
+    npc_setmode(opplayer2);
+    return;
+}
+if (inv_total(inv, hammer) = 0) {
+    mes("You're unable to push the stake far enough in!");
+    mes("The vampire seems to regenerate!");
+    npc_statheal(hitpoints, npc_basestat(hitpoints), 0);
+    npc_setmode(opplayer2);
+    return;
+}
+p_delay(1);
+mes("You hammer the stake into the vampire's chest!");
+inv_del(inv, stake, 1);
+anim(human_stake, 0);
+npc_setmode(none);
+npc_queue(4, 0, 0);
+queue(quest_vampire_complete, 3);
+
+[ai_timer,count_draynor]
+if (finduid(%npc_attacking_uid) = true) {
+    if (npc_range(coord) > 10 | coordy(coord) ! coordy(npc_coord)) {
+        npc_del;
+    }
+} else {
+    npc_del;
+}

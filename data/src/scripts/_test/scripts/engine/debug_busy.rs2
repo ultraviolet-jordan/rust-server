@@ -1,0 +1,10 @@
+[debugproc,busy]
+if (map_production = true) {
+    return;
+}
+
+if (busy = true) {
+    mes("I am busy.");
+} else {
+    mes("I am not busy.");
+}

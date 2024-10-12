@@ -1,0 +1,46 @@
+[delrith]
+size=2
+name=Delrith
+desc=A freshly summoned demon.
+walkanim=demon_walk
+readyanim=demon_ready
+op2=Attack
+vislevel=27
+model1=model_2943_npc
+wanderrange=2
+maxrange=4
+// TODO respawnrate?
+hitpoints=7
+attack=11
+strength=10
+defence=5
+// TODO attackstyle
+param=attackrate,6
+param=attack_anim,demon_attack
+param=defend_anim,demon_block
+param=death_anim,demon_death
+param=demonbane_vulnerable,yes
+param=attack_sound,demon_attack
+param=defend_sound,demon_hit
+param=death_sound,demon_death
+param=death_drop,ashes
+timer=100
+
+[weakened_delrith]
+size=2
+name=Weakened Delrith
+desc=The demon doesn't look so strong now.
+resizeh=100
+resizev=100
+readyanim=delrith_ready
+hasalpha=yes
+vislevel=1
+recol1s=11264
+recol1d=11460
+model1=model_2943_npc
+model2=model_3019_npc
+wanderrange=0
+moverestrict=nomove
+timer=100
+param=death_anim,delrith_banish
+param=death_sound,demon_death

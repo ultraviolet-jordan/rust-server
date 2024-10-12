@@ -1,0 +1,148 @@
+[proc,stat_name](stat $stat)(string)
+return(enum(stat, string, stat_names, $stat));
+
+[proc,stat_members](stat $stat)(int)
+return(enum(stat, int, stat_members, $stat));
+
+[proc,npc_stat_name](npc_stat $stat)(string)
+switch_npc_stat($stat) {
+    case attack: return("Attack");
+    case strength: return("Strength");
+    case ranged: return("Ranged");
+    case magic: return("Magic");
+    case defence: return("Defence");
+    case hitpoints: return("Hitpoints");
+    case default: return("Stat");
+}
+
+[proc,convert_stat_to_npc_stat](stat $stat)(npc_stat)
+switch_stat($stat) {
+    case attack: return(attack);
+    case strength: return(strength);
+    case ranged: return(ranged);
+    case magic: return(magic);
+    case defence: return(defence);
+    case hitpoints: return(hitpoints);
+}
+error("Invalid stat: <~stat_name($stat)>");
+
+// handles restoring a players stat towards the base level
+[softtimer,stat_replenish]
+def_int $i = 1;
+while ($i <= enum_getoutputcount(stats)) {
+    def_stat $stat = enum(int, stat, stats, $i);
+    def_int $base_level = stat_base($stat);
+    def_int $level = stat($stat);
+    // prayer doesnt regen, or deplete when too high
+    if ($base_level > $level & $stat ! prayer & $stat ! hitpoints) {
+        // level is lower than base so add to it
+        stat_add($stat, 1, 0);
+    } else if ($base_level < $level & $stat ! prayer & $stat ! hitpoints) {
+        // level is higher than base so sub from it
+        stat_sub($stat, 1, 0);
+    }
+
+    $i = calc($i + 1);
+}
+
+//hp is on a seperate timer, because of rapid heal and rapid restore
+[softtimer,health_replenish]
+// hitpoints doesnt deplete when too high
+if (stat(hitpoints) < stat_base(hitpoints)) {
+    stat_add(hitpoints, 1, 0);
+}
+
+/***
+ * A version of stat_add that caps the boost to prevent the stat boosting over base + boost.
+ * This intended for potions so that drinking from the same potion wont just keep adding up to 255.
+ */
+[proc,stat_addclamp](stat $stat, int $constant, int $percent)
+def_int $base_level = stat_base($stat);
+def_int $level = stat($stat);
+
+// calculate the maximum level based on the base level
+def_int $max_level = calc($base_level + ($constant + scale($base_level, 100, $percent)));
+
+// calculate the boost and lower it to max - level if it goes over
+def_int $boost = calc($constant + scale($level, 100, $percent));
+if (calc($level + $boost) > $max_level) {
+    $boost = calc($max_level - $level);
+}
+
+// add the boost, with no percent
+stat_add($stat, $boost, 0);
+
+// not sure if this is used anywhere
+// thought it was for kebabs but its not the case
+[proc,stat_subclamp](stat $stat, int $constant, int $percent)
+def_int $base_level = stat_base($stat);
+def_int $level = stat($stat);
+
+// calculate the minimum level based on the base level
+def_int $min_level = calc($base_level - ($constant + scale($base_level, 100, $percent)));
+
+// calculate the debuff
+def_int $debuff = calc($constant - scale($level, 100, $percent));
+if (calc($level - $debuff) < $min_level) {
+    $debuff = calc($level - $min_level);
+}
+
+// subtract the debuff, with no percent
+stat_sub($stat, $debuff, 0);
+
+// stat_heal but instead of scaling based off stat, it scales off of stat_base
+[proc,stat_healbase](stat $stat, int $constant, int $percent)
+def_int $heal = add(scale($percent, 100, stat_base($stat)), $constant);
+stat_heal($stat, $heal, 0);
+
+[proc,stat_reset](stat $stat)
+def_int $d = sub(stat($stat), stat_base($stat));
+
+if ($d > 0) {
+    stat_sub($stat, abs($d), 0);
+} else if ($d < 0) {
+    stat_add($stat, abs($d), 0);
+}
+
+[proc,stat_reset_all]
+def_int $i = 1;
+while ($i <= enum_getoutputcount(stats)) {
+    ~stat_reset(enum(int, stat, stats, $i));
+    $i = calc($i + 1);
+}
+
+[proc,.stat_reset](stat $stat)
+def_int $d = sub(.stat($stat), .stat_base($stat));
+
+if ($d > 0) {
+    .stat_sub($stat, abs($d), 0);
+} else if ($d < 0) {
+    .stat_add($stat, abs($d), 0);
+}
+
+[proc,.stat_reset_all]
+def_int $i = 1;
+while ($i <= enum_getoutputcount(stats)) {
+    ~.stat_reset(enum(int, stat, stats, $i));
+    $i = calc($i + 1);
+}
+
+[proc,stat_reset_boosts]
+def_int $i = 1;
+while ($i <= enum_getoutputcount(stats)) {
+    def_stat $stat = enum(int, stat, stats, $i);
+    if (stat($stat) > stat_base($stat)) {
+        ~stat_reset($stat);
+    }
+    $i = calc($i + 1);
+}
+
+[proc,.stat_reset_boosts]
+def_int $i = 1;
+while ($i <= enum_getoutputcount(stats)) {
+    def_stat $stat = enum(int, stat, stats, $i);
+    if (.stat($stat) > .stat_base($stat)) {
+        ~.stat_reset($stat);
+    }
+    $i = calc($i + 1);
+}

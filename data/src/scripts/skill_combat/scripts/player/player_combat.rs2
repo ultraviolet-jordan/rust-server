@@ -1,0 +1,114 @@
+[opnpc2,_] @player_combat_start;
+[apnpc2,_] @player_combat_start_ap;
+
+[label,player_combat_start_ap]
+def_int $distance = npc_range(coord);
+def_int $attackrange = 0;
+if (inv_getobj(worn, ^wearpos_rhand) ! null) {
+    $attackrange = min(oc_param(inv_getobj(worn, ^wearpos_rhand), attackrange), 10);
+    if (%damagestyle = ^style_ranged_longrange) {
+        $attackrange = min(add($attackrange, 2), 10);
+    }
+}
+
+// mes("<tostring(%attackstyle_magic)>");
+// if (testbit(%attackstyle_magic, 0) = true){
+//     mes("TRUE");
+// }
+// mes("<tostring(%autocast_spell)>");
+// if auto cast is enabled, and autocast spell is set
+if (testbit(%attackstyle_magic, 0) = true & %attackstyle_magic = 3 & %autocast_spell > 0){
+    $attackrange = 10;
+}
+
+if (($attackrange <= 1 & ~player_in_combat_check = false) | $distance > $attackrange) {
+    // p_opnpc(2);
+    p_aprange($attackrange);
+    return;
+}
+@player_combat_start;
+
+[label,player_combat_start]
+if (~player_in_combat_check = false) {
+    return;
+}
+// facesquare(npc_coord);
+// TODO: Range and mage check
+if (%damagetype = ^ranged_style) {
+    @player_ranged_attack;
+}
+// mes("<tostring(%attackstyle_magic)>");
+// if (testbit(%attackstyle_magic, 0) = true){
+//     mes("TRUE");
+// }
+// if autocast is enabled and spell is selected
+if (testbit(%attackstyle_magic, 0) = true & %attackstyle_magic = 3 & %autocast_spell > 0) {
+    def_dbrow $spell_data = ~get_spell_data(%autocast_spell);
+    if (~check_spell_requirements($spell_data) = true) {
+        p_stopaction;
+        p_opnpct(db_getfield($spell_data, magic_spell_table:spellcom, 0));
+    }  
+    return;
+}
+
+@player_melee_attack;
+
+
+[proc,player_npc_hit_roll](int $damagetype)(boolean)
+def_int $attack_roll = ~player_attack_roll_specific($damagetype);
+def_int $defence_roll = ~npc_defence_roll_specific($damagetype);
+//mes("Clock: <tostring(map_clock)>, Player A: <tostring($attack_roll)>, NPC D: <tostring($defence_roll)>, Player Max: <tostring(%com_maxhit)>");
+//mes("Attack roll: <tostring($attack_roll)>, Defence roll: <tostring($defence_roll)>");
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    return(true);
+}
+return(false);
+
+// returns the correct combat calculated attack damage for weapon
+[proc,player_attack_roll_specific](int $damagetype)(int)
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+switch_int ($damagetype) {
+    case ^stab_style: return(%com_stabattack);
+    case ^slash_style: return(%com_slashattack);
+    case ^crush_style: return(%com_crushattack);
+    case ^ranged_style: return(%com_rangeattack);
+    case ^magic_style: return(%com_magicattack);
+}
+error("combat style of <tostring($damagetype)> not defined in switch for p_npc_melee_roll");
+
+// returns the player's defence roll, depending on style
+[proc,player_defence_roll_specific](int $damagetype)(int)
+switch_int ($damagetype) {
+    case ^stab_style: return(%com_stabdef);
+    case ^slash_style: return(%com_slashdef);
+    case ^crush_style: return(%com_crushdef);
+    case ^ranged_style: return(%com_rangedef);
+    case ^magic_style: return(%com_magicdef);
+}
+error("style of <tostring($damagetype)> not defined in switch for player_defence_roll_specific");
+
+[proc,.player_defence_roll_specific](int $damagetype)(int)
+switch_int ($damagetype) {
+    case ^stab_style: return(.%com_stabdef);
+    case ^slash_style: return(.%com_slashdef);
+    case ^crush_style: return(.%com_crushdef);
+    case ^ranged_style: return(.%com_rangedef);
+    case ^magic_style: return(.%com_magicdef);
+}
+
+[proc,player_in_combat_check]()(boolean)
+if (map_multi(npc_coord) = true) {
+    return(true);
+}
+// player has been attacked in the last 8 ticks, and not by the current npc
+// or player has been attacked in the last 8 ticks, and %aggressive_npc is null (for pvp)
+if (add(%lastcombat, 8) > map_clock & (%aggressive_npc ! npc_uid & %aggressive_npc ! null)) {
+    mes("I'm already under attack.");
+    return(false);
+}
+// npc has been attacked in the last 8 ticks, and not by the current player
+if ((add(%npc_lastcombat, 8) > map_clock & %npc_aggressive_player ! uid)) {
+    mes("Someone else is fighting that.");
+    return(false);
+}
+return(true);

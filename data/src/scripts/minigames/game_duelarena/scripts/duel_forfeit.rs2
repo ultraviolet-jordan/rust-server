@@ -1,0 +1,25 @@
+[oploc1,duel_entrance_1] @duel_forfeit;
+[oploc1,duel_entrance_2] @duel_forfeit;
+[oploc1,duel_entrance_3] @duel_forfeit;
+[oploc1,duel_entrance_4] @duel_forfeit;
+[oploc1,duel_trapdoor] @duel_forfeit;
+
+[label,duel_forfeit]
+if (~duel_arena_forfeit_check = false) {
+    return;
+}
+def_int $choice = ~p_choice2_header("Yes", 1, "No", 2, "Do you wish to forfeit?");
+if ($choice = 2) {
+    return;
+}
+if_close;
+%duelstatus = ^duelstatus_lost;
+if (getqueue(duel_arena_finish) < 1) {
+    queue(duel_arena_finish, 0);
+}
+
+if (.finduid(%duelpartner) = true)  {
+    .if_close;
+    .%duelstatus = ^duelstatus_opponent_resigned;
+    .queue(duel_arena_finish, 0);
+}

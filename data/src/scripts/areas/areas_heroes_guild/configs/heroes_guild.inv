@@ -1,0 +1,9 @@
+[happy_heroes_hemporium]
+scope=shared
+size=40
+restock=yes
+stackall=yes
+allstock=no
+stock1=dragon_battleaxe,2,500
+stock2=dragon_mace,2,500
+// second stocks variations both items 1x

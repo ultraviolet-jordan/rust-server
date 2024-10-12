@@ -1,0 +1,46 @@
+[oploc1,chompybird_cave_entrance]
+p_teleport(0_41_146_23_35);
+
+[oploc1,chompybird_cave_exit_a]
+p_teleport(0_41_46_6_53);
+
+[oploc1,chompybird_cave_exit_b]
+p_teleport(0_41_46_6_53);
+
+[oplocu,swamp_bubbles_a]
+@use_bellows_on_swamp_bubbles;
+
+[oplocu,swamp_bubbles_b]
+@use_bellows_on_swamp_bubbles;
+
+[label,use_bellows_on_swamp_bubbles]
+switch_obj(last_useitem) {
+    case ogre_bellows_0:
+        ~ogre_bellows_suck(ogre_bellows_0);
+    case ogre_bellows_1:
+        ~ogre_bellows_suck(ogre_bellows_1);
+    case ogre_bellows_2:
+        ~ogre_bellows_suck(ogre_bellows_2);
+    case default:
+        // TODO can you fill bellows (2) and (1)?
+        mes("Nothing interesting happens.");
+}
+
+[proc,ogre_bellows_suck](obj $bellows)
+// TODO TBC anim and sound
+anim(human_firecooking, 0);
+sound_synth(ogre_bellows_suck, 0, 0);
+p_delay(1);
+
+mes("You collect some gas from the swamp.");
+inv_del(inv, ogre_bellows_0, 1);
+inv_add(inv, ogre_bellows_3, 1);
+
+
+[queue,quest_chompybird_complete]
+%chompybird_progress = ^chompybird_complete;
+stat_advance(fletching, 262);
+stat_advance(cooking, 1470);
+stat_advance(ranged, 735);
+// TODO is ogre bow given separately here?
+~send_quest_complete(questlist:chompybird, ogre_bow, 250, ^chompybird_questpoints, "You have completed the 'Chompy Bird' Quest!");

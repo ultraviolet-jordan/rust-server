@@ -1,0 +1,194 @@
+[opplayer2,_] @pvp_combat_start;
+
+[applayer2,_]
+if (~in_duel_arena(coord) = true) {
+    if (~duel_arena_checks = false) {
+        return;
+    }
+} else {
+    if (~pvp_level_check = false) {
+        return;
+    }
+    if (~pvp_in_combat_check = false) {
+        return;
+    }
+}
+
+def_int $distance = distance(coord, .coord);
+def_int $attackrange = 0;
+if (inv_getobj(worn, ^wearpos_rhand) ! null) {
+    $attackrange = min(oc_param(inv_getobj(worn, ^wearpos_rhand), attackrange), 10);
+    if (%damagestyle = ^style_ranged_longrange) {
+        $attackrange = min(add($attackrange, 2), 10);
+    }
+}
+
+if (testbit(%attackstyle_magic, 0) = true & %attackstyle_magic = 3 & %autocast_spell > 0){
+    $attackrange = 10;
+}
+if ($attackrange <= 1) {
+    p_aprange($attackrange); // walk then op again
+    return;
+}
+p_aprange($attackrange);
+@pvp_combat_start;
+
+[label,pvp_combat_start]
+if (~in_duel_arena(coord) = true) {
+    if (~duel_arena_checks = false) {
+        return;
+    }
+} else {
+    if (~pvp_level_check = false) {
+        return;
+    }
+    if (~pvp_in_combat_check = false) {
+        return;
+    }
+}
+
+if (~inzone_coord_pair_table(mage_arena, coord) = true) {
+    mes("Kolodion allows only magical combat within the arena."); // osrs
+    return;
+}
+if (%damagetype = ^ranged_style) {
+    @pvp_ranged_attack;
+}
+
+// if autocast is enabled and spell is selected
+if (testbit(%attackstyle_magic, 0) = true & %attackstyle_magic = 3 & %autocast_spell > 0) {
+    // look for spell in db
+    def_dbrow $spell_data = ~get_spell_data(%autocast_spell);
+    if (~check_spell_requirements($spell_data) = false) {
+        %attackstyle_magic = 0;
+        return;
+    }
+
+    // in osrs you cant tick manip with autocast delay, so its prob its on varp?
+    p_opplayert(db_getfield($spell_data, magic_spell_table:spellcom, 0));
+    return;
+}
+@pvp_melee_attack;
+
+[proc,pvp_level_check]()(boolean)
+// not high enough level
+def_int $combat_level_diff = abs(sub(~player_combat_level, ~.player_combat_level));
+def_int $wilderness_level = min(~wilderness_level(coord), ~wilderness_level(.coord));
+if ($wilderness_level = 0) {
+    mes("You can't attack players who aren't in the Wilderness.");
+    return(false);
+}
+if ($wilderness_level < $combat_level_diff) {
+    mes("Your level difference is too great!");
+    mes("You need to move deeper into the wilderness."); // wilderness is title'd in late 2005/2006 ish
+    return(false);
+}
+return(true);
+
+[proc,pvp_in_combat_check]()(boolean)
+// if multi, return true
+if (map_multi(.coord) = true) {
+    return(true);
+}
+// if you have been attacked in the last 8 ticks, and the last person to attack you isnt your opponent
+// or an npc attacked you
+if (add(%lastcombat, 8) > map_clock & (%pk_predator1 ! .uid | %aggressive_npc ! null)) {
+    mes("I'm already under attack.");
+    return(false);
+}
+// if your opponent has been attacked in the last 8 ticks, and the opponents last attacker is not you
+// or an npc attacked them 
+if (add(.%lastcombat, 8) > map_clock & (.%pk_predator1 ! uid | .%aggressive_npc ! null)) {
+    mes("Someone else is already fighting your opponent.");
+    return(false);
+}
+return(true);
+
+[proc,pvp_hit_roll](int $damagetype)(boolean)
+def_int $attack_roll = ~player_attack_roll_specific($damagetype);
+def_int $defence_roll = ~.player_defence_roll_specific($damagetype);
+//mes("Clock: <tostring(map_clock)>, Player A: <tostring($attack_roll)>, NPC D: <tostring($defence_roll)>, Player Max: <tostring(%com_maxhit)>");
+//mes("Attack roll: <tostring($attack_roll)>, Defence roll: <tostring($defence_roll)>");
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    return(true);
+}
+return(false);
+
+
+//https://oldschool.runescape.wiki/w/Combat#PvP_bonus_experience
+[proc,pvp_xp_multiplier](int $combat_level)(int)
+return(min(1125, add(1000, divide(multiply(divide($combat_level, 20), 1000), 40))));
+
+[proc,give_combat_experience_pvp](int $damagestyle, int $base, int $multiplier)
+switch_int($damagestyle) {
+    case ^style_melee_accurate : 
+        stat_advance(attack, scale($multiplier, 1000, scale(400, 100, $base)));
+    case ^style_melee_aggressive : 
+        stat_advance(strength, scale($multiplier, 1000, scale(400, 100, $base)));
+    case ^style_melee_defensive : 
+        stat_advance(defence, scale($multiplier, 1000, scale(400, 100, $base)));
+    case ^style_melee_controlled : 
+        stat_advance(attack, scale($multiplier, 1000, scale(133, 100, $base)));
+        stat_advance(strength, scale($multiplier, 1000, scale(133, 100, $base)));
+        stat_advance(defence, scale($multiplier, 1000, scale(133, 100, $base)));
+    case ^style_ranged_accurate, ^style_ranged_rapid : 
+        stat_advance(ranged, scale($multiplier, 1000, scale(400, 100, $base)));
+    case ^style_ranged_longrange : 
+        stat_advance(ranged, scale($multiplier, 1000, scale(200, 100, $base)));
+        stat_advance(defence, scale($multiplier, 1000, scale(200, 100, $base)));
+    case ^style_magic_normal :
+        stat_advance(magic, scale($multiplier, 1000, scale(200, 100, $base)));
+    case ^style_magic_defensive : 
+        stat_advance(magic, scale($multiplier, 1000, scale(133, 100, $base)));
+        stat_advance(defence, scale($multiplier, 1000, scale(100, 100, $base)));
+    case default : return;
+}
+stat_advance(hitpoints, scale($multiplier, 1000, scale(133, 100, $base)));
+
+// needs to be a queue
+[queue,pvp_damage](int $damage)
+if_close;
+if ($damage > 0) {
+    damage(uid, 1, $damage);
+    ~human_hit_sound;
+} else {
+    damage(uid, 0, 0);
+}
+if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & .finduid(%pk_predator1) = true & $damage > 0) {
+    // https://oldschool.runescape.wiki/w/Update:Clue_Scroll_Step_Counter
+    // - "Recoil damage will now always target the entity that caused the initial damage, rather than the most recent entity to deal damage."
+    // Having it here instead of the opplayer2 trigger will allow this bug to occur
+    def_int $recoil_damage = add(scale(10, 100, $damage), 1);
+    .queue(recoil_damage, 0, $recoil_damage);
+    ~ring_of_recoil_lose_charge($recoil_damage);
+}
+if (stat(hitpoints) = 0 & getqueue(player_death) < 1) {
+    queue(player_death, 0);
+    return;
+}
+
+~ring_of_life_check;
+
+
+[queue,recoil_damage](int $damage) // seperate queue to avoid infinite recoil loop
+~damage_self($damage);
+
+[proc,pvp_death_message](player_uid $opponent)
+if (.finduid($opponent) = false) {
+    return;
+}
+def_int $random = random(11);
+switch_int($random) {
+    case 0 : .mes("You have defeated <displayname>.");
+    case 1 : .mes("<displayname> was no match for you.");
+    case 2 : .mes("With a crushing blow you finish <displayname>.");
+    case 3 : .mes("Can anyone defeat you? Certainly not <displayname>.");
+    case 4 : .mes("<displayname> regrets the day they met you in combat.");
+    case 5 : .mes("It's all over for <displayname>.");
+    case 6 : .mes ("<displayname> didn't stand a chance against you.");
+    case 7 : .mes("A humiliating defeat for <displayname>.");
+    case 8 : .mes("<displayname> falls before your might.");
+    case 9 : .mes("<displayname> has won a free ticket to Lumbridge.");
+    case 10 : .mes("You were clearly a better fighter than <displayname>.");
+    case default : .mes("You have defeated <displayname>.");
+}

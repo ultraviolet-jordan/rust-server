@@ -1,0 +1,24 @@
+[opnpcu,sheep_fluffy]
+if(last_useitem ! shears) {
+    ~displaymessage(^dm_default);
+    return;
+}
+anim(human_shearing, 0);
+npc_setmode(playerfaceclose);
+p_delay(1);
+if(random(4) = 0) {
+    mes("The sheep manages to get away from you!");
+    npc_say("Baa!"); // todo: confirm if they say as they retreat
+    npc_setmode(playerescape);
+    return;
+}
+inv_add(inv, wool, 1);
+npc_changetype(sheep_sheared);
+mes("You get some wool.");
+npc_say("Baa!");
+~objbox(wool, "You get some wool.");
+
+[opnpcu,sheep_sheared]
+if(last_useitem = shears) {
+    mes("This sheep has already been shorn.");
+}

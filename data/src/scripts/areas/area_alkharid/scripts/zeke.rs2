@@ -1,0 +1,20 @@
+[opnpc1,zeke]
+//Treasure Trail
+if(map_members = true & inv_total(inv, trail_clue_easy_simple_exp007) = 1) {
+    @trail_zeke;
+}
+~chatnpc("<p,happy>A thousand greetings, sir.");
+def_int $option = ~p_choice2("Do you want to trade?", 1, "Nice cloak.", 2);
+if($option = 1) {
+    ~chatplayer("<p,quiz>Do you want to trade?");
+    ~chatnpc("<p,happy>Yes, certainly. I deal in scimitars.");
+    ~openshop_activenpc;
+} else if($option = 2) {
+    ~chatplayer("<p,neutral>Nice cloak.");
+    ~chatnpc("<p,neutral>Thank you.");
+}
+
+[label,trail_zeke]
+// https://youtu.be/klvUCL0XFyw?si=WWWusRMnfJOBl7E_&t=19
+~chatnpc("<p,happy>Well done!");
+~progress_clue_easy(trail_clue_easy_simple_exp007, "Zeke has given you your next clue!");

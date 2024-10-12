@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "cache",
+    "engine",
+    "io",
+    "math"
+]
+resolver = "2"

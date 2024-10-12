@@ -1,0 +1,125 @@
+[bolt]
+stackable=yes
+cost=3
+name=Bolt
+desc=Good if you have a crossbow!
+model=model_2664_obj
+2dxof=-6
+2dyof=145
+2dzoom=580
+2dyan=104
+2dxan=232
+iop2=Wield
+wearpos=quiver
+weight=18g
+category=bolts
+param=rangebonus,10
+param=levelrequire,1
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+tradeable=yes
+param=weapon_poisoned,bolt_p
+param=weapon_poisoned_message,You poison some bolts.
+
+[bolt_p]
+stackable=yes
+cost=3
+members=yes
+name=Bolt(p)
+desc=Vicious poisoned bolts.
+model=model_2664_obj
+recol1s=14798
+recol1d=14881
+2dxof=-6
+2dyof=145
+2dzoom=580
+2dyan=104
+2dxan=232
+iop2=Wield
+wearpos=quiver
+weight=18g
+category=bolts
+param=rangebonus,10
+param=levelrequire,1
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+param=poison_severity,20
+tradeable=yes
+
+[opal_bolt]
+stackable=yes
+cost=60
+members=yes
+name=Opal bolt
+desc=Great if you have a crossbow!
+model=model_2664_obj
+recol1s=14798
+recol1d=29587
+recol2s=15855
+recol2d=29587
+2dxof=-6
+2dyof=145
+2dzoom=580
+2dyan=104
+2dxan=232
+iop2=Wield
+wearpos=quiver
+weight=18g
+category=bolts
+param=rangebonus,22
+//UNKNOWN, setting to same rangebonus as mithril arrow as according to guesses in https://web.archive.org/web/20041204070450/https://www.lunagang.nl/ , used to be 14 as according to osrs. TODO CONFIRM
+param=levelrequire,1
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+tradeable=yes
+
+[pearl_bolt]
+stackable=yes
+cost=110
+members=yes
+name=Pearl bolt
+desc=Great if you have a crossbow!
+model=model_2664_obj
+recol1s=14798
+recol1d=32767
+recol2s=15855
+recol2d=32767
+2dxof=-6
+2dyof=145
+2dzoom=580
+2dyan=104
+2dxan=232
+iop2=Wield
+wearpos=quiver
+weight=18g
+category=bolts
+param=rangebonus,16
+//UNKNOWN, set to same rangebonus as steel arrowas according to guesses in https://web.archive.org/web/20041204070450/https://www.lunagang.nl/ , used to be 48 as according to osrs . TODO CONFIRM
+param=levelrequire,1
+//Level requirements are guessed to be nonexistent. osrs/post-crossbow-update puts them at 26
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+tradeable=yes
+
+[barbed_bolt]
+stackable=yes
+cost=200
+members=yes
+name=Barbed bolt
+desc=Great if you have a crossbow!
+model=model_2453_obj
+2dxof=-6
+2dyof=145
+2dzoom=580
+2dyan=104
+2dxan=232
+iop2=Wield
+wearpos=quiver
+weight=18g
+category=bolts
+param=rangebonus,40
+//UNKNOWN, setting to rangebonus between adamant and rune arrows (31+49/2=40) as according to guesses in https://web.archive.org/web/20041204070450/https://www.lunagang.nl/ , used to be 12 as according to osrs. TODO CONFIRM
+param=levelrequire,1
+param=proj_launch,crossbowbolt_launch
+param=proj_travel,crossbowbolt_travel
+tradeable=yes

@@ -1,0 +1,10 @@
+[auto_retaliate]
+transmit=yes
+scope=perm
+
+[player_run]
+clientcode=7
+transmit=yes
+
+[temp_run]
+scope=temp

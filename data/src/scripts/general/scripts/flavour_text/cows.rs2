@@ -1,0 +1,15 @@
+[ai_timer,cow_1]
+@cow_moo;
+
+[ai_timer,cow_2]
+@cow_moo;
+
+[ai_timer,cow_3]
+@cow_moo;
+
+
+[label,cow_moo]
+npc_settimer(calc(15 + random(20)));
+if (random(4) = 0) {
+    npc_say("Moo");
+}

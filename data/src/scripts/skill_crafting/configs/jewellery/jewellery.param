@@ -1,0 +1,11 @@
+[gem]
+type=namedobj
+default=null
+
+[strung]
+type=namedobj
+default=null
+
+[crafting_jewelry_struct]
+type=struct
+default=null

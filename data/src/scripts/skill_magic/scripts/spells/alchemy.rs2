@@ -1,0 +1,79 @@
+[opheldt,magic:highlvl_alchemy]@magic_spell_high_alch(^highlvl_alchemy, last_item);
+[opheldt,magic:lowlvl_alchemy]@magic_spell_low_alch(^lowlvl_alchemy, last_item);
+
+[label,magic_spell_high_alch](int $spell, obj $item)
+if_close;
+// look for spell in db
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (~check_spell_requirements($spell_data) = false) {
+    return;
+}
+// prevent alchemy
+if (~is_alchable($item) = false) {
+    return;
+}
+// play sound and anim
+sound_synth(high_alchemy, 0, 0);
+anim(human_casthighlvlalchemy, 0);
+spotanim_pl(highlvlalchemy_casting, 92, 0);
+// delete runes and give xp
+~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+// give 0.6x of item's value and delete item
+inv_del(inv, $item, 1);
+inv_add(inv, coins, max(scale(6, 10, oc_cost($item)), 1));
+// delay by 5 ticks
+if (afk_event = ^true) {
+    ~macro_event_general_spawn(~macro_event_set_random);
+}
+// https://oldschool.runescape.wiki/w/Update:Patch_Notes_(11_April_2013), in osrs it weakqueues the spell. Early osrs it was delay'd
+// https://www.neoseeker.com/forums/2410/t960058-useless-rs-facts/2.htm
+// > When you high alch while your cannon is spinning, it stops spinning until you finish alching
+// Also this video: https://www.youtube.com/watch?v=P_o3Cxg73Tg&t=91s
+if_settabactive(^tab_magic);
+p_delay(4);
+
+
+[label,magic_spell_low_alch](int $spell, obj $item)
+if_close;
+// look for spell in db
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (~check_spell_requirements($spell_data) = false) {
+    return;
+}
+// prevent alchemy
+if (~is_alchable($item) = false) {
+    return;
+}
+// play sound and anim
+sound_synth(low_alchemy, 0, 0);
+anim(human_castlowlvlalchemy, 0);
+spotanim_pl(lowlvlalchemy_casting, 92, 0);
+// delete runes and give xp
+~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+// give 0.4x of item's value and delete item
+inv_del(inv, $item, 1);
+inv_add(inv, coins, max(scale(4, 10, oc_cost($item)), 1));
+if_settabactive(^tab_magic);
+if (afk_event = ^true) {
+    ~macro_event_general_spawn(~macro_event_set_random);
+}
+// delay by 3 ticks
+p_delay(2);
+
+[proc,is_alchable](obj $item)(boolean)
+switch_obj($item) {
+    case obj_1842 : 
+        mes("unimplemented");
+        return(false);
+    case coins : 
+        mes("Coins are already made of gold.");
+        return(false);
+    case default : 
+        if (oc_param($item, no_alchemy) = ^true) {
+            mes("You cannot use alchemy on that item.");
+            return(false);
+        }
+}
+return(true);
