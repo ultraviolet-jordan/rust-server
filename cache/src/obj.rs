@@ -120,23 +120,6 @@ impl ObjProvider {
     /// * `on_not_found` - A closure that is called if the obj does not exist in
     ///                    the `configs` collection.
     ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use cache::ObjProvider;
-    ///
-    /// let provider = ObjProvider::io("../data/pack", true);
-    /// provider.get_by_id(1046, |obj| {
-    ///     if let Some(name) = &obj.name {
-    ///         println!("Found obj with name: {}", name);
-    ///     } else {
-    ///         println!("Found obj with no name.");
-    ///     }
-    /// }, || {
-    ///     println!("obj not found!");
-    /// });
-    /// ```
-    ///
     /// # Behavior
     ///
     /// - If the obj with the given `id` is found in `configs`, the `on_found` closure
@@ -187,23 +170,6 @@ impl ObjProvider {
     /// # Return
     ///
     /// This function does not return any value. Instead, it calls the provided callbacks based on whether the obj is found or not.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use cache::ObjProvider;
-    ///
-    /// let provider = ObjProvider::io("../data/pack", false);
-    /// provider.get_by_name("christmas_cracker", |obj| {
-    ///     if let Some(name) = &obj.name {
-    ///         println!("Found obj with name: {}", name);
-    ///     } else {
-    ///         println!("Found obj with no name.");
-    ///     }
-    /// }, || {
-    ///     println!("obj not found!");
-    /// });
-    /// ```
     ///
     /// # Panics
     ///

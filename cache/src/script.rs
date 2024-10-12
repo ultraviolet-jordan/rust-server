@@ -166,6 +166,45 @@ impl ScriptProvider {
         };
     }
 
+    /// Retrieves a script by its ID, invoking the provided callback functions
+    /// based on whether the script is found or not.
+    ///
+    /// This method looks up the script in the internal `scripts` collection using
+    /// the provided `id`. If the script is found, the `on_found` callback is invoked
+    /// with a reference to the script. If the script is not found, the `on_not_found`
+    /// callback is invoked.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The unique identifier of the script to retrieve from the `scripts`.
+    /// * `on_found` - A closure that is called with a reference to the found `ScriptFile`
+    ///                if the script exists in the `scripts` collection.
+    /// * `on_not_found` - A closure that is called if the script does not exist in
+    ///                    the `scripts` collection.
+    ///
+    /// # Behavior
+    ///
+    /// - If the script with the given `id` is found in `scripts`, the `on_found` closure
+    ///   will be executed with the found `ScriptFile`.
+    /// - If the script is not found, the `on_not_found` closure will be executed.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation.
+    /// However, the callbacks may panic if they are implemented to do so.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data structures of `ScriptProvider` are properly initialized.
+    ///
+    /// # Side Effects
+    ///
+    /// - Calls the appropriate callback (`on_found` or `on_not_found`) based on the existence of the script with the given ID.
+    ///
+    /// # Performance
+    ///
+    /// The time complexity of this function is O(1), as it performs a direct lookup
+    /// on the `scripts` vector using the index.
     pub fn get_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ScriptFile),
@@ -178,6 +217,39 @@ impl ScriptProvider {
         }
     }
 
+    /// Retrieves a script by its name and executes a callback based on whether the script is found or not.
+    ///
+    /// This method searches for the script name in the internal `names` map. If found, it retrieves the script
+    /// from the `scripts` collection and invokes the `on_found` callback. If the script is not found, it invokes the
+    /// `on_not_found` callback.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the script to search for. This is a string slice (`&str`) and is used to look up the script ID in the internal `names` map.
+    /// - `on_found`: A callback function that takes a reference to the `ScriptFile` and is executed when the script is found.
+    /// - `on_not_found`: A callback function that takes no arguments and is executed when the script is not found.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. Instead, it calls the provided callbacks based on whether the script is found or not.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation.
+    /// However, the callbacks may panic if they are implemented to do so.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data structures of `ScriptProvider` are properly initialized.
+    ///
+    /// # Side Effects
+    ///
+    /// - Calls the appropriate callback (`on_found` or `on_not_found`) based on the existence of the script with the given name.
+    ///
+    /// # Performance
+    ///
+    /// This function performs two lookups: one in the `names` map and another in the `scripts` collection. If the name does not exist,
+    /// it performs minimal work. The time complexity is O(1) for both lookups.
     pub fn get_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ScriptFile),
@@ -190,22 +262,155 @@ impl ScriptProvider {
         }
     }
 
-    pub fn get_by_trigger<F, E>(&self, on_found: F, on_not_found: E)
-    where
+    /// Retrieves a script based on a specified trigger, ID, or category, executing a callback if found.
+    ///
+    /// This method attempts to locate a `ScriptFile` using a combination of the provided `trigger`, `id`,
+    /// and `category` values. It constructs keys based on these parameters and searches the internal
+    /// `lookups` mapping for the corresponding script index. If a script is found, the `on_found`
+    /// callback is invoked with the retrieved `ScriptFile`. If no script is found after checking all
+    /// possible keys, the `on_not_found` callback is executed.
+    ///
+    /// # Parameters
+    ///
+    /// - `trigger`: An `i32` used as a base for constructing the lookup keys.
+    /// - `id`: An `i32` that contributes to a key for finding scripts associated with a specific ID.
+    /// - `category`: An `i32` that is part of the key used to find scripts related to a category.
+    /// - `on_found`: A callback function that is executed with a reference to the found `ScriptFile`.
+    /// - `on_not_found`: A callback function that is executed when no script is found.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. It executes the provided callbacks based on whether
+    /// the script is found or not.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, the provided callbacks may panic
+    /// if they are implemented to do so.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data
+    /// structures of the `ScriptProvider` are properly initialized.
+    ///
+    /// # Side Effects
+    ///
+    /// - Calls either the `on_found` or `on_not_found` callback depending on whether the script was
+    /// found.
+    ///
+    /// # Performance
+    ///
+    /// This function performs up to three lookups in the `lookups` map and may perform an additional
+    /// lookup in the `scripts` array. The time complexity is O(1) for each lookup, resulting in a
+    /// worst-case scenario of O(3).
+    pub fn get_by_trigger<F, E>(
+        &self,
+        trigger: i32,
+        id: i32,
+        category: i32,
+        on_found: F,
+        on_not_found: E,
+    ) where
         F: FnOnce(&ScriptFile),
         E: FnOnce(),
     {
-        // TODO: use the lookup to get the script id then get script by id.
-        // TODO: instead of it existing here, probs let consumer write their own.
+        let keys: [i32; 3] = [
+            trigger | (0x2 << 8) | (id << 10),
+            trigger | (0x1 << 8) | (category << 10),
+            trigger,
+        ];
+
+        for key in &keys {
+            if let Some(index) = self.lookups.get(key) {
+                if let Some(script) = self.scripts.get(*index) {
+                    on_found(script);
+                    return;
+                }
+            }
+        }
+        on_not_found();
     }
 
-    pub fn get_by_trigger_specific<F, E>(&self, on_found: F, on_not_found: E)
-    where
+    /// Retrieves a script based on a specified trigger, ID, or category, executing a callback if found.
+    ///
+    /// This method attempts to locate a `ScriptFile` using a combination of the provided `trigger`, `id`,
+    /// and `category` values. It constructs keys based on these parameters and searches the internal
+    /// `lookups` mapping for the corresponding script index. If a script is found using the `id`,
+    /// the `on_found` callback is invoked with the retrieved `ScriptFile`. If no script is found with the
+    /// `id`, it checks for the `category` and does the same. If neither is found, it checks just the `trigger`.
+    /// If no script is found after all checks, the `on_not_found` callback is executed.
+    ///
+    /// # Parameters
+    ///
+    /// - `trigger`: An `i32` used as a base for constructing the lookup keys.
+    /// - `id`: An `i32` that contributes to a key for finding scripts associated with a specific ID.
+    ///          If set to `-1`, the `id` check is skipped.
+    /// - `category`: An `i32` that is part of the key used to find scripts related to a category.
+    ///               If set to `-1`, the `category` check is skipped.
+    /// - `on_found`: A callback function that is executed with a reference to the found `ScriptFile`.
+    /// - `on_not_found`: A callback function that is executed when no script is found.
+    ///
+    /// # Return
+    ///
+    /// This function does not return any value. It executes the provided callbacks based on whether
+    /// the script is found or not.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, the provided callbacks may panic
+    /// if they are implemented to do so.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data
+    /// structures of the `ScriptProvider` are properly initialized.
+    ///
+    /// # Side Effects
+    ///
+    /// - Calls either the `on_found` or `on_not_found` callback depending on whether the script was
+    /// found.
+    ///
+    /// # Performance
+    ///
+    /// This function performs up to three lookups in the `lookups` map and may perform an additional
+    /// lookup in the `scripts` array. The time complexity is O(1) for each lookup, resulting in a
+    /// worst-case scenario of O(3).
+    pub fn get_by_trigger_specific<F, E>(
+        &self,
+        trigger: i32,
+        id: i32,
+        category: i32,
+        on_found: F,
+        on_not_found: E,
+    ) where
         F: FnOnce(&ScriptFile),
         E: FnOnce(),
     {
-        // TODO: use the lookup to get the script id then get script by id.
-        // TODO: instead of it existing here, probs let consumer write their own.
+        if id != -1 {
+            if let Some(index) = self.lookups.get(&(trigger | (0x2 << 8) | (id << 10))) {
+                if let Some(script) = self.scripts.get(*index) {
+                    on_found(script);
+                    return;
+                }
+            }
+            on_not_found();
+        } else if category != -1 {
+            if let Some(index) = self.lookups.get(&(trigger | (0x1 << 8) | (category << 10))) {
+                if let Some(script) = self.scripts.get(*index) {
+                    on_found(script);
+                    return;
+                }
+            }
+            on_not_found();
+        } else if let Some(index) = self.lookups.get(&trigger) {
+            if let Some(script) = self.scripts.get(*index) {
+                on_found(script);
+                return;
+            }
+            on_not_found();
+        } else {
+            on_not_found();
+        }
     }
 }
 

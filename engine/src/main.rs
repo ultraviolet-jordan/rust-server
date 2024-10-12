@@ -29,4 +29,16 @@ fn main() {
         },
         || {},
     );
+
+    script_provider.get_by_trigger(
+        139,
+        708,
+        -1,
+        |script| {
+            if let Some(info) = &script.info {
+                println!("{}", info.name);
+            }
+        },
+        || {},
+    );
 }
