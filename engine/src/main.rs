@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 
-use cache::{ObjProvider, ScriptProvider};
+use cache::{ObjProvider, ScriptPointer, ScriptProvider, ScriptState};
+use engine::script::script_runner;
 
 fn main() {
     println!("Hello, world!");
@@ -21,11 +22,17 @@ fn main() {
     );
 
     script_provider.get_by_name(
-        "[opnpc1,helemos]",
+        "[proc,fib]",
         |script| {
-            if let Some(info) = &script.info {
-                println!("{}", info.path);
-            }
+            let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
+            state.execute(&script_provider, script_runner);
+            state.pointer_add(ScriptPointer::ProtectedActivePlayer);
+            println!(
+                "fib: result={}, opcount={}, pointers={}",
+                state.pop_int(),
+                state.opcount,
+                state.pointer_debug()
+            );
         },
         || {},
     );
@@ -35,9 +42,7 @@ fn main() {
         708,
         -1,
         |script| {
-            if let Some(info) = &script.info {
-                println!("{}", info.name);
-            }
+            println!("{}", script.info.name);
         },
         || {},
     );

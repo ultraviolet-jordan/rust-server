@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use io::Packet;
 
+#[derive(Clone)]
 pub enum ParamValue {
     Int(i32),
     String(String),

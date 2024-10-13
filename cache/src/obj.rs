@@ -7,7 +7,7 @@ use crate::param::{decode_params, ParamValue};
 
 pub struct ObjProvider {
     names: HashMap<String, usize>,
-    objs: Vec<ObjType>,
+    objs: Vec<Option<ObjType>>,
 }
 
 impl ObjProvider {
@@ -46,9 +46,9 @@ impl ObjProvider {
                 client.pos += 2;
 
                 let mut names: HashMap<String, usize> = HashMap::new();
-                let mut objs: Vec<ObjType> = Vec::with_capacity(count);
+                let mut objs: Vec<Option<ObjType>> = vec![None; count];
 
-                for id in 0..count {
+                for (id, option) in objs.iter_mut().enumerate() {
                     let mut obj: ObjType = ObjType::new(id);
                     obj.decode(&mut server);
                     obj.decode(&mut client);
@@ -56,12 +56,12 @@ impl ObjProvider {
                     if let Some(debugname) = &obj.debugname {
                         names.insert(debugname.clone(), id);
                     }
-                    objs.push(obj);
+                    *option = Some(obj);
                 }
 
                 for id in 0..count {
-                    if let Some(certtemplate) = objs.get(id).and_then(|obj| obj.certtemplate) {
-                        match objs.get(certtemplate as usize) {
+                    if let Some(certtemplate) = objs.get(id).and_then(|opt_obj| opt_obj.as_ref().and_then(|obj| obj.certtemplate)) {
+                        match objs.get(certtemplate as usize).and_then(|template| template.as_ref()) {
                             None => panic!("Obj not found for a certtemplate!"),
                             Some(template) => {
                                 let model: u16 = template.model;
@@ -73,27 +73,30 @@ impl ObjProvider {
                                 let yof2d: i16 = template.yof2d;
                                 let recol_s: Option<Vec<u16>> = template.recol_s.clone();
                                 let recol_d: Option<Vec<u16>> = template.recol_d.clone();
-                                if let Some(obj) = objs.get_mut(id) {
+
+                                if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
                                     obj.cert_template(model, zoom2d, xan2d, yan2d, zan2d, xof2d, yof2d, recol_s, recol_d);
                                 }
                             }
                         }
                     }
-                    if let Some(certlink) = objs.get(id).and_then(|obj| obj.certlink) {
-                        match objs.get(certlink as usize) {
+
+                    if let Some(certlink) = objs.get(id).and_then(|opt_obj| opt_obj.as_ref().and_then(|obj| obj.certlink)) {
+                        match objs.get(certlink as usize).and_then(|link| link.as_ref()) {
                             None => panic!("Obj not found for a certlink!"),
                             Some(link) => {
                                 let name: Option<String> = link.name.clone();
                                 let members: bool = link.members;
                                 let cost: i32 = link.cost;
                                 let tradeable: bool = link.tradeable;
-                                if let Some(obj) = objs.get_mut(id) {
+
+                                if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
                                     obj.cert_link(name, members, cost, tradeable);
                                 }
                             }
                         }
                     }
-                    if let Some(obj) = objs.get_mut(id) {
+                    if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
                         obj.disable(members);
                     }
                 }
@@ -148,8 +151,12 @@ impl ObjProvider {
         F: FnOnce(&ObjType),
         E: FnOnce(),
     {
-        if let Some(obj) = self.objs.get(id) {
-            on_found(obj);
+        if let Some(option) = self.objs.get(id) {
+            if let Some(script) = option {
+                on_found(script);
+            } else {
+                on_not_found();
+            }
         } else {
             on_not_found();
         }
@@ -201,6 +208,7 @@ impl ObjProvider {
     }
 }
 
+#[derive(Clone)]
 pub struct ObjType {
     pub id: usize,  // 0->65535
     pub model: u16, // 0->65535
