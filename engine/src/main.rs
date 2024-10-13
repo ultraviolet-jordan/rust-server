@@ -1,17 +1,17 @@
 use dotenv::dotenv;
 
-use cache::{ObjProvider, ScriptPointer, ScriptProvider, ScriptState};
+use cache::{CacheProvider, ScriptPointer, ScriptState};
 use engine::script::script_runner;
 
 fn main() {
     println!("Hello, world!");
     // ----
     dotenv().ok();
-    let obj_provider: ObjProvider =
-        ObjProvider::io("./data/pack", std::env::var("MEMBERS").unwrap() == "true");
-    let script_provider: ScriptProvider = ScriptProvider::io("./data/pack");
 
-    obj_provider.get_by_name(
+    let provider: CacheProvider =
+        CacheProvider::new("./data/pack", std::env::var("MEMBERS").unwrap() == "true");
+
+    provider.objs.get_by_name(
         "christmas_cracker",
         |obj| {
             if let Some(desc) = &obj.desc {
@@ -21,11 +21,11 @@ fn main() {
         || {},
     );
 
-    script_provider.get_by_name(
+    provider.scripts.get_by_name(
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
-            state.execute(&script_provider, script_runner, false);
+            state.execute(&provider, script_runner, false);
             state.pointer_add(ScriptPointer::ProtectedActivePlayer);
             println!(
                 "fib: result={}, opcount={}, pointers={}",
@@ -37,7 +37,7 @@ fn main() {
         || {},
     );
 
-    script_provider.get_by_trigger(
+    provider.scripts.get_by_trigger(
         139,
         708,
         -1,

@@ -1,3 +1,4 @@
+pub use cache::CacheProvider;
 pub use obj::ObjProvider;
 pub use obj::ObjType;
 pub use param::decode_params;
@@ -11,6 +12,7 @@ pub use script::ScriptProvider;
 pub use script::ScriptRunner;
 pub use script::ScriptState;
 
+mod cache;
 mod obj;
 mod param;
 mod script;

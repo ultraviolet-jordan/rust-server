@@ -1,9 +1,9 @@
-use cache::{ScriptExecutionState, ScriptOpcode, ScriptProvider, ScriptState};
+use cache::{CacheProvider, ScriptExecutionState, ScriptOpcode, ScriptState};
 
 pub fn script_core_ops<'script>(
     code: &ScriptOpcode,
     state: &mut ScriptState<'script>,
-    provider: &'script ScriptProvider,
+    provider: &'script CacheProvider,
 ) {
     match code {
         ScriptOpcode::PushConstantInt => {
@@ -100,7 +100,7 @@ pub fn script_core_ops<'script>(
         }
         ScriptOpcode::GoSubWithParams => {
             let operand: usize = state.int_operand() as usize;
-            provider.get_by_id(
+            provider.scripts.get_by_id(
                 operand,
                 |script| state.push_frame(script),
                 || {

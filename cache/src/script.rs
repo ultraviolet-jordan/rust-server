@@ -3,6 +3,8 @@ use std::time::Instant;
 
 use io::Packet;
 
+use crate::cache::CacheProvider;
+
 #[derive(PartialEq, PartialOrd, Clone, Debug)]
 #[repr(u16)]
 pub enum ScriptOpcode {
@@ -1423,7 +1425,7 @@ impl<'script> ScriptState<'script> {
 
     pub fn execute(
         &mut self,
-        provider: &'script ScriptProvider,
+        provider: &'script CacheProvider,
         runner: ScriptRunner<'script>,
         benchmark: bool,
     ) {
@@ -1766,10 +1768,10 @@ impl<'script> ScriptState<'script> {
 ///
 /// - A reference to a `ScriptOpcode`, which specifies the operation to be executed.
 /// - A mutable reference to a `ScriptState`, which holds the current state of the script execution and allows for modifications.
-/// - A reference to a `ScriptProvider`, which provides access to scripts or resources needed for execution.
+/// - A reference to a `CacheProvider`, which provides access to cache resources that may be needed for execution.
 ///
 /// The `ScriptRunner` function pointer defines the mechanism for executing individual script operations
 /// within the context of the provided `ScriptState`. This allows for flexible and dynamic execution of
 /// script logic based on the opcode being processed.
 #[rustfmt::skip]
-pub type ScriptRunner<'script> = fn(&ScriptOpcode, &mut ScriptState<'script>, &'script ScriptProvider);
+pub type ScriptRunner<'script> = fn(&ScriptOpcode, &mut ScriptState<'script>, &'script CacheProvider);

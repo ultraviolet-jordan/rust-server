@@ -1,4 +1,4 @@
-use cache::{ScriptOpcode, ScriptProvider, ScriptState};
+use cache::{CacheProvider, ScriptOpcode, ScriptState};
 
 use crate::script::ops::core_ops::script_core_ops;
 use crate::script::ops::math_ops::script_math_ops;
@@ -7,7 +7,7 @@ use crate::script::ops::string_ops::script_string_ops;
 pub fn script_runner<'script>(
     code: &ScriptOpcode,
     state: &mut ScriptState<'script>,
-    provider: &'script ScriptProvider,
+    provider: &'script CacheProvider,
 ) {
     // println!("{:?}", code);
     match code {
