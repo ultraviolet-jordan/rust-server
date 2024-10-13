@@ -9,7 +9,7 @@ pub fn script_runner<'script>(
     state: &mut ScriptState<'script>,
     provider: &'script ScriptProvider,
 ) {
-    println!("{:?}", code);
+    // println!("{:?}", code);
     match code {
         // Core language ops (0-99)
         ScriptOpcode::PushConstantInt => script_core_ops(code, state, provider),

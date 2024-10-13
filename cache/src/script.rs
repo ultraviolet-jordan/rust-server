@@ -834,6 +834,7 @@ impl From<u16> for ScriptOpcode {
     }
 }
 
+#[derive(Clone)]
 pub struct ScriptProvider {
     names: HashMap<String, usize>,
     scripts: Vec<Option<ScriptFile>>,
@@ -1420,7 +1421,12 @@ impl<'script> ScriptState<'script> {
         }
     }
 
-    pub fn execute(&mut self, provider: &'script ScriptProvider, runner: ScriptRunner<'script>) {
+    pub fn execute(
+        &mut self,
+        provider: &'script ScriptProvider,
+        runner: ScriptRunner<'script>,
+        benchmark: bool,
+    ) {
         self.execution_state = ScriptExecutionState::Running;
 
         let start: Instant = Instant::now();
@@ -1449,7 +1455,9 @@ impl<'script> ScriptState<'script> {
                 }
             }
         }
-        println!("Executed script in: {:?}", start.elapsed());
+        if !benchmark {
+            println!("Executed script in: {:?}", start.elapsed());
+        }
     }
 
     // ---- ints

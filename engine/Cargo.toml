@@ -3,6 +3,13 @@ name = "engine"
 version = "0.1.0"
 edition = "2021"
 
+[dev-dependencies]
+criterion = "0.5.1"
+
 [dependencies]
 dotenv = "0.15.0"
 cache = { path = "../cache" }
+
+[[bench]]
+name = "fib"
+harness = false

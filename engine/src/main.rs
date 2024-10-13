@@ -25,7 +25,7 @@ fn main() {
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
-            state.execute(&script_provider, script_runner);
+            state.execute(&script_provider, script_runner, false);
             state.pointer_add(ScriptPointer::ProtectedActivePlayer);
             println!(
                 "fib: result={}, opcount={}, pointers={}",
