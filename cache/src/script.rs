@@ -1454,6 +1454,7 @@ impl<'script> ScriptState<'script> {
 
     // ---- ints
 
+    #[inline(always)]
     pub fn int_operand(&self) -> i32 {
         return self.script.int_operands[self.pc as usize];
     }
@@ -1467,6 +1468,7 @@ impl<'script> ScriptState<'script> {
     /// # Parameters
     ///
     /// - `value`: The `i32` value to push onto the integer stack.
+    #[inline(always)]
     pub fn push_int(&mut self, value: i32) {
         self.int_stack[self.isp] = value;
         self.isp += 1;
@@ -1480,6 +1482,7 @@ impl<'script> ScriptState<'script> {
     /// # Return
     ///
     /// Returns the top integer value as an `i32`.
+    #[inline(always)]
     pub fn pop_int(&mut self) -> i32 {
         self.isp -= 1;
         return self.int_stack[self.isp];
@@ -1487,6 +1490,7 @@ impl<'script> ScriptState<'script> {
 
     // ---- strings
 
+    #[inline(always)]
     pub fn string_operand(&self) -> String {
         return self.script.string_operands[self.pc as usize].clone();
     }
@@ -1500,6 +1504,7 @@ impl<'script> ScriptState<'script> {
     /// # Parameters
     ///
     /// - `value`: The `String` value to push onto the string stack.
+    #[inline(always)]
     pub fn push_string(&mut self, value: String) {
         self.string_stack[self.ssp] = value;
         self.ssp += 1;
@@ -1513,6 +1518,7 @@ impl<'script> ScriptState<'script> {
     /// # Return
     ///
     /// Returns the top string value as a `String`.
+    #[inline(always)]
     pub fn pop_string(&mut self) -> String {
         self.ssp -= 1;
         return self.string_stack[self.ssp].clone();
@@ -1526,6 +1532,7 @@ impl<'script> ScriptState<'script> {
     /// context (including the program counter and local variables) back to that frame's state,
     /// and decreases the frame pointer accordingly. It assumes that there is at least one frame
     /// to pop.
+    #[inline(always)]
     pub fn pop_frame(&mut self) {
         let frame: GoSubFrame = self.frame_stack.pop().unwrap();
         self.fp -= 1;
@@ -1546,6 +1553,7 @@ impl<'script> ScriptState<'script> {
     /// # Parameters
     ///
     /// - `script`: A reference to the `ScriptFile` to execute in the new frame.
+    #[inline(always)]
     pub fn push_frame(&mut self, script: &'script ScriptFile) {
         self.frame_stack.push(GoSubFrame {
             script: self.script,
@@ -1596,6 +1604,7 @@ impl<'script> ScriptState<'script> {
     /// # Side Effects
     ///
     /// - Updates the internal `pointers` state to include the new pointer.
+    #[inline(always)]
     pub fn pointer_add(&mut self, pointer: ScriptPointer) {
         self.pointers |= 1 << pointer as i32;
     }
@@ -1626,6 +1635,7 @@ impl<'script> ScriptState<'script> {
     /// # Side Effects
     ///
     /// - Updates the internal `pointers` state to exclude the specified pointer.
+    #[inline(always)]
     pub fn pointer_remove(&mut self, pointer: ScriptPointer) {
         self.pointers &= !(1 << pointer as i32);
     }
@@ -1655,6 +1665,7 @@ impl<'script> ScriptState<'script> {
     /// # Side Effects
     ///
     /// - This function does not modify the internal state.
+    #[inline(always)]
     pub fn pointer_get(&self, pointer: ScriptPointer) -> bool {
         return (self.pointers & (1 << pointer as i32)) != 0;
     }
@@ -1686,17 +1697,12 @@ impl<'script> ScriptState<'script> {
     /// # Side Effects
     ///
     /// - This function may panic and terminate the execution if required pointers are not found.
-    pub fn pointer_check(&self, pointers: &[ScriptPointer]) {
-        for pointer in pointers {
-            let flag = 1 << *pointer as i32;
-            if self.pointers & flag != flag {
-                panic!(
-                    "Required pointer: {}, current: {}",
-                    self.pointer_print(flag),
-                    self.pointer_print(self.pointers)
-                )
-            }
-        }
+    #[inline(always)]
+    pub fn pointer_check(&self, pointers: &[ScriptPointer]) -> bool {
+        return pointers.iter().all(|&pointer| {
+            let flag: i32 = 1 << pointer as i32;
+            self.pointers & flag == flag
+        });
     }
 
     /// Converts the specified flags into a readable string representation of active pointers.
@@ -1740,6 +1746,7 @@ impl<'script> ScriptState<'script> {
         return text;
     }
 
+    // testing purposes.
     pub fn pointer_debug(&self) -> String {
         return self.pointer_print(self.pointers);
     }
