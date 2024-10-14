@@ -61,41 +61,40 @@ impl ObjProvider {
 
                 for id in 0..count {
                     if let Some(certtemplate) = objs.get(id).and_then(|opt_obj| opt_obj.as_ref().and_then(|obj| obj.certtemplate)) {
-                        match objs.get(certtemplate as usize).and_then(|template| template.as_ref()) {
-                            None => panic!("Obj not found for a certtemplate!"),
-                            Some(template) => {
-                                let model: u16 = template.model;
-                                let zoom2d: u16 = template.zoom2d;
-                                let xan2d: u16 = template.xan2d;
-                                let yan2d: u16 = template.yan2d;
-                                let zan2d: u16 = template.zan2d;
-                                let xof2d: i16 = template.xof2d;
-                                let yof2d: i16 = template.yof2d;
-                                let recol_s: Option<Vec<u16>> = template.recol_s.clone();
-                                let recol_d: Option<Vec<u16>> = template.recol_d.clone();
+                        let template = objs.get(certtemplate as usize)
+                            .and_then(|template| template.as_ref())
+                            .expect("Obj not found for a certtemplate!");
 
-                                if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
-                                    obj.cert_template(model, zoom2d, xan2d, yan2d, zan2d, xof2d, yof2d, recol_s, recol_d);
-                                }
+                        let model: u16 = template.model;
+                        let zoom2d: u16 = template.zoom2d;
+                        let xan2d: u16 = template.xan2d;
+                        let yan2d: u16 = template.yan2d;
+                        let zan2d: u16 = template.zan2d;
+                        let xof2d: i16 = template.xof2d;
+                        let yof2d: i16 = template.yof2d;
+                        let recol_s: Option<Vec<u16>> = template.recol_s.clone();
+                        let recol_d: Option<Vec<u16>> = template.recol_d.clone();
+
+                        if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
+                            obj.cert_template(model, zoom2d, xan2d, yan2d, zan2d, xof2d, yof2d, recol_s, recol_d);
+                        }
+
+                        if let Some(certlink) = objs.get(id).and_then(|opt_obj| opt_obj.as_ref().and_then(|obj| obj.certlink)) {
+                            let link = objs.get(certlink as usize)
+                                .and_then(|link| link.as_ref())
+                                .expect("Obj not found for a certlink!");
+
+                            let name: Option<String> = link.name.clone();
+                            let members: bool = link.members;
+                            let cost: i32 = link.cost;
+                            let tradeable: bool = link.tradeable;
+
+                            if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
+                                obj.cert_link(name, members, cost, tradeable);
                             }
                         }
                     }
 
-                    if let Some(certlink) = objs.get(id).and_then(|opt_obj| opt_obj.as_ref().and_then(|obj| obj.certlink)) {
-                        match objs.get(certlink as usize).and_then(|link| link.as_ref()) {
-                            None => panic!("Obj not found for a certlink!"),
-                            Some(link) => {
-                                let name: Option<String> = link.name.clone();
-                                let members: bool = link.members;
-                                let cost: i32 = link.cost;
-                                let tradeable: bool = link.tradeable;
-
-                                if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
-                                    obj.cert_link(name, members, cost, tradeable);
-                                }
-                            }
-                        }
-                    }
                     if let Some(obj) = objs.get_mut(id).and_then(|opt_obj| opt_obj.as_mut()) {
                         obj.disable(members);
                     }
