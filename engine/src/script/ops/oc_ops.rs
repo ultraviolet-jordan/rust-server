@@ -20,7 +20,7 @@ pub fn script_oc_ops<'script>(
                 |obj| {
                     if let Some(name) = &obj.name {
                         state.push_string(name.clone());
-                    } else if let Some(debugname) = &obj.name {
+                    } else if let Some(debugname) = &obj.debugname {
                         state.push_string(debugname.clone());
                     } else {
                         state.push_string(String::new());
