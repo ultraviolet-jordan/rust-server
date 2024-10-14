@@ -1,1 +1,1 @@
-mod trig;
+pub mod trig;

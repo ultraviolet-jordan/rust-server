@@ -277,6 +277,7 @@ dependencies = [
  "cache",
  "criterion",
  "dotenv",
+ "math",
 ]
 
 [[package]]

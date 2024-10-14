@@ -9,6 +9,7 @@ criterion = "0.5.1"
 [dependencies]
 dotenv = "0.15.0"
 cache = { path = "../cache" }
+math = { path = "../math" }
 
 [[bench]]
 name = "fib"
