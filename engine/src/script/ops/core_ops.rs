@@ -104,7 +104,10 @@ pub fn script_core_ops<'script>(
                 operand,
                 |script| state.push_frame(script),
                 || {
-                    panic!("[ScriptOpcode::GoSubWithParams] Script not found for operand!");
+                    panic!(
+                        "[ScriptOpcode::GoSubWithParams] Script not found for int_operand: {}!",
+                        operand
+                    );
                 },
             );
         }

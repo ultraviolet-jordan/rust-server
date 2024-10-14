@@ -2,6 +2,7 @@ use cache::{CacheProvider, ScriptOpcode, ScriptState};
 
 use crate::script::ops::core_ops::script_core_ops;
 use crate::script::ops::math_ops::script_math_ops;
+use crate::script::ops::oc_ops::script_oc_ops;
 use crate::script::ops::string_ops::script_string_ops;
 
 pub fn script_runner<'script>(
@@ -299,23 +300,23 @@ pub fn script_runner<'script>(
         ScriptOpcode::LcWidth => panic!("Not implemented"),
         ScriptOpcode::LcLength => panic!("Not implemented"),
         // Obj config ops (4200-4299)
-        ScriptOpcode::OcCategory => panic!("Not implemented"),
-        ScriptOpcode::OcCert => panic!("Not implemented"),
-        ScriptOpcode::OcCost => panic!("Not implemented"),
-        ScriptOpcode::OcDebugname => panic!("Not implemented"),
-        ScriptOpcode::OcDesc => panic!("Not implemented"),
-        ScriptOpcode::OcIop => panic!("Not implemented"),
-        ScriptOpcode::OcMembers => panic!("Not implemented"),
-        ScriptOpcode::OcName => panic!("Not implemented"),
-        ScriptOpcode::OcOp => panic!("Not implemented"),
-        ScriptOpcode::OcParam => panic!("Not implemented"),
-        ScriptOpcode::OcStackable => panic!("Not implemented"),
-        ScriptOpcode::OcTradeable => panic!("Not implemented"),
-        ScriptOpcode::OcUncert => panic!("Not implemented"),
-        ScriptOpcode::OcWearPos2 => panic!("Not implemented"),
-        ScriptOpcode::OcWearPos3 => panic!("Not implemented"),
-        ScriptOpcode::OcWearPos => panic!("Not implemented"),
-        ScriptOpcode::OcWeight => panic!("Not implemented"),
+        ScriptOpcode::OcCategory => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcCert => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcCost => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcDebugname => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcDesc => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcIop => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcMembers => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcName => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcOp => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcParam => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcStackable => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcTradeable => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcUncert => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcWearPos2 => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcWearPos3 => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcWearPos => script_oc_ops(code, state, provider),
+        ScriptOpcode::OcWeight => script_oc_ops(code, state, provider),
         // Inventory ops (4300-4399)
         ScriptOpcode::InvAllStock => panic!("Not implemented"),
         ScriptOpcode::InvSize => panic!("Not implemented"),

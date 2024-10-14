@@ -46,4 +46,25 @@ fn main() {
         },
         || {},
     );
+
+    provider.scripts.get_by_name(
+        "[proc,get_obj_name]",
+        |script| {
+            provider.objs.get_by_name(
+                "christmas_cracker",
+                |obj| {
+                    let mut state: ScriptState =
+                        ScriptState::new_with_args(script, vec![obj.id as i32], Vec::new());
+                    state.execute(&provider, script_runner, false);
+                    println!(
+                        "get_obj_name: result={}, opcount={}",
+                        state.pop_string(),
+                        state.opcount
+                    );
+                },
+                || {},
+            );
+        },
+        || {},
+    );
 }
