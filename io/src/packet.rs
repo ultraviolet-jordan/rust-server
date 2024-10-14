@@ -2,8 +2,8 @@ use num_bigint::BigInt;
 use num_traits::identities::One;
 use pem::{parse, Pem};
 use rsa::pkcs8::DecodePrivateKey;
-use rsa::RsaPrivateKey;
 use rsa::traits::{PrivateKeyParts, PublicKeyParts};
+use rsa::RsaPrivateKey;
 
 #[derive(Clone)]
 pub struct Packet {

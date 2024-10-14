@@ -1,17 +1,19 @@
 use dotenv::dotenv;
 
 use cache::{CacheProvider, ScriptPointer, ScriptState};
-use engine::script::script_runner;
+use engine::engine::Engine;
 
 fn main() {
     println!("Hello, world!");
     // ----
     dotenv().ok();
 
-    let provider: CacheProvider =
-        CacheProvider::new("./data/pack", std::env::var("MEMBERS").unwrap() == "true");
+    let engine: Engine = Engine::new(CacheProvider::new(
+        "./data/pack",
+        std::env::var("MEMBERS").unwrap() == "true",
+    ));
 
-    provider.objs.get_by_name(
+    engine.cache.objs.on_by_name(
         "christmas_cracker",
         |obj| {
             if let Some(desc) = &obj.desc {
@@ -21,11 +23,11 @@ fn main() {
         || {},
     );
 
-    provider.scripts.get_by_name(
+    engine.cache.scripts.on_by_name(
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
-            state.execute(&provider, script_runner, false);
+            state.execute(&engine, false);
             state.pointer_add(ScriptPointer::ProtectedActivePlayer);
             println!(
                 "fib: result={}, opcount={}, pointers={}",
@@ -37,7 +39,7 @@ fn main() {
         || {},
     );
 
-    provider.scripts.get_by_trigger(
+    engine.cache.scripts.get_by_trigger(
         139,
         708,
         -1,
@@ -47,15 +49,15 @@ fn main() {
         || {},
     );
 
-    provider.scripts.get_by_name(
+    engine.cache.scripts.on_by_name(
         "[proc,get_obj_name]",
         |script| {
-            provider.objs.get_by_name(
+            engine.cache.objs.on_by_name(
                 "christmas_cracker",
                 |obj| {
                     let mut state: ScriptState =
                         ScriptState::new_with_args(script, vec![obj.id as i32], Vec::new());
-                    state.execute(&provider, script_runner, false);
+                    state.execute(&engine, false);
                     println!(
                         "get_obj_name: result={}, opcount={}",
                         state.pop_string(),

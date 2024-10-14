@@ -29,7 +29,7 @@ impl ObjProvider {
     /// # Returns
     ///
     /// Returns an `ObjProvider` containing a collection of decoded obj configurations
-    /// (`configs`) and a mapping of obj names (`names`) to their respective obj IDs.
+    /// (`objs`) and a mapping of obj names (`names`) to their respective obj IDs.
     ///
     /// # Panics
     ///
@@ -109,22 +109,22 @@ impl ObjProvider {
     /// Retrieves an obj by its ID, invoking the provided callback functions
     /// based on whether the obj is found or not.
     ///
-    /// This method looks up the obj in the internal `configs` collection using
+    /// This method looks up the obj in the internal `objs` collection using
     /// the provided `id`. If the obj is found, the `on_found` callback is invoked
     /// with a reference to the obj. If the obj is not found, the `on_not_found`
     /// callback is invoked.
     ///
     /// # Arguments
     ///
-    /// * `id` - The unique identifier of the obj to retrieve from the `configs`.
+    /// * `id` - The unique identifier of the obj to retrieve from the `objs`.
     /// * `on_found` - A closure that is called with a reference to the found `ObjType`
-    ///                if the obj exists in the `configs` collection.
+    ///                if the obj exists in the `objs` collection.
     /// * `on_not_found` - A closure that is called if the obj does not exist in
-    ///                    the `configs` collection.
+    ///                    the `objs` collection.
     ///
     /// # Behavior
     ///
-    /// - If the obj with the given `id` is found in `configs`, the `on_found` closure
+    /// - If the obj with the given `id` is found in `objs`, the `on_found` closure
     ///   will be executed with the found `ObjType`.
     /// - If the obj is not found, the `on_not_found` closure will be executed.
     ///
@@ -144,27 +144,67 @@ impl ObjProvider {
     /// # Performance
     ///
     /// The time complexity of this function is O(1), as it performs a direct lookup
-    /// on the `configs` vector using the index.
-    pub fn get_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
+    /// on the `objs` vector using the index.
+    pub fn on_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ObjType),
         E: FnOnce(),
     {
-        if let Some(option) = self.objs.get(id) {
-            if let Some(script) = option {
-                on_found(script);
-            } else {
-                on_not_found();
-            }
-        } else {
-            on_not_found();
-        }
+        return self
+            .objs
+            .get(id)
+            .and_then(|option| option.as_ref())
+            .map(|obj| on_found(obj))
+            .unwrap_or(on_not_found());
+    }
+
+    /// Retrieves an obj by its ID, returning a `Result` that indicates
+    /// success or failure of the operation.
+    ///
+    /// This method looks up the obj in the internal `objs` vector using
+    /// the provided `id`. If the obj is found, a reference to the `ObjType`
+    /// is returned wrapped in `Ok`. If the obj is not found, an error message
+    /// is returned wrapped in `Err`.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The unique identifier of the obj to retrieve from the `objs`
+    ///          vector.
+    ///
+    /// # Behavior
+    ///
+    /// - If the obj with the given `id` is found in `objs`, a reference to the
+    ///   obj is returned as `Ok(&ObjType)`.
+    /// - If the obj is not found, an error message indicating the absence of
+    ///   the obj is returned as `Err(String)`.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, it will
+    /// return an error if the obj is not found.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long
+    /// as the internal data structures of `ObjProvider` are properly initialized.
+    ///
+    /// # Performance
+    ///
+    /// The time complexity of this function is O(1) for accessing elements in the
+    /// `objs` vector by index. If the `id` is out of bounds, the method will return
+    /// an error without panic.
+    pub fn get_by_id(&self, id: usize) -> Result<&ObjType, String> {
+        return self
+            .objs
+            .get(id)
+            .and_then(|option| option.as_ref())
+            .ok_or(format!("Obj not found for id: {}", id));
     }
 
     /// Retrieves an obj by its name and executes a callback based on whether the obj is found or not.
     ///
     /// This method searches for the obj name in the internal `names` map. If found, it retrieves the obj
-    /// from the `configs` list and invokes the `on_found` callback. If the obj is not found, it invokes the
+    /// from the `objs` list and invokes the `on_found` callback. If the obj is not found, it invokes the
     /// `on_not_found` callback.
     ///
     /// # Parameters
@@ -192,18 +232,54 @@ impl ObjProvider {
     ///
     /// # Performance
     ///
-    /// This function performs two lookups: one in the `names` map and another in the `configs` list. If the name does not exist,
+    /// This function performs two lookups: one in the `names` map and another in the `objs` list. If the name does not exist,
     /// it performs minimal work. The time complexity is O(1) for both lookups.
-    pub fn get_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
+    pub fn on_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ObjType),
         E: FnOnce(),
     {
-        if let Some(id) = self.names.get(name) {
-            self.get_by_id(*id, on_found, on_not_found);
+        if let Some(&id) = self.names.get(name) {
+            self.on_by_id(id, on_found, on_not_found);
         } else {
             on_not_found();
         }
+    }
+
+    /// Retrieves an obj by its name.
+    ///
+    /// This method searches for the obj name in the internal `names` map. If found, it retrieves the obj
+    /// from the `objs` vector using its ID. If the obj is not found, an error message is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the obj to search for. This is a string slice (`&str`) and is used to look up the obj ID in the internal `names` map.
+    ///
+    /// # Return
+    ///
+    /// This function returns a `Result`:
+    /// - `Ok(&ObjType)` if the obj is found, containing a reference to the obj.
+    /// - `Err(String)` if the obj is not found, containing an error message.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, it may return an error if the obj is not found.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data structures of `ObjProvider` are properly initialized.
+    ///
+    /// # Performance
+    ///
+    /// This function performs a lookup in the `names` map to find the obj ID and then retrieves the obj
+    /// from the `objs` vector using that ID. The time complexity for both lookups is O(1).
+    pub fn get_by_name(&self, name: &str) -> Result<&ObjType, String> {
+        return self
+            .names
+            .get(name)
+            .map(|&id| self.get_by_id(id))
+            .unwrap_or_else(|| Err(format!("Obj not found for name: {}", name)))
+            .and_then(|result| Ok(result));
     }
 }
 

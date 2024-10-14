@@ -1,5 +1,5 @@
-use criterion::*;
 use criterion::measurement::WallTime;
+use criterion::*;
 
 use cache::{ScriptProvider, ScriptState};
 use engine::script::script_runner;
@@ -17,7 +17,7 @@ fn bench_fib(c: &mut Criterion) {
         b.iter_batched(
             || script_provider.clone(),
             |mut provider| {
-                provider.get_by_name(
+                provider.on_by_name(
                     "[proc,fib]",
                     |script| {
                         let mut state: ScriptState =

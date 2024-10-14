@@ -1,9 +1,9 @@
-use cache::{CacheProvider, ScriptExecutionState, ScriptOpcode, ScriptState};
+use cache::{ScriptEngine, ScriptExecutionState, ScriptOpcode, ScriptState};
 
 pub fn script_core_ops<'script>(
-    code: &ScriptOpcode,
+    engine: &'script impl ScriptEngine,
     state: &mut ScriptState<'script>,
-    provider: &'script CacheProvider,
+    code: &ScriptOpcode,
 ) {
     match code {
         ScriptOpcode::PushConstantInt => {
@@ -98,19 +98,10 @@ pub fn script_core_ops<'script>(
         ScriptOpcode::PopStringDiscard => {
             state.ssp -= 1;
         }
-        ScriptOpcode::GoSubWithParams => {
-            let operand: usize = state.int_operand() as usize;
-            provider.scripts.get_by_id(
-                operand,
-                |script| state.push_frame(script),
-                || {
-                    panic!(
-                        "[ScriptOpcode::GoSubWithParams] Script not found for int_operand: {}!",
-                        operand
-                    );
-                },
-            );
-        }
+        ScriptOpcode::GoSubWithParams => match engine.pop_script(state.int_operand()) {
+            Ok(script) => state.push_frame(script),
+            Err(e) => panic!("{}", e),
+        },
         ScriptOpcode::JumpWithParams => panic!("Not implemented"),
         ScriptOpcode::PushVarcInt => panic!("Not implemented"),
         ScriptOpcode::PopVarcInt => panic!("Not implemented"),

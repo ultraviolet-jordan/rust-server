@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use io::Packet;
 
-use crate::cache::CacheProvider;
+use crate::ObjType;
 
 #[derive(PartialEq, PartialOrd, Clone, Debug)]
 #[repr(u16)]
@@ -936,24 +936,60 @@ impl ScriptProvider {
     ///
     /// The time complexity of this function is O(1), as it performs a direct lookup
     /// on the `scripts` vector using the index.
-    pub fn get_by_id<'script, 'state: 'script, F, E>(
-        &'state self,
-        id: usize,
-        on_found: F,
-        on_not_found: E,
-    ) where
-        F: FnOnce(&'script ScriptFile),
+    pub fn on_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
+    where
+        F: FnOnce(&ScriptFile),
         E: FnOnce(),
     {
-        if let Some(option) = self.scripts.get(id) {
-            if let Some(script) = option {
-                on_found(script);
-            } else {
-                on_not_found();
-            }
-        } else {
-            on_not_found();
-        }
+        return self
+            .scripts
+            .get(id)
+            .and_then(|option| option.as_ref())
+            .map(|obj| on_found(obj))
+            .unwrap_or(on_not_found());
+    }
+
+    /// Retrieves a script by its ID, returning a `Result` that indicates
+    /// success or failure of the operation.
+    ///
+    /// This method looks up the script in the internal `scripts` vector using
+    /// the provided `id`. If the script is found, a reference to the `ScriptFile`
+    /// is returned wrapped in `Ok`. If the script is not found, an error message
+    /// is returned wrapped in `Err`.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The unique identifier of the script to retrieve from the `scripts`
+    ///          vector.
+    ///
+    /// # Behavior
+    ///
+    /// - If the script with the given `id` is found in `scripts`, a reference to the
+    ///   script is returned as `Ok(&ScriptFile)`.
+    /// - If the script is not found, an error message indicating the absence of
+    ///   the script is returned as `Err(String)`.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, it will
+    /// return an error if the script is not found.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long
+    /// as the internal data structures of the `ScriptProvider` are properly initialized.
+    ///
+    /// # Performance
+    ///
+    /// The time complexity of this function is O(1) for accessing elements in the
+    /// `scripts` vector by index. If the `id` is out of bounds, the method will return
+    /// an error without panic.
+    pub fn get_by_id(&self, id: usize) -> Result<&ScriptFile, String> {
+        return self
+            .scripts
+            .get(id)
+            .and_then(|option| option.as_ref())
+            .ok_or(format!("Script not found for id: {}", id));
     }
 
     /// Retrieves a script by its name and executes a callback based on whether the script is found or not.
@@ -989,20 +1025,52 @@ impl ScriptProvider {
     ///
     /// This function performs two lookups: one in the `names` map and another in the `scripts` collection. If the name does not exist,
     /// it performs minimal work. The time complexity is O(1) for both lookups.
-    pub fn get_by_name<'script, 'state: 'script, F, E>(
-        &'state self,
-        name: &str,
-        on_found: F,
-        on_not_found: E,
-    ) where
-        F: FnOnce(&'script ScriptFile),
+    pub fn on_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
+    where
+        F: FnOnce(&ScriptFile),
         E: FnOnce(),
     {
-        if let Some(id) = self.names.get(name) {
-            self.get_by_id(*id, on_found, on_not_found);
+        if let Some(&id) = self.names.get(name) {
+            self.on_by_id(id, on_found, on_not_found);
         } else {
             on_not_found();
         }
+    }
+
+    /// Retrieves a script by its name.
+    ///
+    /// This method searches for the script name in the internal `names` map. If found, it retrieves the script
+    /// from the `scripts` vector using its ID. If the script is not found, an error message is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the script to search for. This is a string slice (`&str`) and is used to look up the script ID in the internal `names` map.
+    ///
+    /// # Return
+    ///
+    /// This function returns a `Result`:
+    /// - `Ok(&ScriptFile)` if the script is found, containing a reference to the script.
+    /// - `Err(String)` if the script is not found, containing an error message.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation. However, it may return an error if the script is not found.
+    ///
+    /// # Safety
+    ///
+    /// There are no specific safety concerns for this function. It is safe as long as the internal data structures of `ScriptProvider` are properly initialized.
+    ///
+    /// # Performance
+    ///
+    /// This function performs a lookup in the `names` map to find the script ID and then retrieves the script
+    /// from the `scripts` vector using that ID. The time complexity for both lookups is O(1).
+    pub fn get_by_name(&self, name: &str) -> Result<&ScriptFile, String> {
+        return self
+            .names
+            .get(name)
+            .map(|&id| self.get_by_id(id))
+            .unwrap_or_else(|| Err(format!("Script not found for name: {}", name)))
+            .and_then(|result| Ok(result));
     }
 
     /// Retrieves a script based on a specified trigger, ID, or category, executing a callback if found.
@@ -1423,12 +1491,7 @@ impl<'script> ScriptState<'script> {
         }
     }
 
-    pub fn execute(
-        &mut self,
-        provider: &'script CacheProvider,
-        runner: ScriptRunner<'script>,
-        benchmark: bool,
-    ) {
+    pub fn execute(&mut self, runner: &'script impl ScriptRunner, benchmark: bool) {
         self.execution_state = ScriptExecutionState::Running;
 
         let start: Instant = Instant::now();
@@ -1451,7 +1514,8 @@ impl<'script> ScriptState<'script> {
 
                     if let Some(codes) = &self.script.codes {
                         if let Some(code) = &codes[self.pc as usize] {
-                            runner(code, self, provider);
+                            runner.push_script(code, self);
+                            // runner(code, self, provider);
                         }
                     }
                 }
@@ -1762,16 +1826,15 @@ impl<'script> ScriptState<'script> {
     }
 }
 
-/// A type alias for the function pointer used to execute script opcodes.
-///
-/// This type represents a function that takes three parameters:
-///
-/// - A reference to a `ScriptOpcode`, which specifies the operation to be executed.
-/// - A mutable reference to a `ScriptState`, which holds the current state of the script execution and allows for modifications.
-/// - A reference to a `CacheProvider`, which provides access to cache resources that may be needed for execution.
-///
-/// The `ScriptRunner` function pointer defines the mechanism for executing individual script operations
-/// within the context of the provided `ScriptState`. This allows for flexible and dynamic execution of
-/// script logic based on the opcode being processed.
-#[rustfmt::skip]
-pub type ScriptRunner<'script> = fn(&ScriptOpcode, &mut ScriptState<'script>, &'script CacheProvider);
+pub trait ScriptRunner: ScriptEngine {
+    fn push_script<'script>(&'script self, code: &ScriptOpcode, state: &mut ScriptState<'script>);
+}
+
+/// It is important to note that these are not commands.
+/// This is specifically for interfacing commands<->engine.
+pub trait ScriptEngine {
+    fn pop_obj(&self, id: i32) -> Result<&ObjType, String>;
+    fn pop_script(&self, id: i32) -> Result<&ScriptFile, String>;
+    fn line_of_sight(&self, from: i32, to: i32) -> bool;
+    fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool;
+}

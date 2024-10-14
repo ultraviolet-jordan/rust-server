@@ -1,5 +1,5 @@
-use criterion::*;
 use criterion::measurement::WallTime;
+use criterion::*;
 
 use io::Packet;
 

@@ -1,9 +1,9 @@
-use cache::{CacheProvider, ScriptOpcode, ScriptState};
+use cache::{ScriptEngine, ScriptOpcode, ScriptState};
 
 pub fn script_oc_ops<'script>(
-    code: &ScriptOpcode,
+    engine: &'script impl ScriptEngine,
     state: &mut ScriptState<'script>,
-    provider: &'script CacheProvider,
+    code: &ScriptOpcode,
 ) {
     match code {
         ScriptOpcode::OcCategory => panic!("Not implemented"),
@@ -13,22 +13,18 @@ pub fn script_oc_ops<'script>(
         ScriptOpcode::OcDesc => panic!("Not implemented"),
         ScriptOpcode::OcIop => panic!("Not implemented"),
         ScriptOpcode::OcMembers => panic!("Not implemented"),
-        ScriptOpcode::OcName => {
-            let obj: usize = state.pop_int() as usize;
-            provider.objs.get_by_id(
-                obj,
-                |obj| {
-                    if let Some(name) = &obj.name {
-                        state.push_string(name.clone());
-                    } else if let Some(debugname) = &obj.debugname {
-                        state.push_string(debugname.clone());
-                    } else {
-                        state.push_string(String::new());
-                    }
-                },
-                || panic!("[ScriptOpcode::OcName] Obj not found for pop_int: {}", obj),
-            )
-        }
+        ScriptOpcode::OcName => match engine.pop_obj(state.pop_int()) {
+            Ok(obj) => {
+                if let Some(name) = &obj.name {
+                    state.push_string(name.clone());
+                } else if let Some(debugname) = &obj.debugname {
+                    state.push_string(debugname.clone());
+                } else {
+                    state.push_string(String::new());
+                }
+            }
+            Err(e) => panic!("{}", e),
+        },
         ScriptOpcode::OcOp => panic!("Not implemented"),
         ScriptOpcode::OcParam => panic!("Not implemented"),
         ScriptOpcode::OcStackable => panic!("Not implemented"),

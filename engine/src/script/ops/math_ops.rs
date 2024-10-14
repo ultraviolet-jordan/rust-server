@@ -1,6 +1,6 @@
 use cache::{ScriptOpcode, ScriptState};
 
-pub fn script_math_ops(code: &ScriptOpcode, state: &mut ScriptState) {
+pub fn script_math_ops(state: &mut ScriptState, code: &ScriptOpcode) {
     match code {
         ScriptOpcode::Add => {
             let b: i32 = state.pop_int();

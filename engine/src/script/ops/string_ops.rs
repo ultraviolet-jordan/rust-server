@@ -1,6 +1,6 @@
 use cache::{ScriptOpcode, ScriptState};
 
-pub fn script_string_ops(code: &ScriptOpcode, state: &mut ScriptState) {
+pub fn script_string_ops(state: &mut ScriptState, code: &ScriptOpcode) {
     match code {
         ScriptOpcode::AppendNum => panic!("Not implemented"),
         ScriptOpcode::Append => panic!("Not implemented"),
