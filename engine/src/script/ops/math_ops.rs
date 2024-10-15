@@ -296,7 +296,7 @@ impl MathOps {
     fn modulo(&self, state: &mut ScriptState) {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int(a % b);
+        state.push_int(a.wrapping_rem(b));
     }
 
     /// ```rust
@@ -552,7 +552,7 @@ impl MathOps {
         let end: i32 = state.pop_int();
         let start: i32 = state.pop_int();
         let num: i32 = state.pop_int();
-        let r: i32 = 31 - end;
+        let r: i32 = 31i32.wrapping_sub(end);
         state.push_int(
             ((num.wrapping_shl(r as u32) as u32) >> (start.wrapping_add(r) as u32)) as i32,
         )
