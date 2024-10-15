@@ -1358,6 +1358,28 @@ impl ScriptFile {
             string_operands,
         };
     }
+
+    pub fn mock() -> ScriptFile {
+        return ScriptFile {
+            id: 0,
+            int_local_count: 0,
+            string_local_count: 0,
+            int_arg_count: 0,
+            string_arg_count: 0,
+            switch_table: None,
+            info: ScriptInfo {
+                name: String::new(),
+                path: String::new(),
+                lookup: 0,
+                params: Vec::new(),
+                pcs: Vec::new(),
+                lines: Vec::new(),
+            },
+            codes: None,
+            int_operands: Vec::new(),
+            string_operands: Vec::new(),
+        };
+    }
 }
 
 struct GoSubFrame<'script> {
@@ -1431,9 +1453,9 @@ pub struct ScriptState<'script> {
     pub opcount: i64, // number of opcodes executed
     frame_stack: Vec<GoSubFrame<'script>>,
     pub fp: usize, // frame pointer
-    int_stack: Vec<i32>,
+    pub int_stack: Vec<i32>,
     pub isp: usize, // integer stack pointer
-    string_stack: Vec<String>,
+    pub string_stack: Vec<String>,
     pub ssp: usize, // string stack pointer
     pub int_locals: Vec<i32>,
     pub string_locals: Vec<String>,
@@ -1474,7 +1496,7 @@ impl<'script> ScriptState<'script> {
         int_locals[..int_args.len()].copy_from_slice(&int_args);
         string_locals[..string_args.len()].clone_from_slice(&string_args);
 
-        ScriptState {
+        return ScriptState {
             script,
             execution_state: ScriptExecutionState::Running,
             pc: -1,
@@ -1489,6 +1511,24 @@ impl<'script> ScriptState<'script> {
             string_locals,
             pointers: 0,
         }
+    }
+
+    pub fn mock(file: &ScriptFile) -> ScriptState {
+        return ScriptState {
+            script: file,
+            execution_state: ScriptExecutionState::Running,
+            pc: -1,
+            opcount: 0,
+            frame_stack: Vec::with_capacity(5),
+            fp: 0,
+            int_stack: vec![0; 100],
+            isp: 0,
+            string_stack: vec![String::new(); 100],
+            ssp: 0,
+            int_locals: Vec::new(),
+            string_locals: Vec::new(),
+            pointers: 0,
+        };
     }
 
     pub fn execute(&mut self, runner: &'script impl ScriptRunner, benchmark: bool) {

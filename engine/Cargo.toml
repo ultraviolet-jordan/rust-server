@@ -8,6 +8,7 @@ criterion = "0.5.1"
 
 [dependencies]
 dotenv = "0.15.0"
+rand = "0.8.5"
 cache = { path = "../cache" }
 math = { path = "../math" }
 
