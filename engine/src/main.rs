@@ -27,14 +27,18 @@ fn main() {
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
-            state.execute(&engine, false);
             state.pointer_add(ScriptPointer::ProtectedActivePlayer);
-            println!(
-                "fib: result={}, opcount={}, pointers={}",
-                state.pop_int(),
-                state.opcount,
-                state.pointer_debug()
-            );
+            match state.execute(&engine, false) {
+                Ok(()) => {
+                    println!(
+                        "fib: result={}, opcount={}, pointers={}",
+                        state.pop_int(),
+                        state.opcount,
+                        state.pointer_debug()
+                    );
+                }
+                Err(e) => panic!("{}", e),
+            };
         },
         || {},
     );
@@ -57,12 +61,16 @@ fn main() {
                 |obj| {
                     let mut state: ScriptState =
                         ScriptState::new_with_args(script, vec![obj.id as i32], Vec::new());
-                    state.execute(&engine, false);
-                    println!(
-                        "get_obj_name: result={}, opcount={}",
-                        state.pop_string(),
-                        state.opcount
-                    );
+                    match state.execute(&engine, false) {
+                        Ok(()) => {
+                            println!(
+                                "get_obj_name: result={}, opcount={}",
+                                state.pop_string(),
+                                state.opcount
+                            );
+                        }
+                        Err(e) => panic!("{}", e),
+                    };
                 },
                 || {},
             );

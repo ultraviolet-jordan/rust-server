@@ -41,7 +41,11 @@ impl ScriptEngine for Engine {
 }
 
 impl ScriptRunner for Engine {
-    fn push_script<'script>(&'script self, code: &ScriptOpcode, state: &mut ScriptState<'script>) {
+    fn push_script<'script>(
+        &'script self,
+        code: &ScriptOpcode,
+        state: &mut ScriptState<'script>,
+    ) -> Result<(), String> {
         // println!("{:?}", code);
         match code {
             // Core language ops (0-99)
@@ -187,6 +191,7 @@ impl ScriptRunner for Engine {
             ScriptOpcode::LongQueue => panic!("Not implemented"),
             ScriptOpcode::Mes => {
                 println!("{}", state.pop_string());
+                return Ok(());
             }
             ScriptOpcode::MidiJingle => panic!("Not implemented"),
             ScriptOpcode::MidiSong => panic!("Not implemented"),

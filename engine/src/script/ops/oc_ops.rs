@@ -1,4 +1,4 @@
-use cache::{ScriptEngine, ScriptOpcode, ScriptState};
+use cache::{ObjType, ScriptEngine, ScriptOpcode, ScriptState};
 
 pub struct OcOps;
 
@@ -7,7 +7,12 @@ impl OcOps {
         return OcOps;
     }
 
-    pub fn push(&self, engine: &impl ScriptEngine, state: &mut ScriptState, code: &ScriptOpcode) {
+    pub fn push(
+        &self,
+        engine: &impl ScriptEngine,
+        state: &mut ScriptState,
+        code: &ScriptOpcode,
+    ) -> Result<(), String> {
         match code {
             ScriptOpcode::OcCategory => panic!("Not implemented"),
             ScriptOpcode::OcCert => panic!("Not implemented"),
@@ -16,18 +21,7 @@ impl OcOps {
             ScriptOpcode::OcDesc => panic!("Not implemented"),
             ScriptOpcode::OcIop => panic!("Not implemented"),
             ScriptOpcode::OcMembers => panic!("Not implemented"),
-            ScriptOpcode::OcName => match engine.pop_obj(state.pop_int()) {
-                Ok(obj) => {
-                    if let Some(name) = &obj.name {
-                        state.push_string(name.clone());
-                    } else if let Some(debugname) = &obj.debugname {
-                        state.push_string(debugname.clone());
-                    } else {
-                        state.push_string(String::new());
-                    }
-                }
-                Err(e) => panic!("{}", e),
-            },
+            ScriptOpcode::OcName => self.oc_name(engine, state),
             ScriptOpcode::OcOp => panic!("Not implemented"),
             ScriptOpcode::OcParam => panic!("Not implemented"),
             ScriptOpcode::OcStackable => panic!("Not implemented"),
@@ -39,5 +33,17 @@ impl OcOps {
             ScriptOpcode::OcWeight => panic!("Not implemented"),
             _ => panic!("Unrecognised oc ops code: {:?}", code),
         }
+    }
+
+    fn oc_name(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        let obj: &ObjType = engine.pop_obj(state.pop_int())?;
+        state.push_string(
+            obj.name
+                .as_ref()
+                .or(obj.debugname.as_ref())
+                .unwrap_or(&String::new())
+                .clone(),
+        );
+        return Ok(());
     }
 }

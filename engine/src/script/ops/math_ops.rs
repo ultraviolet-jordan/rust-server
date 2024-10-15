@@ -17,7 +17,7 @@ impl MathOps {
         };
     }
 
-    pub fn push(&self, state: &mut ScriptState, code: &ScriptOpcode) {
+    pub fn push(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String> {
         match code {
             ScriptOpcode::Add => self.add(state),
             ScriptOpcode::Sub => self.sub(state),
@@ -62,14 +62,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Add);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Add);
     /// assert_eq!(3, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn add(&self, state: &mut ScriptState) {
+    fn add(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_add(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -82,14 +84,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Sub);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Sub);
     /// assert_eq!(-1, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn sub(&self, state: &mut ScriptState) {
+    fn sub(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_sub(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -102,14 +106,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Multiply);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Multiply);
     /// assert_eq!(2, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn multiply(&self, state: &mut ScriptState) {
+    fn multiply(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_mul(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -122,14 +128,16 @@ impl MathOps {
     /// state.push_int(5);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Divide);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Divide);
     /// assert_eq!(10, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn divide(&self, state: &mut ScriptState) {
+    fn divide(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_div(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -141,14 +149,16 @@ impl MathOps {
     /// state.push_int(100);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Random);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Random);
     /// let rand = state.pop_int();
     /// assert!(rand >= 0 && rand <= 99);
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn random(&self, state: &mut ScriptState) {
+    fn random(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: f64 = state.pop_int() as f64;
         state.push_int((random::<f64>() * a) as i32);
+        return Ok(());
     }
 
     /// ```rust
@@ -160,18 +170,20 @@ impl MathOps {
     /// state.push_int(100);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::RandomInc);
+    /// let result = ops.push(&mut state, &ScriptOpcode::RandomInc);
     /// let rand = state.pop_int();
     /// assert!(rand >= 0 && rand <= 100);
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn randominc(&self, state: &mut ScriptState) {
+    fn randominc(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: f64 = state.pop_int().wrapping_add(1) as f64;
         state.push_int((random::<f64>() * a) as i32);
+        return Ok(());
     }
 
     #[inline(always)]
-    fn interpolate(&self, state: &mut ScriptState) {
+    fn interpolate(&self, state: &mut ScriptState) -> Result<(), String> {
         let x: i32 = state.pop_int();
         let x1: i32 = state.pop_int();
         let x0: i32 = state.pop_int();
@@ -179,6 +191,7 @@ impl MathOps {
         let y0: i32 = state.pop_int();
         let floor: f64 = (y1.wrapping_sub(y0) as f64 / x1.wrapping_sub(x0) as f64).floor();
         state.push_int(((floor * x.wrapping_sub(x0) as f64) + y0 as f64) as i32);
+        return Ok(());
     }
 
     /// ```rust
@@ -191,11 +204,12 @@ impl MathOps {
     /// state.push_int(6);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::AddPercent);
+    /// let result = ops.push(&mut state, &ScriptOpcode::AddPercent);
     /// assert_eq!(53, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn addpercent(&self, state: &mut ScriptState) {
+    fn addpercent(&self, state: &mut ScriptState) -> Result<(), String> {
         let percent: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         state.push_int(
@@ -203,6 +217,7 @@ impl MathOps {
                 .wrapping_div(100)
                 .wrapping_add(num),
         );
+        return Ok(());
     }
 
     /// ```rust
@@ -215,14 +230,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::SetBit);
+    /// let result = ops.push(&mut state, &ScriptOpcode::SetBit);
     /// assert_eq!(15, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn setbit(&self, state: &mut ScriptState) {
+    fn setbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
         state.push_int(value | (1i32.wrapping_shl(bit as u32)));
+        return Ok(());
     }
 
     /// ```rust
@@ -235,14 +252,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::ClearBit);
+    /// let result = ops.push(&mut state, &ScriptOpcode::ClearBit);
     /// assert_eq!(11, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn clearbit(&self, state: &mut ScriptState) {
+    fn clearbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
         state.push_int(value & !1i32.wrapping_shl(bit as u32));
+        return Ok(());
     }
 
     /// ```rust
@@ -255,8 +274,9 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::TestBit);
+    /// let result = ops.push(&mut state, &ScriptOpcode::TestBit);
     /// assert_eq!(1, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     /// ----
     /// ```rust
@@ -269,14 +289,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::TestBit);
+    /// let result = ops.push(&mut state, &ScriptOpcode::TestBit);
     /// assert_eq!(0, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn testbit(&self, state: &mut ScriptState) {
+    fn testbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
         state.push_int(((value & (1i32.wrapping_shl(bit as u32))) != 0) as i32);
+        return Ok(());
     }
 
     /// ```rust
@@ -289,14 +311,16 @@ impl MathOps {
     /// state.push_int(6);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Modulo);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Modulo);
     /// assert_eq!(5, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn modulo(&self, state: &mut ScriptState) {
+    fn modulo(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_rem(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -309,14 +333,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Pow);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Pow);
     /// assert_eq!(10000, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn pow(&self, state: &mut ScriptState) {
+    fn pow(&self, state: &mut ScriptState) -> Result<(), String> {
         let exponent: i32 = state.pop_int();
         let base: i32 = state.pop_int();
         state.push_int(base.wrapping_pow(exponent as u32));
+        return Ok(());
     }
 
     /// ```rust
@@ -329,24 +355,26 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::InvPow);
+    /// let result = ops.push(&mut state, &ScriptOpcode::InvPow);
     /// assert_eq!(10, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn invpow(&self, state: &mut ScriptState) {
+    fn invpow(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         if a == 0 || b == 0 {
             state.push_int(0);
-            return;
+        } else {
+            match b {
+                1 => state.push_int(a),
+                2 => state.push_int((a as f64).sqrt() as i32),
+                3 => state.push_int((a as f64).cbrt() as i32),
+                4 => state.push_int((a as f64).sqrt().sqrt() as i32),
+                _ => state.push_int(a.pow((1.0 / b as f64) as u32)),
+            }
         }
-        match b {
-            1 => state.push_int(a),
-            2 => state.push_int((a as f64).sqrt() as i32),
-            3 => state.push_int((a as f64).cbrt() as i32),
-            4 => state.push_int((a as f64).sqrt().sqrt() as i32),
-            _ => state.push_int(a.pow((1.0 / b as f64) as u32)),
-        }
+        return Ok(());
     }
 
     /// ```rust
@@ -359,14 +387,16 @@ impl MathOps {
     /// state.push_int(33);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::And);
+    /// let result = ops.push(&mut state, &ScriptOpcode::And);
     /// assert_eq!(32, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn and(&self, state: &mut ScriptState) {
+    fn and(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a & b);
+        return Ok(());
     }
 
     /// ```rust
@@ -379,14 +409,16 @@ impl MathOps {
     /// state.push_int(533);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Or);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Or);
     /// assert_eq!(575, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn or(&self, state: &mut ScriptState) {
+    fn or(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a | b);
+        return Ok(());
     }
 
     /// ```rust
@@ -399,14 +431,16 @@ impl MathOps {
     /// state.push_int(533);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Min);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Min);
     /// assert_eq!(46, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn min(&self, state: &mut ScriptState) {
+    fn min(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.min(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -419,14 +453,16 @@ impl MathOps {
     /// state.push_int(533);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Max);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Max);
     /// assert_eq!(533, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn max(&self, state: &mut ScriptState) {
+    fn max(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.max(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -440,15 +476,17 @@ impl MathOps {
     /// state.push_int(69);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Scale);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Scale);
     /// assert_eq!(5, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn scale(&self, state: &mut ScriptState) {
+    fn scale(&self, state: &mut ScriptState) -> Result<(), String> {
         let c: i32 = state.pop_int();
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(a.wrapping_mul(c).wrapping_div(b));
+        return Ok(());
     }
 
     /// ```rust
@@ -460,13 +498,15 @@ impl MathOps {
     /// state.push_int(15);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::BitCount);
+    /// let result = ops.push(&mut state, &ScriptOpcode::BitCount);
     /// assert_eq!(4, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn bitcount(&self, state: &mut ScriptState) {
+    fn bitcount(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
         state.push_int(Bits::bitcount(a));
+        return Ok(());
     }
 
     /// ```rust
@@ -479,14 +519,16 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::ToggleBit);
+    /// let result = ops.push(&mut state, &ScriptOpcode::ToggleBit);
     /// assert_eq!(15, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn togglebit(&self, state: &mut ScriptState) {
+    fn togglebit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
         state.push_int(value ^ (1i32.wrapping_shl(bit as u32)));
+        return Ok(());
     }
 
     /// ```rust
@@ -500,15 +542,17 @@ impl MathOps {
     /// state.push_int(3);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::SetBitRange);
+    /// let result = ops.push(&mut state, &ScriptOpcode::SetBitRange);
     /// assert_eq!(14, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn setbit_range(&self, state: &mut ScriptState) {
+    fn setbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
         let start: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         state.push_int(self.bits.setbit_range(num, start, end));
+        return Ok(());
     }
 
     /// ```rust
@@ -522,15 +566,17 @@ impl MathOps {
     /// state.push_int(3);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::ClearBitRange);
+    /// let result = ops.push(&mut state, &ScriptOpcode::ClearBitRange);
     /// assert_eq!(1, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn clearbit_range(&self, state: &mut ScriptState) {
+    fn clearbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
         let start: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         state.push_int(self.bits.clearbit_range(num, start, end));
+        return Ok(());
     }
 
     /// ```rust
@@ -544,18 +590,20 @@ impl MathOps {
     /// state.push_int(2);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::GetBitRange);
+    /// let result = ops.push(&mut state, &ScriptOpcode::GetBitRange);
     /// assert_eq!(7, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn getbit_range(&self, state: &mut ScriptState) {
+    fn getbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
         let start: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         let r: i32 = 31i32.wrapping_sub(end);
         state.push_int(
             ((num.wrapping_shl(r as u32) as u32) >> (start.wrapping_add(r) as u32)) as i32,
-        )
+        );
+        return Ok(());
     }
 
     /// ```rust
@@ -570,16 +618,18 @@ impl MathOps {
     /// state.push_int(3);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::SetBitRangeToInt);
+    /// let result = ops.push(&mut state, &ScriptOpcode::SetBitRangeToInt);
     /// assert_eq!(6, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn setbit_range_toint(&self, state: &mut ScriptState) {
+    fn setbit_range_toint(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
         let start: i32 = state.pop_int();
         let value: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         state.push_int(self.bits.setbit_range_toint(num, value, start, end));
+        return Ok(());
     }
 
     /// ```rust
@@ -591,13 +641,15 @@ impl MathOps {
     /// state.push_int(std::f64::consts::PI as i32);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::SinDeg);
+    /// let result = ops.push(&mut state, &ScriptOpcode::SinDeg);
     /// assert_eq!(18, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn sin_deg(&self, state: &mut ScriptState) {
+    fn sin_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
         state.push_int(self.trig.sin(a));
+        return Ok(());
     }
 
     /// ```rust
@@ -609,13 +661,15 @@ impl MathOps {
     /// state.push_int(std::f64::consts::PI as i32);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::CosDeg);
+    /// let result = ops.push(&mut state, &ScriptOpcode::CosDeg);
     /// assert_eq!(16383, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn cos_deg(&self, state: &mut ScriptState) {
+    fn cos_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
         state.push_int(self.trig.cos(a));
+        return Ok(());
     }
 
     /// ```rust
@@ -628,14 +682,16 @@ impl MathOps {
     /// state.push_int(1);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Atan2Deg);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Atan2Deg);
     /// assert_eq!(6144, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn atan2_deg(&self, state: &mut ScriptState) {
+    fn atan2_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
         state.push_int(Trig::atan2(b, a));
+        return Ok(());
     }
 
     /// ```rust
@@ -647,12 +703,14 @@ impl MathOps {
     /// state.push_int(-136);
     ///
     /// let ops = MathOps::new();
-    /// ops.push(&mut state, &ScriptOpcode::Abs);
+    /// let result = ops.push(&mut state, &ScriptOpcode::Abs);
     /// assert_eq!(136, state.pop_int());
+    /// assert!(result.is_ok());
     /// ```
     #[inline(always)]
-    fn abs(&self, state: &mut ScriptState) {
+    fn abs(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
         state.push_int(a.abs());
+        return Ok(());
     }
 }

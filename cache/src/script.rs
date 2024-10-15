@@ -1531,7 +1531,11 @@ impl<'script> ScriptState<'script> {
         };
     }
 
-    pub fn execute(&mut self, runner: &'script impl ScriptRunner, benchmark: bool) {
+    pub fn execute(
+        &mut self,
+        runner: &'script impl ScriptRunner,
+        benchmark: bool,
+    ) -> Result<(), String> {
         self.execution_state = ScriptExecutionState::Running;
 
         let start: Instant = Instant::now();
@@ -1552,10 +1556,15 @@ impl<'script> ScriptState<'script> {
                     self.opcount += 1;
                     self.pc += 1;
 
-                    if let Some(codes) = &self.script.codes {
-                        if let Some(code) = &codes[self.pc as usize] {
-                            runner.push_script(code, self);
-                            // runner(code, self, provider);
+                    if let Some(Some(code)) = self
+                        .script
+                        .codes
+                        .as_ref()
+                        .and_then(|codes| codes.get(self.pc as usize))
+                    {
+                        if let Err(err) = runner.push_script(code, self) {
+                            self.execution_state = ScriptExecutionState::Aborted;
+                            return Err(err);
                         }
                     }
                 }
@@ -1564,6 +1573,7 @@ impl<'script> ScriptState<'script> {
         if !benchmark {
             println!("Executed script in: {:?}", start.elapsed());
         }
+        return Ok(());
     }
 
     // ---- ints
@@ -1867,7 +1877,11 @@ impl<'script> ScriptState<'script> {
 }
 
 pub trait ScriptRunner: ScriptEngine {
-    fn push_script<'script>(&'script self, code: &ScriptOpcode, state: &mut ScriptState<'script>);
+    fn push_script<'script>(
+        &'script self,
+        code: &ScriptOpcode,
+        state: &mut ScriptState<'script>,
+    ) -> Result<(), String>;
 }
 
 /// It is important to note that these are not commands.
