@@ -7,12 +7,7 @@ impl OcOps {
         return OcOps;
     }
 
-    pub fn push<'script>(
-        &self,
-        engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
-        code: &ScriptOpcode,
-    ) {
+    pub fn push(&self, engine: &impl ScriptEngine, state: &mut ScriptState, code: &ScriptOpcode) {
         match code {
             ScriptOpcode::OcCategory => panic!("Not implemented"),
             ScriptOpcode::OcCert => panic!("Not implemented"),
