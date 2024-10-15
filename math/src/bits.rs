@@ -36,9 +36,9 @@ impl Bits {
     /// Returns the number of set bits (1s) in `num`.
     #[inline(always)]
     pub fn bitcount(num: i32) -> i32 {
-        let one: i32 = num - ((num >> 1) & 0x55555555);
-        let two: i32 = (one & 0x33333333) + ((one >> 2) & 0x33333333);
-        return (((two + (two >> 4)) & 0xf0f0f0f) * 0x1010101) >> 24;
+        let one: i32 = num.wrapping_sub((num >> 1) & 0x55555555);
+        let two: i32 = (one & 0x33333333).wrapping_add((one >> 2) & 0x33333333);
+        return (((two.wrapping_add(two >> 4)) & 0xf0f0f0f).wrapping_mul(0x1010101)) >> 24;
     }
 
     /// Sets a range of bits to `1` within an `i32`.
@@ -67,7 +67,9 @@ impl Bits {
     /// Returns the modified integer with the bits in the specified range set to `1`.
     #[inline(always)]
     pub fn setbit_range(&self, num: i32, start: i32, end: i32) -> i32 {
-        return num | (self.masks[(end - start + 1) as usize] << start);
+        return num
+            | (self.masks[end.wrapping_sub(start).wrapping_add(1) as usize]
+                .wrapping_shl(start as u32));
     }
 
     /// Sets a range of bits to the value of the provided `i32` within a number.
@@ -99,9 +101,9 @@ impl Bits {
     #[inline(always)]
     pub fn setbit_range_toint(&self, num: i32, value: i32, start: i32, end: i32) -> i32 {
         let cleared: i32 = self.clearbit_range(num, start, end);
-        let max: i32 = self.masks[(end - start + 1) as usize];
+        let max: i32 = self.masks[end.wrapping_sub(start).wrapping_add(1) as usize];
         let assign: i32 = if value > max { max } else { value };
-        return cleared | (assign << start);
+        return cleared | (assign.wrapping_shl(start as u32));
     }
 
     /// Clears (sets to 0) a range of bits within an `i32`.
@@ -130,6 +132,8 @@ impl Bits {
     /// Returns the modified integer with the bits in the specified range cleared (set to 0).
     #[inline(always)]
     pub fn clearbit_range(&self, num: i32, start: i32, end: i32) -> i32 {
-        return num & !(self.masks[(end - start + 1) as usize] << start);
+        return num
+            & !self.masks[end.wrapping_sub(start).wrapping_add(1) as usize]
+                .wrapping_shl(start as u32);
     }
 }

@@ -69,7 +69,7 @@ impl MathOps {
     fn add(&self, state: &mut ScriptState) {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int(a + b);
+        state.push_int(a.wrapping_add(b));
     }
 
     /// ```rust
@@ -89,7 +89,7 @@ impl MathOps {
     fn sub(&self, state: &mut ScriptState) {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int(a - b);
+        state.push_int(a.wrapping_sub(b));
     }
 
     /// ```rust
@@ -109,7 +109,7 @@ impl MathOps {
     fn multiply(&self, state: &mut ScriptState) {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int(a * b);
+        state.push_int(a.wrapping_mul(b));
     }
 
     /// ```rust
@@ -129,7 +129,7 @@ impl MathOps {
     fn divide(&self, state: &mut ScriptState) {
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int(a / b);
+        state.push_int(a.wrapping_div(b));
     }
 
     /// ```rust
@@ -166,7 +166,7 @@ impl MathOps {
     /// ```
     #[inline(always)]
     fn randominc(&self, state: &mut ScriptState) {
-        let a: f64 = (state.pop_int() + 1) as f64;
+        let a: f64 = state.pop_int().wrapping_add(1) as f64;
         state.push_int((random::<f64>() * a) as i32);
     }
 
@@ -177,8 +177,8 @@ impl MathOps {
         let x0: i32 = state.pop_int();
         let y1: i32 = state.pop_int();
         let y0: i32 = state.pop_int();
-        let floor: f64 = ((y1 - y0) as f64 / (x1 - x0) as f64).floor();
-        state.push_int((floor * (x - x0) as f64 + y0 as f64) as i32);
+        let floor: f64 = (y1.wrapping_sub(y0) as f64 / x1.wrapping_sub(x0) as f64).floor();
+        state.push_int(((floor * x.wrapping_sub(x0) as f64) + y0 as f64) as i32);
     }
 
     /// ```rust
@@ -198,7 +198,11 @@ impl MathOps {
     fn addpercent(&self, state: &mut ScriptState) {
         let percent: i32 = state.pop_int();
         let num: i32 = state.pop_int();
-        state.push_int(num * percent / 100 + num);
+        state.push_int(
+            num.wrapping_mul(percent)
+                .wrapping_div(100)
+                .wrapping_add(num),
+        );
     }
 
     /// ```rust
@@ -218,7 +222,7 @@ impl MathOps {
     fn setbit(&self, state: &mut ScriptState) {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
-        state.push_int(value | (1 << bit));
+        state.push_int(value | (1i32.wrapping_shl(bit as u32)));
     }
 
     /// ```rust
@@ -238,7 +242,7 @@ impl MathOps {
     fn clearbit(&self, state: &mut ScriptState) {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
-        state.push_int(value & !(1 << bit));
+        state.push_int(value & !1i32.wrapping_shl(bit as u32));
     }
 
     /// ```rust
@@ -272,7 +276,7 @@ impl MathOps {
     fn testbit(&self, state: &mut ScriptState) {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
-        state.push_int(((value & (1 << bit)) != 0) as i32);
+        state.push_int(((value & (1i32.wrapping_shl(bit as u32))) != 0) as i32);
     }
 
     /// ```rust
@@ -312,7 +316,7 @@ impl MathOps {
     fn pow(&self, state: &mut ScriptState) {
         let exponent: i32 = state.pop_int();
         let base: i32 = state.pop_int();
-        state.push_int(base.pow(exponent as u32));
+        state.push_int(base.wrapping_pow(exponent as u32));
     }
 
     /// ```rust
@@ -444,7 +448,7 @@ impl MathOps {
         let c: i32 = state.pop_int();
         let b: i32 = state.pop_int();
         let a: i32 = state.pop_int();
-        state.push_int((a * c) / b);
+        state.push_int(a.wrapping_mul(c).wrapping_div(b));
     }
 
     /// ```rust
@@ -482,7 +486,7 @@ impl MathOps {
     fn togglebit(&self, state: &mut ScriptState) {
         let bit: i32 = state.pop_int();
         let value: i32 = state.pop_int();
-        state.push_int(value ^ (1 << bit));
+        state.push_int(value ^ (1i32.wrapping_shl(bit as u32)));
     }
 
     /// ```rust
@@ -549,7 +553,9 @@ impl MathOps {
         let start: i32 = state.pop_int();
         let num: i32 = state.pop_int();
         let r: i32 = 31 - end;
-        state.push_int((((num << r) as u32) >> ((start + r) as u32)) as i32)
+        state.push_int(
+            ((num.wrapping_shl(r as u32) as u32) >> (start.wrapping_add(r) as u32)) as i32,
+        )
     }
 
     /// ```rust
