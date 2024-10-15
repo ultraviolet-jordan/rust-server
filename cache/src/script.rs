@@ -1450,7 +1450,7 @@ pub struct ScriptState<'script> {
     pub script: &'script ScriptFile,
     pub execution_state: ScriptExecutionState,
     pub pc: i32,      // program counter
-    pub opcount: i64, // number of opcodes executed
+    pub opcount: i32, // number of opcodes executed
     frame_stack: Vec<GoSubFrame<'script>>,
     pub fp: usize, // frame pointer
     pub int_stack: Vec<i32>,
