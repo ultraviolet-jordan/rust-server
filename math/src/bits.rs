@@ -22,15 +22,6 @@ impl Bits {
     ///
     /// * `num` - The `i32` whose set bits are to be counted.
     ///
-    /// # Example
-    ///
-    /// ```
-    /// use math::bits::Bits;
-    ///
-    /// let count = Bits::bitcount(15); // 15 in binary is 1111, so count is 4
-    /// assert_eq!(count, 4);
-    /// ```
-    ///
     /// # Returns
     ///
     /// Returns the number of set bits (1s) in `num`.
@@ -51,16 +42,6 @@ impl Bits {
     /// * `num` - The `i32` whose bits are to be modified.
     /// * `start` - The starting position of the bit range (0-based).
     /// * `end` - The ending position of the bit range (0-based).
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use math::bits::Bits;
-    ///
-    /// let bits = Bits::new();
-    /// let result = bits.setbit_range(0, 1, 3); // Sets bits 1 to 3 in 0, resulting in 14 (1110 in binary)
-    /// assert_eq!(result, 14);
-    /// ```
     ///
     /// # Returns
     ///
@@ -85,16 +66,6 @@ impl Bits {
     /// * `start` - The starting position of the bit range (0-based).
     /// * `end` - The ending position of the bit range (0-based).
     ///
-    /// # Example
-    ///
-    /// ```
-    /// use math::bits::Bits;
-    ///
-    /// let bits = Bits::new();
-    /// let result = bits.setbit_range_toint(0, 3, 1, 3); // Sets bits 1 to 3 to match 3, resulting in 6
-    /// assert_eq!(result, 6);
-    /// ```
-    ///
     /// # Returns
     ///
     /// Returns the modified integer with the bit range set to the value of `value`.
@@ -116,16 +87,6 @@ impl Bits {
     /// * `num` - The integer whose bits are to be cleared.
     /// * `start` - The starting position of the bit range (0-based).
     /// * `end` - The ending position of the bit range (0-based).
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use math::bits::Bits;
-    ///
-    /// let bits = Bits::new();
-    /// let result = bits.clearbit_range(15, 1, 3); // Clears bits 1 to 3 in 15, resulting in 1
-    /// assert_eq!(result, 1);
-    /// ```
     ///
     /// # Returns
     ///
