@@ -23,7 +23,7 @@ fn main() {
         || {},
     );
 
-    engine.cache.scripts.on_by_name(
+    engine.cache.script_provider.on_by_name(
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
@@ -43,7 +43,7 @@ fn main() {
         || {},
     );
 
-    engine.cache.scripts.get_by_trigger(
+    engine.cache.script_provider.get_by_trigger(
         139,
         708,
         -1,
@@ -53,7 +53,7 @@ fn main() {
         || {},
     );
 
-    engine.cache.scripts.on_by_name(
+    engine.cache.script_provider.on_by_name(
         "[proc,get_obj_name]",
         |script| {
             engine.cache.obj_provider.on_by_name(

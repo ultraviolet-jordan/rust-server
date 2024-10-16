@@ -33,7 +33,7 @@ impl ScriptEngine for Engine {
     }
 
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String> {
-        return self.cache.scripts.get_by_id(id as usize);
+        return self.cache.script_provider.get_by_id(id as usize);
     }
 
     fn line_of_sight(&self, from: i32, to: i32) -> bool {
