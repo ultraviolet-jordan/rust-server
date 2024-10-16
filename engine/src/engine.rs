@@ -49,417 +49,413 @@ impl ScriptRunner for Engine {
         // println!("{:?}", code);
         match code {
             // Core language ops (0-99)
-            ScriptOpcode::PushConstantInt => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushVarp => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopVarp => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushConstantString => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushVarn => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopVarn => self.ops.core.push(self, state, code),
-            ScriptOpcode::Branch => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchNot => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchEquals => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchLessThan => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchGreaterThan => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushVars => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopVars => self.ops.core.push(self, state, code),
-            ScriptOpcode::Return => self.ops.core.push(self, state, code),
-            ScriptOpcode::GoSub => self.ops.core.push(self, state, code),
-            ScriptOpcode::Jump => self.ops.core.push(self, state, code),
-            ScriptOpcode::Switch => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushVarbit => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopVarbit => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchLessThanOrEquals => self.ops.core.push(self, state, code),
-            ScriptOpcode::BranchGreaterThanOrEquals => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushIntLocal => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopIntLocal => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushStringLocal => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopStringLocal => self.ops.core.push(self, state, code),
-            ScriptOpcode::JoinString => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopIntDiscard => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopStringDiscard => self.ops.core.push(self, state, code),
-            ScriptOpcode::GoSubWithParams => self.ops.core.push(self, state, code),
-            ScriptOpcode::JumpWithParams => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushVarcInt => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopVarcInt => self.ops.core.push(self, state, code),
-            ScriptOpcode::DefineArray => self.ops.core.push(self, state, code),
-            ScriptOpcode::PushArrayInt => self.ops.core.push(self, state, code),
-            ScriptOpcode::PopArrayInt => self.ops.core.push(self, state, code),
-            ScriptOpcode::EndCoreOps => self.ops.core.push(self, state, code),
+            ScriptOpcode::PushConstantInt
+            | ScriptOpcode::PushVarp
+            | ScriptOpcode::PopVarp
+            | ScriptOpcode::PushConstantString
+            | ScriptOpcode::PushVarn
+            | ScriptOpcode::PopVarn
+            | ScriptOpcode::Branch
+            | ScriptOpcode::BranchNot
+            | ScriptOpcode::BranchEquals
+            | ScriptOpcode::BranchLessThan
+            | ScriptOpcode::BranchGreaterThan
+            | ScriptOpcode::PushVars
+            | ScriptOpcode::PopVars
+            | ScriptOpcode::Return
+            | ScriptOpcode::GoSub
+            | ScriptOpcode::Jump
+            | ScriptOpcode::Switch
+            | ScriptOpcode::PushVarbit
+            | ScriptOpcode::PopVarbit
+            | ScriptOpcode::BranchLessThanOrEquals
+            | ScriptOpcode::BranchGreaterThanOrEquals
+            | ScriptOpcode::PushIntLocal
+            | ScriptOpcode::PopIntLocal
+            | ScriptOpcode::PushStringLocal
+            | ScriptOpcode::PopStringLocal
+            | ScriptOpcode::JoinString
+            | ScriptOpcode::PopIntDiscard
+            | ScriptOpcode::PopStringDiscard
+            | ScriptOpcode::GoSubWithParams
+            | ScriptOpcode::JumpWithParams
+            | ScriptOpcode::PushVarcInt
+            | ScriptOpcode::PopVarcInt
+            | ScriptOpcode::DefineArray
+            | ScriptOpcode::PushArrayInt
+            | ScriptOpcode::PopArrayInt
+            | ScriptOpcode::EndCoreOps => self.ops.core.push(self, state, code),
             // Server ops (1000-1999)
-            ScriptOpcode::CoordX => panic!("Not implemented"),
-            ScriptOpcode::CoordY => panic!("Not implemented"),
-            ScriptOpcode::CoordZ => panic!("Not implemented"),
-            ScriptOpcode::Distance => panic!("Not implemented"),
-            ScriptOpcode::HuntAll => panic!("Not implemented"),
-            ScriptOpcode::HuntNext => panic!("Not implemented"),
-            ScriptOpcode::InZone => panic!("Not implemented"),
-            ScriptOpcode::LineOfSight => panic!("Not implemented"),
-            ScriptOpcode::LineOfWalk => panic!("Not implemented"),
-            ScriptOpcode::MapBlocked => panic!("Not implemented"),
-            ScriptOpcode::MapIndoors => panic!("Not implemented"),
-            ScriptOpcode::MapClock => panic!("Not implemented"),
-            ScriptOpcode::MapLocAddUnsafe => panic!("Not implemented"),
-            ScriptOpcode::MapMembers => panic!("Not implemented"),
-            ScriptOpcode::MapPlayerCount => panic!("Not implemented"),
-            ScriptOpcode::MapFindSquare => panic!("Not implemented"),
-            ScriptOpcode::MoveCoord => panic!("Not implemented"),
-            ScriptOpcode::PlayerCount => panic!("Not implemented"),
-            ScriptOpcode::ProjAnimMap => panic!("Not implemented"),
-            ScriptOpcode::ProjAnimNpc => panic!("Not implemented"),
-            ScriptOpcode::ProjAnimPl => panic!("Not implemented"),
-            ScriptOpcode::SeqLength => panic!("Not implemented"),
-            ScriptOpcode::SplitGet => panic!("Not implemented"),
-            ScriptOpcode::SplitGetAnim => panic!("Not implemented"),
-            ScriptOpcode::SplitInit => panic!("Not implemented"),
-            ScriptOpcode::SplitLineCount => panic!("Not implemented"),
-            ScriptOpcode::SplitPageCount => panic!("Not implemented"),
-            ScriptOpcode::SpotAnimMap => panic!("Not implemented"),
-            ScriptOpcode::StatRandom => panic!("Not implemented"),
-            ScriptOpcode::StructParam => panic!("Not implemented"),
-            ScriptOpcode::WorldDelay => panic!("Not implemented"),
-            ScriptOpcode::NpcsCount => panic!("Not implemented"),
-            ScriptOpcode::ZonesCount => panic!("Not implemented"),
-            ScriptOpcode::LocsCount => panic!("Not implemented"),
-            ScriptOpcode::ObjsCount => panic!("Not implemented"),
-            ScriptOpcode::MapMulti => panic!("Not implemented"),
+            ScriptOpcode::CoordX
+            | ScriptOpcode::CoordY
+            | ScriptOpcode::CoordZ
+            | ScriptOpcode::Distance
+            | ScriptOpcode::HuntAll
+            | ScriptOpcode::HuntNext
+            | ScriptOpcode::InZone
+            | ScriptOpcode::LineOfSight
+            | ScriptOpcode::LineOfWalk
+            | ScriptOpcode::MapBlocked
+            | ScriptOpcode::MapIndoors
+            | ScriptOpcode::MapClock
+            | ScriptOpcode::MapLocAddUnsafe
+            | ScriptOpcode::MapMembers
+            | ScriptOpcode::MapPlayerCount
+            | ScriptOpcode::MapFindSquare
+            | ScriptOpcode::MoveCoord
+            | ScriptOpcode::PlayerCount
+            | ScriptOpcode::ProjAnimMap
+            | ScriptOpcode::ProjAnimNpc
+            | ScriptOpcode::ProjAnimPl
+            | ScriptOpcode::SeqLength
+            | ScriptOpcode::SplitGet
+            | ScriptOpcode::SplitGetAnim
+            | ScriptOpcode::SplitInit
+            | ScriptOpcode::SplitLineCount
+            | ScriptOpcode::SplitPageCount
+            | ScriptOpcode::SpotAnimMap
+            | ScriptOpcode::StatRandom
+            | ScriptOpcode::StructParam
+            | ScriptOpcode::WorldDelay
+            | ScriptOpcode::NpcsCount
+            | ScriptOpcode::ZonesCount
+            | ScriptOpcode::LocsCount
+            | ScriptOpcode::ObjsCount
+            | ScriptOpcode::MapMulti => panic!("Not implemented"),
             // Player ops (2000-2499)
-            ScriptOpcode::AllowDesign => panic!("Not implemented"),
-            ScriptOpcode::Anim => panic!("Not implemented"),
-            ScriptOpcode::BasReadyAnim => panic!("Not implemented"),
-            ScriptOpcode::BasRunning => panic!("Not implemented"),
-            ScriptOpcode::BasTurnOnSpot => panic!("Not implemented"),
-            ScriptOpcode::BasWalkB => panic!("Not implemented"),
-            ScriptOpcode::BasWalkF => panic!("Not implemented"),
-            ScriptOpcode::BasWalkL => panic!("Not implemented"),
-            ScriptOpcode::BasWalkR => panic!("Not implemented"),
-            ScriptOpcode::BufferFull => panic!("Not implemented"),
-            ScriptOpcode::BuildAppearance => panic!("Not implemented"),
-            ScriptOpcode::Busy => panic!("Not implemented"),
-            ScriptOpcode::CamLookAt => panic!("Not implemented"),
-            ScriptOpcode::CamMoveTo => panic!("Not implemented"),
-            ScriptOpcode::CamReset => panic!("Not implemented"),
-            ScriptOpcode::CamShake => panic!("Not implemented"),
-            ScriptOpcode::ClearQueue => panic!("Not implemented"),
-            ScriptOpcode::ClearSoftTimer => panic!("Not implemented"),
-            ScriptOpcode::ClearTimer => panic!("Not implemented"),
-            ScriptOpcode::GetTimer => panic!("Not implemented"),
-            ScriptOpcode::Coord => panic!("Not implemented"),
-            ScriptOpcode::Damage => panic!("Not implemented"),
-            ScriptOpcode::Displayname => panic!("Not implemented"),
-            ScriptOpcode::FaceSquare => panic!("Not implemented"),
-            ScriptOpcode::FindUid => panic!("Not implemented"),
-            ScriptOpcode::Gender => panic!("Not implemented"),
-            ScriptOpcode::GetQueue => panic!("Not implemented"),
-            ScriptOpcode::StatAdvance => panic!("Not implemented"),
-            ScriptOpcode::HeadiconsGet => panic!("Not implemented"),
-            ScriptOpcode::HeadiconsSet => panic!("Not implemented"),
-            ScriptOpcode::HealEnergy => panic!("Not implemented"),
-            ScriptOpcode::HintCoord => panic!("Not implemented"),
-            ScriptOpcode::HintNpc => panic!("Not implemented"),
-            ScriptOpcode::HintPlayer => panic!("Not implemented"),
-            ScriptOpcode::HintStop => panic!("Not implemented"),
-            ScriptOpcode::IfClose => panic!("Not implemented"),
-            ScriptOpcode::TutClose => panic!("Not implemented"),
-            ScriptOpcode::IfMultiZone => panic!("Not implemented"),
-            ScriptOpcode::IfOpenChat => panic!("Not implemented"),
-            ScriptOpcode::TutOpen => panic!("Not implemented"),
-            ScriptOpcode::IfOpenMain => panic!("Not implemented"),
-            ScriptOpcode::IfOpenMainSide => panic!("Not implemented"),
-            ScriptOpcode::IfOpenSide => panic!("Not implemented"),
-            ScriptOpcode::IfSetAnim => panic!("Not implemented"),
-            ScriptOpcode::IfSetColour => panic!("Not implemented"),
-            ScriptOpcode::IfSetHide => panic!("Not implemented"),
-            ScriptOpcode::IfSetModel => panic!("Not implemented"),
-            ScriptOpcode::IfSetRecol => panic!("Not implemented"),
-            ScriptOpcode::IfSetNpcHead => panic!("Not implemented"),
-            ScriptOpcode::IfSetObject => panic!("Not implemented"),
-            ScriptOpcode::IfSetPlayerHead => panic!("Not implemented"),
-            ScriptOpcode::IfSetPosition => panic!("Not implemented"),
-            ScriptOpcode::IfSetResumeButtons => panic!("Not implemented"),
-            ScriptOpcode::IfSetTab => panic!("Not implemented"),
-            ScriptOpcode::IfSetTabActive => panic!("Not implemented"),
-            ScriptOpcode::TutFlash => panic!("Not implemented"),
-            ScriptOpcode::IfSetText => panic!("Not implemented"),
-            ScriptOpcode::LastLoginInfo => panic!("Not implemented"),
-            ScriptOpcode::LastCom => panic!("Not implemented"),
-            ScriptOpcode::LastInt => panic!("Not implemented"),
-            ScriptOpcode::LastItem => panic!("Not implemented"),
-            ScriptOpcode::LastSlot => panic!("Not implemented"),
-            ScriptOpcode::LastTargetSlot => panic!("Not implemented"),
-            ScriptOpcode::LastUseItem => panic!("Not implemented"),
-            ScriptOpcode::LastUseSlot => panic!("Not implemented"),
-            ScriptOpcode::LongQueue => panic!("Not implemented"),
-            ScriptOpcode::Mes => {
-                println!("{}", state.pop_string());
-                return Ok(());
-            }
-            ScriptOpcode::MidiJingle => panic!("Not implemented"),
-            ScriptOpcode::MidiSong => panic!("Not implemented"),
-            ScriptOpcode::Name => panic!("Not implemented"),
-            ScriptOpcode::PApRange => panic!("Not implemented"),
-            ScriptOpcode::PArriveDelay => panic!("Not implemented"),
-            ScriptOpcode::PCountDialog => panic!("Not implemented"),
-            ScriptOpcode::PDelay => panic!("Not implemented"),
-            ScriptOpcode::PExactMove => panic!("Not implemented"),
-            ScriptOpcode::PFindUid => panic!("Not implemented"),
-            ScriptOpcode::PLocMerge => panic!("Not implemented"),
-            ScriptOpcode::PLogout => panic!("Not implemented"),
-            ScriptOpcode::POpHeld => panic!("Not implemented"),
-            ScriptOpcode::POpLoc => panic!("Not implemented"),
-            ScriptOpcode::POpNpc => panic!("Not implemented"),
-            ScriptOpcode::POpNpcT => panic!("Not implemented"),
-            ScriptOpcode::POpObj => panic!("Not implemented"),
-            ScriptOpcode::POpPlayer => panic!("Not implemented"),
-            ScriptOpcode::POpPlayerT => panic!("Not implemented"),
-            ScriptOpcode::PPauseButton => panic!("Not implemented"),
-            ScriptOpcode::PStopAction => panic!("Not implemented"),
-            ScriptOpcode::PTeleJump => panic!("Not implemented"),
-            ScriptOpcode::PTeleport => panic!("Not implemented"),
-            ScriptOpcode::PWalk => panic!("Not implemented"),
-            ScriptOpcode::PlayerFindAllZone => panic!("Not implemented"),
-            ScriptOpcode::PlayerFindNext => panic!("Not implemented"),
-            ScriptOpcode::Queue => panic!("Not implemented"),
-            ScriptOpcode::Say => panic!("Not implemented"),
-            ScriptOpcode::WalkTrigger => panic!("Not implemented"),
-            ScriptOpcode::SetTimer => panic!("Not implemented"),
-            ScriptOpcode::SoftTimer => panic!("Not implemented"),
-            ScriptOpcode::SoundSynth => panic!("Not implemented"),
-            ScriptOpcode::SpotAnimPl => panic!("Not implemented"),
-            ScriptOpcode::StaffModLevel => panic!("Not implemented"),
-            ScriptOpcode::Stat => panic!("Not implemented"),
-            ScriptOpcode::StatAdd => panic!("Not implemented"),
-            ScriptOpcode::StatBase => panic!("Not implemented"),
-            ScriptOpcode::StatHeal => panic!("Not implemented"),
-            ScriptOpcode::StatSub => panic!("Not implemented"),
-            ScriptOpcode::StrongQueue => panic!("Not implemented"),
-            ScriptOpcode::Uid => panic!("Not implemented"),
-            ScriptOpcode::WeakQueue => panic!("Not implemented"),
-            ScriptOpcode::IfOpenMainOverlay => panic!("Not implemented"),
-            ScriptOpcode::AfkEvent => panic!("Not implemented"),
-            ScriptOpcode::LowMemory => panic!("Not implemented"),
-            ScriptOpcode::SetIdkit => panic!("Not implemented"),
-            ScriptOpcode::PClearPendingAction => panic!("Not implemented"),
-            ScriptOpcode::GetWalkTrigger => panic!("Not implemented"),
-            ScriptOpcode::Busy2 => panic!("Not implemented"),
-            ScriptOpcode::FindHero => panic!("Not implemented"),
-            ScriptOpcode::BothHeroPoints => panic!("Not implemented"),
-            ScriptOpcode::SetGender => panic!("Not implemented"),
-            ScriptOpcode::SetSkinColour => panic!("Not implemented"),
-            ScriptOpcode::PAnimProtect => panic!("Not implemented"),
-            ScriptOpcode::RunEnergy => panic!("Not implemented"),
-            ScriptOpcode::Weight => panic!("Not implemented"),
-            ScriptOpcode::LastCoord => panic!("Not implemented"),
+            ScriptOpcode::AllowDesign
+            | ScriptOpcode::Anim
+            | ScriptOpcode::BasReadyAnim
+            | ScriptOpcode::BasRunning
+            | ScriptOpcode::BasTurnOnSpot
+            | ScriptOpcode::BasWalkB
+            | ScriptOpcode::BasWalkF
+            | ScriptOpcode::BasWalkL
+            | ScriptOpcode::BasWalkR
+            | ScriptOpcode::BufferFull
+            | ScriptOpcode::BuildAppearance
+            | ScriptOpcode::Busy
+            | ScriptOpcode::CamLookAt
+            | ScriptOpcode::CamMoveTo
+            | ScriptOpcode::CamReset
+            | ScriptOpcode::CamShake
+            | ScriptOpcode::ClearQueue
+            | ScriptOpcode::ClearSoftTimer
+            | ScriptOpcode::ClearTimer
+            | ScriptOpcode::GetTimer
+            | ScriptOpcode::Coord
+            | ScriptOpcode::Damage
+            | ScriptOpcode::Displayname
+            | ScriptOpcode::FaceSquare
+            | ScriptOpcode::FindUid
+            | ScriptOpcode::Gender
+            | ScriptOpcode::GetQueue
+            | ScriptOpcode::StatAdvance
+            | ScriptOpcode::HeadiconsGet
+            | ScriptOpcode::HeadiconsSet
+            | ScriptOpcode::HealEnergy
+            | ScriptOpcode::HintCoord
+            | ScriptOpcode::HintNpc
+            | ScriptOpcode::HintPlayer
+            | ScriptOpcode::HintStop
+            | ScriptOpcode::IfClose
+            | ScriptOpcode::TutClose
+            | ScriptOpcode::IfMultiZone
+            | ScriptOpcode::IfOpenChat
+            | ScriptOpcode::TutOpen
+            | ScriptOpcode::IfOpenMain
+            | ScriptOpcode::IfOpenMainSide
+            | ScriptOpcode::IfOpenSide
+            | ScriptOpcode::IfSetAnim
+            | ScriptOpcode::IfSetColour
+            | ScriptOpcode::IfSetHide
+            | ScriptOpcode::IfSetModel
+            | ScriptOpcode::IfSetRecol
+            | ScriptOpcode::IfSetNpcHead
+            | ScriptOpcode::IfSetObject
+            | ScriptOpcode::IfSetPlayerHead
+            | ScriptOpcode::IfSetPosition
+            | ScriptOpcode::IfSetResumeButtons
+            | ScriptOpcode::IfSetTab
+            | ScriptOpcode::IfSetTabActive
+            | ScriptOpcode::TutFlash
+            | ScriptOpcode::IfSetText
+            | ScriptOpcode::LastLoginInfo
+            | ScriptOpcode::LastCom
+            | ScriptOpcode::LastInt
+            | ScriptOpcode::LastItem
+            | ScriptOpcode::LastSlot
+            | ScriptOpcode::LastTargetSlot
+            | ScriptOpcode::LastUseItem
+            | ScriptOpcode::LastUseSlot
+            | ScriptOpcode::LongQueue
+            | ScriptOpcode::Mes
+            | ScriptOpcode::MidiJingle
+            | ScriptOpcode::MidiSong
+            | ScriptOpcode::Name
+            | ScriptOpcode::PApRange
+            | ScriptOpcode::PArriveDelay
+            | ScriptOpcode::PCountDialog
+            | ScriptOpcode::PDelay
+            | ScriptOpcode::PExactMove
+            | ScriptOpcode::PFindUid
+            | ScriptOpcode::PLocMerge
+            | ScriptOpcode::PLogout
+            | ScriptOpcode::POpHeld
+            | ScriptOpcode::POpLoc
+            | ScriptOpcode::POpNpc
+            | ScriptOpcode::POpNpcT
+            | ScriptOpcode::POpObj
+            | ScriptOpcode::POpPlayer
+            | ScriptOpcode::POpPlayerT
+            | ScriptOpcode::PPauseButton
+            | ScriptOpcode::PStopAction
+            | ScriptOpcode::PTeleJump
+            | ScriptOpcode::PTeleport
+            | ScriptOpcode::PWalk
+            | ScriptOpcode::PlayerFindAllZone
+            | ScriptOpcode::PlayerFindNext
+            | ScriptOpcode::Queue
+            | ScriptOpcode::Say
+            | ScriptOpcode::WalkTrigger
+            | ScriptOpcode::SetTimer
+            | ScriptOpcode::SoftTimer
+            | ScriptOpcode::SoundSynth
+            | ScriptOpcode::SpotAnimPl
+            | ScriptOpcode::StaffModLevel
+            | ScriptOpcode::Stat
+            | ScriptOpcode::StatAdd
+            | ScriptOpcode::StatBase
+            | ScriptOpcode::StatHeal
+            | ScriptOpcode::StatSub
+            | ScriptOpcode::StrongQueue
+            | ScriptOpcode::Uid
+            | ScriptOpcode::WeakQueue
+            | ScriptOpcode::IfOpenMainOverlay
+            | ScriptOpcode::AfkEvent
+            | ScriptOpcode::LowMemory
+            | ScriptOpcode::SetIdkit
+            | ScriptOpcode::PClearPendingAction
+            | ScriptOpcode::GetWalkTrigger
+            | ScriptOpcode::Busy2
+            | ScriptOpcode::FindHero
+            | ScriptOpcode::BothHeroPoints
+            | ScriptOpcode::SetGender
+            | ScriptOpcode::SetSkinColour
+            | ScriptOpcode::PAnimProtect
+            | ScriptOpcode::RunEnergy
+            | ScriptOpcode::Weight
+            | ScriptOpcode::LastCoord => panic!("Not implemented"),
             // Npc ops (2500-2999)
-            ScriptOpcode::NpcAdd => panic!("Not implemented"),
-            ScriptOpcode::NpcAnim => panic!("Not implemented"),
-            ScriptOpcode::NpcBaseStat => panic!("Not implemented"),
-            ScriptOpcode::NpcCategory => panic!("Not implemented"),
-            ScriptOpcode::NpcChangeType => panic!("Not implemented"),
-            ScriptOpcode::NpcCoord => panic!("Not implemented"),
-            ScriptOpcode::NpcDamage => panic!("Not implemented"),
-            ScriptOpcode::NpcDel => panic!("Not implemented"),
-            ScriptOpcode::NpcDelay => panic!("Not implemented"),
-            ScriptOpcode::NpcFaceSquare => panic!("Not implemented"),
-            ScriptOpcode::NpcFind => panic!("Not implemented"),
-            ScriptOpcode::NpcFindAllAny => panic!("Not implemented"),
-            ScriptOpcode::NpcFindAll => panic!("Not implemented"),
-            ScriptOpcode::NpcFindExact => panic!("Not implemented"),
-            ScriptOpcode::NpcFindHero => panic!("Not implemented"),
-            ScriptOpcode::NpcFindAllZone => panic!("Not implemented"),
-            ScriptOpcode::NpcFindNext => panic!("Not implemented"),
-            ScriptOpcode::NpcFindUid => panic!("Not implemented"),
-            ScriptOpcode::NpcGetMode => panic!("Not implemented"),
-            ScriptOpcode::NpcHeroPoints => panic!("Not implemented"),
-            ScriptOpcode::NpcName => panic!("Not implemented"),
-            ScriptOpcode::NpcParam => panic!("Not implemented"),
-            ScriptOpcode::NpcQueue => panic!("Not implemented"),
-            ScriptOpcode::NpcRange => panic!("Not implemented"),
-            ScriptOpcode::NpcSay => panic!("Not implemented"),
-            ScriptOpcode::NpcHuntAll => panic!("Not implemented"),
-            ScriptOpcode::NpcHuntNext => panic!("Not implemented"),
-            ScriptOpcode::NpcSetHunt => panic!("Not implemented"),
-            ScriptOpcode::NpcSetHuntMode => panic!("Not implemented"),
-            ScriptOpcode::NpcSetMode => panic!("Not implemented"),
-            ScriptOpcode::NpcWalkTrigger => panic!("Not implemented"),
-            ScriptOpcode::NpcSetTimer => panic!("Not implemented"),
-            ScriptOpcode::NpcStat => panic!("Not implemented"),
-            ScriptOpcode::NpcStatAdd => panic!("Not implemented"),
-            ScriptOpcode::NpcStatHeal => panic!("Not implemented"),
-            ScriptOpcode::NpcStatSub => panic!("Not implemented"),
-            ScriptOpcode::NpcTele => panic!("Not implemented"),
-            ScriptOpcode::NpcType => panic!("Not implemented"),
-            ScriptOpcode::NpcUid => panic!("Not implemented"),
-            ScriptOpcode::SpotAnimNpc => panic!("Not implemented"),
-            ScriptOpcode::NpcWalk => panic!("Not implemented"),
-            ScriptOpcode::NpcAttackRange => panic!("Not implemented"),
-            ScriptOpcode::NpcHasOp => panic!("Not implemented"),
-            ScriptOpcode::NpcArriveDelay => panic!("Not implemented"),
+            ScriptOpcode::NpcAdd
+            | ScriptOpcode::NpcAnim
+            | ScriptOpcode::NpcBaseStat
+            | ScriptOpcode::NpcCategory
+            | ScriptOpcode::NpcChangeType
+            | ScriptOpcode::NpcCoord
+            | ScriptOpcode::NpcDamage
+            | ScriptOpcode::NpcDel
+            | ScriptOpcode::NpcDelay
+            | ScriptOpcode::NpcFaceSquare
+            | ScriptOpcode::NpcFind
+            | ScriptOpcode::NpcFindAllAny
+            | ScriptOpcode::NpcFindAll
+            | ScriptOpcode::NpcFindExact
+            | ScriptOpcode::NpcFindHero
+            | ScriptOpcode::NpcFindAllZone
+            | ScriptOpcode::NpcFindNext
+            | ScriptOpcode::NpcFindUid
+            | ScriptOpcode::NpcGetMode
+            | ScriptOpcode::NpcHeroPoints
+            | ScriptOpcode::NpcName
+            | ScriptOpcode::NpcParam
+            | ScriptOpcode::NpcQueue
+            | ScriptOpcode::NpcRange
+            | ScriptOpcode::NpcSay
+            | ScriptOpcode::NpcHuntAll
+            | ScriptOpcode::NpcHuntNext
+            | ScriptOpcode::NpcSetHunt
+            | ScriptOpcode::NpcSetHuntMode
+            | ScriptOpcode::NpcSetMode
+            | ScriptOpcode::NpcWalkTrigger
+            | ScriptOpcode::NpcSetTimer
+            | ScriptOpcode::NpcStat
+            | ScriptOpcode::NpcStatAdd
+            | ScriptOpcode::NpcStatHeal
+            | ScriptOpcode::NpcStatSub
+            | ScriptOpcode::NpcTele
+            | ScriptOpcode::NpcType
+            | ScriptOpcode::NpcUid
+            | ScriptOpcode::SpotAnimNpc
+            | ScriptOpcode::NpcWalk
+            | ScriptOpcode::NpcAttackRange
+            | ScriptOpcode::NpcHasOp
+            | ScriptOpcode::NpcArriveDelay => panic!("Not implemented"),
             // Loc ops (3000-3499)
-            ScriptOpcode::LocAdd => panic!("Not implemented"),
-            ScriptOpcode::LocAngle => panic!("Not implemented"),
-            ScriptOpcode::LocAnim => panic!("Not implemented"),
-            ScriptOpcode::LocCategory => panic!("Not implemented"),
-            ScriptOpcode::LocChange => panic!("Not implemented"),
-            ScriptOpcode::LocCoord => panic!("Not implemented"),
-            ScriptOpcode::LocDel => panic!("Not implemented"),
-            ScriptOpcode::LocFind => panic!("Not implemented"),
-            ScriptOpcode::LocFindAllZone => panic!("Not implemented"),
-            ScriptOpcode::LocFindNext => panic!("Not implemented"),
-            ScriptOpcode::LocName => panic!("Not implemented"),
-            ScriptOpcode::LocParam => panic!("Not implemented"),
-            ScriptOpcode::LocShape => panic!("Not implemented"),
-            ScriptOpcode::LocType => panic!("Not implemented"),
+            ScriptOpcode::LocAdd
+            | ScriptOpcode::LocAngle
+            | ScriptOpcode::LocAnim
+            | ScriptOpcode::LocCategory
+            | ScriptOpcode::LocChange
+            | ScriptOpcode::LocCoord
+            | ScriptOpcode::LocDel
+            | ScriptOpcode::LocFind
+            | ScriptOpcode::LocFindAllZone
+            | ScriptOpcode::LocFindNext
+            | ScriptOpcode::LocName
+            | ScriptOpcode::LocParam
+            | ScriptOpcode::LocShape
+            | ScriptOpcode::LocType => panic!("Not implemented"),
             // Obj ops (3500-4000)
-            ScriptOpcode::ObjAdd => panic!("Not implemented"),
-            ScriptOpcode::ObjAddAll => panic!("Not implemented"),
-            ScriptOpcode::ObjCoord => panic!("Not implemented"),
-            ScriptOpcode::ObjCount => panic!("Not implemented"),
-            ScriptOpcode::ObjDel => panic!("Not implemented"),
-            ScriptOpcode::ObjName => panic!("Not implemented"),
-            ScriptOpcode::ObjParam => panic!("Not implemented"),
-            ScriptOpcode::ObjTakeItem => panic!("Not implemented"),
-            ScriptOpcode::ObjType => panic!("Not implemented"),
-            ScriptOpcode::ObjFind => panic!("Not implemented"),
+            ScriptOpcode::ObjAdd
+            | ScriptOpcode::ObjAddAll
+            | ScriptOpcode::ObjCoord
+            | ScriptOpcode::ObjCount
+            | ScriptOpcode::ObjDel
+            | ScriptOpcode::ObjName
+            | ScriptOpcode::ObjParam
+            | ScriptOpcode::ObjTakeItem
+            | ScriptOpcode::ObjType
+            | ScriptOpcode::ObjFind => panic!("Not implemented"),
             // Npc config ops (4000-4099)
-            ScriptOpcode::NcCategory => panic!("Not implemented"),
-            ScriptOpcode::NcDebugname => panic!("Not implemented"),
-            ScriptOpcode::NcDesc => panic!("Not implemented"),
-            ScriptOpcode::NcName => panic!("Not implemented"),
-            ScriptOpcode::NcOp => panic!("Not implemented"),
-            ScriptOpcode::NcParam => panic!("Not implemented"),
+            ScriptOpcode::NcCategory
+            | ScriptOpcode::NcDebugname
+            | ScriptOpcode::NcDesc
+            | ScriptOpcode::NcName
+            | ScriptOpcode::NcOp
+            | ScriptOpcode::NcParam => panic!("Not implemented"),
             // Loc config ops (4100-4199)
-            ScriptOpcode::LcCategory => panic!("Not implemented"),
-            ScriptOpcode::LcDebugname => panic!("Not implemented"),
-            ScriptOpcode::LcDesc => panic!("Not implemented"),
-            ScriptOpcode::LcName => panic!("Not implemented"),
-            ScriptOpcode::LcOp => panic!("Not implemented"),
-            ScriptOpcode::LcParam => panic!("Not implemented"),
-            ScriptOpcode::LcWidth => panic!("Not implemented"),
-            ScriptOpcode::LcLength => panic!("Not implemented"),
+            ScriptOpcode::LcCategory
+            | ScriptOpcode::LcDebugname
+            | ScriptOpcode::LcDesc
+            | ScriptOpcode::LcName
+            | ScriptOpcode::LcOp
+            | ScriptOpcode::LcParam
+            | ScriptOpcode::LcWidth
+            | ScriptOpcode::LcLength => panic!("Not implemented"),
             // Obj config ops (4200-4299)
-            ScriptOpcode::OcCategory => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcCert => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcCost => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcDebugname => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcDesc => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcIop => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcMembers => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcName => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcOp => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcParam => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcStackable => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcTradeable => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcUncert => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcWearPos2 => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcWearPos3 => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcWearPos => self.ops.oc.push(self, state, code),
-            ScriptOpcode::OcWeight => self.ops.oc.push(self, state, code),
+            ScriptOpcode::OcCategory
+            | ScriptOpcode::OcCert
+            | ScriptOpcode::OcCost
+            | ScriptOpcode::OcDebugname
+            | ScriptOpcode::OcDesc
+            | ScriptOpcode::OcIop
+            | ScriptOpcode::OcMembers
+            | ScriptOpcode::OcName
+            | ScriptOpcode::OcOp
+            | ScriptOpcode::OcParam
+            | ScriptOpcode::OcStackable
+            | ScriptOpcode::OcTradeable
+            | ScriptOpcode::OcUncert
+            | ScriptOpcode::OcWearPos2
+            | ScriptOpcode::OcWearPos3
+            | ScriptOpcode::OcWearPos
+            | ScriptOpcode::OcWeight => self.ops.oc.push(self, state, code),
             // Inventory ops (4300-4399)
-            ScriptOpcode::InvAllStock => panic!("Not implemented"),
-            ScriptOpcode::InvSize => panic!("Not implemented"),
-            ScriptOpcode::InvStockBase => panic!("Not implemented"),
-            ScriptOpcode::InvAdd => panic!("Not implemented"),
-            ScriptOpcode::InvChangeSlot => panic!("Not implemented"),
-            ScriptOpcode::InvClear => panic!("Not implemented"),
-            ScriptOpcode::InvDel => panic!("Not implemented"),
-            ScriptOpcode::InvDelSlot => panic!("Not implemented"),
-            ScriptOpcode::InvDropItem => panic!("Not implemented"),
-            ScriptOpcode::InvDropSlot => panic!("Not implemented"),
-            ScriptOpcode::InvFreespace => panic!("Not implemented"),
-            ScriptOpcode::InvGetNum => panic!("Not implemented"),
-            ScriptOpcode::InvGetObj => panic!("Not implemented"),
-            ScriptOpcode::InvItemSpace => panic!("Not implemented"),
-            ScriptOpcode::InvItemSpace2 => panic!("Not implemented"),
-            ScriptOpcode::InvMoveFromSlot => panic!("Not implemented"),
-            ScriptOpcode::InvMoveToSlot => panic!("Not implemented"),
-            ScriptOpcode::BothMoveInv => panic!("Not implemented"),
-            ScriptOpcode::InvMoveItem => panic!("Not implemented"),
-            ScriptOpcode::InvMoveItemCert => panic!("Not implemented"),
-            ScriptOpcode::InvMoveItemUncert => panic!("Not implemented"),
-            ScriptOpcode::InvSetSlot => panic!("Not implemented"),
-            ScriptOpcode::InvTotal => panic!("Not implemented"),
-            ScriptOpcode::InvTotalCat => panic!("Not implemented"),
-            ScriptOpcode::InvTransmit => panic!("Not implemented"),
-            ScriptOpcode::InvOtherTransmit => panic!("Not implemented"),
-            ScriptOpcode::InvStopTransmit => panic!("Not implemented"),
-            ScriptOpcode::BothDropSlot => panic!("Not implemented"),
-            ScriptOpcode::InvDropAll => panic!("Not implemented"),
-            ScriptOpcode::InvTotalParam => panic!("Not implemented"),
-            ScriptOpcode::InvTotalParamStack => panic!("Not implemented"),
+            ScriptOpcode::InvAllStock
+            | ScriptOpcode::InvSize
+            | ScriptOpcode::InvStockBase
+            | ScriptOpcode::InvAdd
+            | ScriptOpcode::InvChangeSlot
+            | ScriptOpcode::InvClear
+            | ScriptOpcode::InvDel
+            | ScriptOpcode::InvDelSlot
+            | ScriptOpcode::InvDropItem
+            | ScriptOpcode::InvDropSlot
+            | ScriptOpcode::InvFreespace
+            | ScriptOpcode::InvGetNum
+            | ScriptOpcode::InvGetObj
+            | ScriptOpcode::InvItemSpace
+            | ScriptOpcode::InvItemSpace2
+            | ScriptOpcode::InvMoveFromSlot
+            | ScriptOpcode::InvMoveToSlot
+            | ScriptOpcode::BothMoveInv
+            | ScriptOpcode::InvMoveItem
+            | ScriptOpcode::InvMoveItemCert
+            | ScriptOpcode::InvMoveItemUncert
+            | ScriptOpcode::InvSetSlot
+            | ScriptOpcode::InvTotal
+            | ScriptOpcode::InvTotalCat
+            | ScriptOpcode::InvTransmit
+            | ScriptOpcode::InvOtherTransmit
+            | ScriptOpcode::InvStopTransmit
+            | ScriptOpcode::BothDropSlot
+            | ScriptOpcode::InvDropAll
+            | ScriptOpcode::InvTotalParam
+            | ScriptOpcode::InvTotalParamStack => panic!("Not implemented"),
             // Enum ops (4400-4499)
-            ScriptOpcode::Enum => panic!("Not implemented"),
-            ScriptOpcode::EnumGetOutputCount => panic!("Not implemented"),
+            ScriptOpcode::Enum | ScriptOpcode::EnumGetOutputCount => panic!("Not implemented"),
             // String ops (4500-4599)
-            ScriptOpcode::AppendNum => self.ops.string.push(state, code),
-            ScriptOpcode::Append => self.ops.string.push(state, code),
-            ScriptOpcode::AppendSignNum => self.ops.string.push(state, code),
-            ScriptOpcode::Lowercase => self.ops.string.push(state, code),
-            ScriptOpcode::TextGender => self.ops.string.push(state, code),
-            ScriptOpcode::ToString => self.ops.string.push(state, code),
-            ScriptOpcode::Compare => self.ops.string.push(state, code),
-            ScriptOpcode::TextSwitch => self.ops.string.push(state, code),
-            ScriptOpcode::AppendChar => self.ops.string.push(state, code),
-            ScriptOpcode::StringLength => self.ops.string.push(state, code),
-            ScriptOpcode::SubString => self.ops.string.push(state, code),
-            ScriptOpcode::StringIndexOfChar => self.ops.string.push(state, code),
-            ScriptOpcode::StringIndexOfString => self.ops.string.push(state, code),
+            ScriptOpcode::AppendNum
+            | ScriptOpcode::Append
+            | ScriptOpcode::AppendSignNum
+            | ScriptOpcode::Lowercase
+            | ScriptOpcode::TextGender
+            | ScriptOpcode::ToString
+            | ScriptOpcode::Compare
+            | ScriptOpcode::TextSwitch
+            | ScriptOpcode::AppendChar
+            | ScriptOpcode::StringLength
+            | ScriptOpcode::SubString
+            | ScriptOpcode::StringIndexOfChar
+            | ScriptOpcode::StringIndexOfString => self.ops.string.push(state, code),
             // Number ops (4600-4699)
-            ScriptOpcode::Add => self.ops.math.push(state, code),
-            ScriptOpcode::Sub => self.ops.math.push(state, code),
-            ScriptOpcode::Multiply => self.ops.math.push(state, code),
-            ScriptOpcode::Divide => self.ops.math.push(state, code),
-            ScriptOpcode::Random => self.ops.math.push(state, code),
-            ScriptOpcode::RandomInc => self.ops.math.push(state, code),
-            ScriptOpcode::Interpolate => self.ops.math.push(state, code),
-            ScriptOpcode::AddPercent => self.ops.math.push(state, code),
-            ScriptOpcode::SetBit => self.ops.math.push(state, code),
-            ScriptOpcode::ClearBit => self.ops.math.push(state, code),
-            ScriptOpcode::TestBit => self.ops.math.push(state, code),
-            ScriptOpcode::Modulo => self.ops.math.push(state, code),
-            ScriptOpcode::Pow => self.ops.math.push(state, code),
-            ScriptOpcode::InvPow => self.ops.math.push(state, code),
-            ScriptOpcode::And => self.ops.math.push(state, code),
-            ScriptOpcode::Or => self.ops.math.push(state, code),
-            ScriptOpcode::Min => self.ops.math.push(state, code),
-            ScriptOpcode::Max => self.ops.math.push(state, code),
-            ScriptOpcode::Scale => self.ops.math.push(state, code),
-            ScriptOpcode::BitCount => self.ops.math.push(state, code),
-            ScriptOpcode::ToggleBit => self.ops.math.push(state, code),
-            ScriptOpcode::SetBitRange => self.ops.math.push(state, code),
-            ScriptOpcode::ClearBitRange => self.ops.math.push(state, code),
-            ScriptOpcode::GetBitRange => self.ops.math.push(state, code),
-            ScriptOpcode::SetBitRangeToInt => self.ops.math.push(state, code),
-            ScriptOpcode::SinDeg => self.ops.math.push(state, code),
-            ScriptOpcode::CosDeg => self.ops.math.push(state, code),
-            ScriptOpcode::Atan2Deg => self.ops.math.push(state, code),
-            ScriptOpcode::Abs => self.ops.math.push(state, code),
+            ScriptOpcode::Add
+            | ScriptOpcode::Sub
+            | ScriptOpcode::Multiply
+            | ScriptOpcode::Divide
+            | ScriptOpcode::Random
+            | ScriptOpcode::RandomInc
+            | ScriptOpcode::Interpolate
+            | ScriptOpcode::AddPercent
+            | ScriptOpcode::SetBit
+            | ScriptOpcode::ClearBit
+            | ScriptOpcode::TestBit
+            | ScriptOpcode::Modulo
+            | ScriptOpcode::Pow
+            | ScriptOpcode::InvPow
+            | ScriptOpcode::And
+            | ScriptOpcode::Or
+            | ScriptOpcode::Min
+            | ScriptOpcode::Max
+            | ScriptOpcode::Scale
+            | ScriptOpcode::BitCount
+            | ScriptOpcode::ToggleBit
+            | ScriptOpcode::SetBitRange
+            | ScriptOpcode::ClearBitRange
+            | ScriptOpcode::GetBitRange
+            | ScriptOpcode::SetBitRangeToInt
+            | ScriptOpcode::SinDeg
+            | ScriptOpcode::CosDeg
+            | ScriptOpcode::Atan2Deg
+            | ScriptOpcode::Abs => self.ops.math.push(state, code),
             // DB ops (7500-7599)
-            ScriptOpcode::DbFindWithCount => panic!("Not implemented"),
-            ScriptOpcode::DbFindNext => panic!("Not implemented"),
-            ScriptOpcode::DbGetField => panic!("Not implemented"),
-            ScriptOpcode::DbGetFieldCount => panic!("Not implemented"),
-            ScriptOpcode::DbListAllWithCount => panic!("Not implemented"),
-            ScriptOpcode::DbGetRowTable => panic!("Not implemented"),
-            ScriptOpcode::DbFindByIndex => panic!("Not implemented"),
-            ScriptOpcode::DbFindRefineWithCount => panic!("Not implemented"),
-            ScriptOpcode::DbFind => panic!("Not implemented"),
-            ScriptOpcode::DbFindRefine => panic!("Not implemented"),
-            ScriptOpcode::DbListAll => panic!("Not implemented"),
+            ScriptOpcode::DbFindWithCount
+            | ScriptOpcode::DbFindNext
+            | ScriptOpcode::DbGetField
+            | ScriptOpcode::DbGetFieldCount
+            | ScriptOpcode::DbListAllWithCount
+            | ScriptOpcode::DbGetRowTable
+            | ScriptOpcode::DbFindByIndex
+            | ScriptOpcode::DbFindRefineWithCount
+            | ScriptOpcode::DbFind
+            | ScriptOpcode::DbFindRefine
+            | ScriptOpcode::DbListAll => panic!("Not implemented"),
             // Debug ops (10000-11000)
-            ScriptOpcode::Error => panic!("Not implemented"),
-            ScriptOpcode::MapProduction => panic!("Not implemented"),
-            ScriptOpcode::MapLastClock => panic!("Not implemented"),
-            ScriptOpcode::MapLastWorld => panic!("Not implemented"),
-            ScriptOpcode::MapLastClientIn => panic!("Not implemented"),
-            ScriptOpcode::MapLastNpc => panic!("Not implemented"),
-            ScriptOpcode::MapLastPlayer => panic!("Not implemented"),
-            ScriptOpcode::MapLastLogout => panic!("Not implemented"),
-            ScriptOpcode::MapLastLogin => panic!("Not implemented"),
-            ScriptOpcode::MapLastZone => panic!("Not implemented"),
-            ScriptOpcode::MapLastClientOut => panic!("Not implemented"),
-            ScriptOpcode::MapLastCleanup => panic!("Not implemented"),
-            ScriptOpcode::MapLastBandwidthIn => panic!("Not implemented"),
-            ScriptOpcode::MapLastBandwidthOut => panic!("Not implemented"),
+            ScriptOpcode::Error
+            | ScriptOpcode::MapProduction
+            | ScriptOpcode::MapLastClock
+            | ScriptOpcode::MapLastWorld
+            | ScriptOpcode::MapLastClientIn
+            | ScriptOpcode::MapLastNpc
+            | ScriptOpcode::MapLastPlayer
+            | ScriptOpcode::MapLastLogout
+            | ScriptOpcode::MapLastLogin
+            | ScriptOpcode::MapLastZone
+            | ScriptOpcode::MapLastClientOut
+            | ScriptOpcode::MapLastCleanup
+            | ScriptOpcode::MapLastBandwidthIn
+            | ScriptOpcode::MapLastBandwidthOut => panic!("Not implemented"),
         }
     }
 }
