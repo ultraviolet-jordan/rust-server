@@ -6,8 +6,8 @@ use io::{JagFile, Packet};
 use crate::param::{decode_params, ParamValue};
 
 pub struct ObjProvider {
-    names: HashMap<String, usize>,
-    objs: Vec<Option<ObjType>>,
+    pub names: HashMap<String, usize>,
+    pub objs: Vec<Option<ObjType>>,
 }
 
 impl ObjProvider {
@@ -104,6 +104,13 @@ impl ObjProvider {
             }
             _ => panic!("Could not load objs!"),
         }
+    }
+
+    pub fn mock() -> ObjProvider {
+        return ObjProvider {
+            names: HashMap::new(),
+            objs: Vec::new(),
+        };
     }
 
     /// Retrieves an obj by its ID, invoking the provided callback functions

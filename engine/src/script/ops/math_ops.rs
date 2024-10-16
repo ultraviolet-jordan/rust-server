@@ -48,24 +48,10 @@ impl MathOps {
             ScriptOpcode::CosDeg => self.cos_deg(state),
             ScriptOpcode::Atan2Deg => self.atan2_deg(state),
             ScriptOpcode::Abs => self.abs(state),
-            _ => panic!("Unrecognised math ops code: {:?}", code),
+            _ => Err(format!("Unrecognised math ops code: {:?}", code)),
         }
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(1);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Add);
-    /// assert_eq!(3, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn add(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -74,20 +60,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(1);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Sub);
-    /// assert_eq!(-1, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn sub(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -96,20 +68,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(1);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Multiply);
-    /// assert_eq!(2, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn multiply(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -118,20 +76,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(50);
-    /// state.push_int(5);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Divide);
-    /// assert_eq!(10, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn divide(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -140,20 +84,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(100);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Random);
-    /// let rand = state.pop_int();
-    /// assert!(rand >= 0 && rand <= 99);
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn random(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: f64 = state.pop_int() as f64;
@@ -161,20 +91,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(100);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::RandomInc);
-    /// let rand = state.pop_int();
-    /// assert!(rand >= 0 && rand <= 100);
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn randominc(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: f64 = state.pop_int().wrapping_add(1) as f64;
@@ -194,20 +110,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(50);
-    /// state.push_int(6);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::AddPercent);
-    /// assert_eq!(53, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn addpercent(&self, state: &mut ScriptState) -> Result<(), String> {
         let percent: i32 = state.pop_int();
@@ -220,20 +122,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(11);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::SetBit);
-    /// assert_eq!(15, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn setbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
@@ -242,20 +130,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(15);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::ClearBit);
-    /// assert_eq!(11, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn clearbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
@@ -264,35 +138,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(15);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::TestBit);
-    /// assert_eq!(1, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
-    /// ----
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(11);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::TestBit);
-    /// assert_eq!(0, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn testbit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
@@ -301,20 +146,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(41);
-    /// state.push_int(6);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Modulo);
-    /// assert_eq!(5, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn modulo(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -323,20 +154,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(100);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Pow);
-    /// assert_eq!(10000, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn pow(&self, state: &mut ScriptState) -> Result<(), String> {
         let exponent: i32 = state.pop_int();
@@ -345,20 +162,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(100);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::InvPow);
-    /// assert_eq!(10, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn invpow(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -377,20 +180,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(46);
-    /// state.push_int(33);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::And);
-    /// assert_eq!(32, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn and(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -399,20 +188,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(46);
-    /// state.push_int(533);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Or);
-    /// assert_eq!(575, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn or(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -421,20 +196,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(46);
-    /// state.push_int(533);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Min);
-    /// assert_eq!(46, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn min(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -443,20 +204,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(46);
-    /// state.push_int(533);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Max);
-    /// assert_eq!(533, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn max(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -465,21 +212,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(46);
-    /// state.push_int(533);
-    /// state.push_int(69);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Scale);
-    /// assert_eq!(5, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn scale(&self, state: &mut ScriptState) -> Result<(), String> {
         let c: i32 = state.pop_int();
@@ -489,19 +221,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(15);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::BitCount);
-    /// assert_eq!(4, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn bitcount(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
@@ -509,20 +228,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(11);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::ToggleBit);
-    /// assert_eq!(15, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn togglebit(&self, state: &mut ScriptState) -> Result<(), String> {
         let bit: i32 = state.pop_int();
@@ -531,21 +236,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(0);
-    /// state.push_int(1);
-    /// state.push_int(3);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::SetBitRange);
-    /// assert_eq!(14, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn setbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
@@ -555,21 +245,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(15);
-    /// state.push_int(1);
-    /// state.push_int(3);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::ClearBitRange);
-    /// assert_eq!(1, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn clearbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
@@ -579,21 +254,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(15);
-    /// state.push_int(0);
-    /// state.push_int(2);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::GetBitRange);
-    /// assert_eq!(7, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn getbit_range(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
@@ -606,22 +266,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(0);
-    /// state.push_int(3);
-    /// state.push_int(1);
-    /// state.push_int(3);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::SetBitRangeToInt);
-    /// assert_eq!(6, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn setbit_range_toint(&self, state: &mut ScriptState) -> Result<(), String> {
         let end: i32 = state.pop_int();
@@ -632,19 +276,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(std::f64::consts::PI as i32);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::SinDeg);
-    /// assert_eq!(18, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn sin_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
@@ -652,19 +283,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(std::f64::consts::PI as i32);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::CosDeg);
-    /// assert_eq!(16383, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn cos_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();
@@ -672,20 +290,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(-1);
-    /// state.push_int(1);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Atan2Deg);
-    /// assert_eq!(6144, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn atan2_deg(&self, state: &mut ScriptState) -> Result<(), String> {
         let b: i32 = state.pop_int();
@@ -694,19 +298,6 @@ impl MathOps {
         return Ok(());
     }
 
-    /// ```rust
-    /// use cache::{ScriptFile, ScriptOpcode, ScriptState};
-    /// use engine::script::ops::math_ops::MathOps;
-    ///
-    /// let file = ScriptFile::mock();
-    /// let mut state = ScriptState::mock(&file);
-    /// state.push_int(-136);
-    ///
-    /// let ops = MathOps::new();
-    /// let result = ops.push(&mut state, &ScriptOpcode::Abs);
-    /// assert_eq!(136, state.pop_int());
-    /// assert!(result.is_ok());
-    /// ```
     #[inline(always)]
     fn abs(&self, state: &mut ScriptState) -> Result<(), String> {
         let a: i32 = state.pop_int();

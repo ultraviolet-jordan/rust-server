@@ -31,10 +31,11 @@ impl OcOps {
             ScriptOpcode::OcWearPos3 => panic!("Not implemented"),
             ScriptOpcode::OcWearPos => panic!("Not implemented"),
             ScriptOpcode::OcWeight => panic!("Not implemented"),
-            _ => panic!("Unrecognised oc ops code: {:?}", code),
+            _ => Err(format!("Unrecognised oc ops code: {:?}", code)),
         }
     }
 
+    #[inline(always)]
     fn oc_name(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let obj: &ObjType = engine.pop_obj(state.pop_int())?;
         state.push_string(

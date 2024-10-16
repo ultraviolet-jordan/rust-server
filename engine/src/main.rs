@@ -13,7 +13,7 @@ fn main() {
         std::env::var("MEMBERS").unwrap() == "true",
     ));
 
-    engine.cache.objs.on_by_name(
+    engine.cache.obj_provider.on_by_name(
         "christmas_cracker",
         |obj| {
             if let Some(desc) = &obj.desc {
@@ -56,7 +56,7 @@ fn main() {
     engine.cache.scripts.on_by_name(
         "[proc,get_obj_name]",
         |script| {
-            engine.cache.objs.on_by_name(
+            engine.cache.obj_provider.on_by_name(
                 "christmas_cracker",
                 |obj| {
                     let mut state: ScriptState =

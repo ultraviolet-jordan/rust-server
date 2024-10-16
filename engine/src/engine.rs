@@ -2,7 +2,7 @@ use cache::{
     CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptRunner, ScriptState,
 };
 
-use crate::script::ops::Ops;
+use crate::script::script::Ops;
 
 pub struct Engine {
     pub cache: CacheProvider,
@@ -16,13 +16,20 @@ impl Engine {
             ops: Ops::new(),
         };
     }
+
+    pub fn mock() -> Engine {
+        return Engine {
+            cache: CacheProvider::mock(),
+            ops: Ops::new(),
+        };
+    }
 }
 
 /// It is important to note that these are not commands.
 /// This is specifically for interfacing commands<->engine.
 impl ScriptEngine for Engine {
     fn pop_obj(&self, id: i32) -> Result<&ObjType, String> {
-        return self.cache.objs.get_by_id(id as usize);
+        return self.cache.obj_provider.get_by_id(id as usize);
     }
 
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String> {
@@ -121,7 +128,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::ZonesCount
             | ScriptOpcode::LocsCount
             | ScriptOpcode::ObjsCount
-            | ScriptOpcode::MapMulti => panic!("Not implemented"),
+            | ScriptOpcode::MapMulti => Err("Not implemented".to_string()),
             // Player ops (2000-2499)
             ScriptOpcode::AllowDesign
             | ScriptOpcode::Anim
@@ -245,7 +252,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::PAnimProtect
             | ScriptOpcode::RunEnergy
             | ScriptOpcode::Weight
-            | ScriptOpcode::LastCoord => panic!("Not implemented"),
+            | ScriptOpcode::LastCoord => Err("Not implemented".to_string()),
             // Npc ops (2500-2999)
             ScriptOpcode::NpcAdd
             | ScriptOpcode::NpcAnim
@@ -290,7 +297,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::NpcWalk
             | ScriptOpcode::NpcAttackRange
             | ScriptOpcode::NpcHasOp
-            | ScriptOpcode::NpcArriveDelay => panic!("Not implemented"),
+            | ScriptOpcode::NpcArriveDelay => Err("Not implemented".to_string()),
             // Loc ops (3000-3499)
             ScriptOpcode::LocAdd
             | ScriptOpcode::LocAngle
@@ -305,7 +312,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::LocName
             | ScriptOpcode::LocParam
             | ScriptOpcode::LocShape
-            | ScriptOpcode::LocType => panic!("Not implemented"),
+            | ScriptOpcode::LocType => Err("Not implemented".to_string()),
             // Obj ops (3500-4000)
             ScriptOpcode::ObjAdd
             | ScriptOpcode::ObjAddAll
@@ -316,14 +323,14 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::ObjParam
             | ScriptOpcode::ObjTakeItem
             | ScriptOpcode::ObjType
-            | ScriptOpcode::ObjFind => panic!("Not implemented"),
+            | ScriptOpcode::ObjFind => Err("Not implemented".to_string()),
             // Npc config ops (4000-4099)
             ScriptOpcode::NcCategory
             | ScriptOpcode::NcDebugname
             | ScriptOpcode::NcDesc
             | ScriptOpcode::NcName
             | ScriptOpcode::NcOp
-            | ScriptOpcode::NcParam => panic!("Not implemented"),
+            | ScriptOpcode::NcParam => Err("Not implemented".to_string()),
             // Loc config ops (4100-4199)
             ScriptOpcode::LcCategory
             | ScriptOpcode::LcDebugname
@@ -332,7 +339,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::LcOp
             | ScriptOpcode::LcParam
             | ScriptOpcode::LcWidth
-            | ScriptOpcode::LcLength => panic!("Not implemented"),
+            | ScriptOpcode::LcLength => Err("Not implemented".to_string()),
             // Obj config ops (4200-4299)
             ScriptOpcode::OcCategory
             | ScriptOpcode::OcCert
@@ -382,9 +389,11 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::BothDropSlot
             | ScriptOpcode::InvDropAll
             | ScriptOpcode::InvTotalParam
-            | ScriptOpcode::InvTotalParamStack => panic!("Not implemented"),
+            | ScriptOpcode::InvTotalParamStack => Err("Not implemented".to_string()),
             // Enum ops (4400-4499)
-            ScriptOpcode::Enum | ScriptOpcode::EnumGetOutputCount => panic!("Not implemented"),
+            ScriptOpcode::Enum | ScriptOpcode::EnumGetOutputCount => {
+                Err("Not implemented".to_string())
+            }
             // String ops (4500-4599)
             ScriptOpcode::AppendNum
             | ScriptOpcode::Append
@@ -440,7 +449,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::DbFindRefineWithCount
             | ScriptOpcode::DbFind
             | ScriptOpcode::DbFindRefine
-            | ScriptOpcode::DbListAll => panic!("Not implemented"),
+            | ScriptOpcode::DbListAll => Err("Not implemented".to_string()),
             // Debug ops (10000-11000)
             ScriptOpcode::Error
             | ScriptOpcode::MapProduction
@@ -455,7 +464,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::MapLastClientOut
             | ScriptOpcode::MapLastCleanup
             | ScriptOpcode::MapLastBandwidthIn
-            | ScriptOpcode::MapLastBandwidthOut => panic!("Not implemented"),
+            | ScriptOpcode::MapLastBandwidthOut => Err("Not implemented".to_string()),
         }
     }
 }

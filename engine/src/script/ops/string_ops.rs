@@ -22,10 +22,11 @@ impl StringOps {
             ScriptOpcode::SubString => panic!("Not implemented"),
             ScriptOpcode::StringIndexOfChar => panic!("Not implemented"),
             ScriptOpcode::StringIndexOfString => panic!("Not implemented"),
-            _ => panic!("Unrecognised string ops code: {:?}", code),
+            _ => Err(format!("Unrecognised string ops code: {:?}", code)),
         }
     }
 
+    #[inline(always)]
     fn to_string(&self, state: &mut ScriptState) -> Result<(), String> {
         let int: i32 = state.pop_int();
         state.push_string(int.to_string());

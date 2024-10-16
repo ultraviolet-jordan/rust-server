@@ -838,9 +838,9 @@ impl From<u16> for ScriptOpcode {
 
 #[derive(Clone)]
 pub struct ScriptProvider {
-    names: HashMap<String, usize>,
-    scripts: Vec<Option<ScriptFile>>,
-    lookups: HashMap<i32, usize>,
+    pub names: HashMap<String, usize>,
+    pub scripts: Vec<Option<ScriptFile>>,
+    pub lookups: HashMap<i32, usize>,
 }
 
 impl ScriptProvider {
@@ -894,6 +894,14 @@ impl ScriptProvider {
             names,
             scripts,
             lookups,
+        };
+    }
+
+    pub fn mock() -> ScriptProvider {
+        return ScriptProvider {
+            names: HashMap::new(),
+            scripts: Vec::new(),
+            lookups: HashMap::new(),
         };
     }
 
@@ -1398,7 +1406,7 @@ struct JumpFrame<'script> {
 
 impl<'script> JumpFrame<'script> {}
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 #[repr(i8)]
 pub enum ScriptExecutionState {
     Aborted = -1,
