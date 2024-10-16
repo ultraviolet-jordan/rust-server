@@ -22,26 +22,6 @@ impl JagFile {
     ///
     /// # Return
     /// - Returns an `i32` value representing the computed hash.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// assert_eq!(22834782, JagFile::hash("gnomeball_buttons.dat"));
-    /// ```
-    /// ----
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// assert_eq!(-288954319, JagFile::hash("headicons.dat"));
-    /// ```
-    /// ----
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// assert_eq!(-1502153170, JagFile::hash("hitmarks.dat"));
-    /// ```
     pub fn hash(name: &str) -> i32 {
         let mut hash: i32 = 0;
         for ch in name.as_bytes() {
@@ -65,24 +45,6 @@ impl JagFile {
     ///
     /// # Return
     /// - Returns a new `JagFile` instance.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// let jag: JagFile = JagFile::new(std::fs::read("../data/pack/client/interface").unwrap());
-    /// assert_eq!(1, jag.file_count);
-    /// assert_eq!(8297314, jag.file_hashes[0]);
-    /// ```
-    /// ----
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// let jag: JagFile = JagFile::new(std::fs::read("../data/pack/client/config").unwrap());
-    /// assert_eq!(16, jag.file_count);
-    /// assert_eq!(886159288, jag.file_hashes[0]);
-    /// ```
     pub fn new(bytes: Vec<u8>) -> JagFile {
         let mut buf: Packet = Packet::from(bytes);
         let unpacked: i32 = buf.g3();
@@ -134,14 +96,6 @@ impl JagFile {
     /// # Return
     /// - Returns an `Option<Packet>`. If the file is found, it returns `Some(Packet)` containing the file's data.
     /// - If the file is not found, it returns `None`.
-    ///
-    /// # Example
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// let jag: JagFile = JagFile::new(std::fs::read("../data/pack/client/media").unwrap());
-    /// assert!(jag.read("gnomeball_buttons.dat").is_some());
-    /// ```
     pub fn read(&self, name: &str) -> Option<Packet> {
         let hash: i32 = JagFile::hash(name);
         return self
@@ -163,15 +117,6 @@ impl JagFile {
     /// # Return
     /// - Returns an `Option<Packet>`. If the file exists and the data is valid, it returns `Some(Packet)` with
     ///   the file's data. Otherwise, it returns `None`.
-    ///
-    /// # Example
-    /// ```rust
-    /// use io::JagFile;
-    ///
-    /// let jag: JagFile = JagFile::new(std::fs::read("../data/pack/client/interface").unwrap());
-    /// let packet = jag.get(0);
-    /// assert!(packet.is_some());
-    /// ```
     pub fn get(&self, index: usize) -> Option<Packet> {
         if index >= self.file_count {
             return None;

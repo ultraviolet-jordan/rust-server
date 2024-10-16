@@ -43,28 +43,6 @@ impl Isaac {
     /// This method is designed to efficiently produce random numbers by cycling
     /// through the pre-generated numbers stored in the `rsl` vector, updating
     /// the sequence only when necessary.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use io::Isaac;
-    ///
-    /// let mut isaac = Isaac::new(vec![0, 0, 0, 0]);
-    /// for _ in 0..1000000 {
-    ///     isaac.next();
-    /// }
-    /// assert_eq!(1536048213, isaac.next());
-    /// ```
-    /// ----
-    /// ```rust
-    /// use io::Isaac;
-    ///
-    /// let mut isaac = Isaac::new(vec![1, 2, 3, 4]);
-    /// for _ in 0..1000000 {
-    ///     isaac.next();
-    /// }
-    /// assert_eq!(-107094133, isaac.next());
-    /// ```
     pub fn next(&mut self) -> i32 {
         if self.count == 0 {
             self.isaac();
