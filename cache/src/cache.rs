@@ -6,9 +6,9 @@ pub struct CacheProvider {
 }
 
 impl CacheProvider {
-    pub fn new(dir: &str, members: bool) -> CacheProvider {
+    pub fn new(dir: &str, compiler_version: String, members: bool) -> CacheProvider {
         return CacheProvider {
-            script_provider: ScriptProvider::io(dir),
+            script_provider: ScriptProvider::io(dir, compiler_version),
             obj_provider: ObjProvider::io(dir, members),
         };
     }

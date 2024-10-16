@@ -10,6 +10,7 @@ fn main() {
 
     let engine: Engine = Engine::new(CacheProvider::new(
         "./data/pack",
+        std::env::var("COMPILER_VERSION").unwrap(),
         std::env::var("MEMBERS").unwrap() == "true",
     ));
 

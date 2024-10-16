@@ -1,5 +1,5 @@
-use criterion::measurement::WallTime;
 use criterion::*;
+use criterion::measurement::WallTime;
 
 use io::Packet;
 
@@ -689,31 +689,31 @@ fn bench_gdata(c: &mut Criterion) {
 criterion_group!(
     benches,
     bench_pbit,
-    // bench_gbit,
-    // bench_p1,
-    // bench_g1,
-    // bench_g1s,
-    // bench_p2,
-    // bench_g2,
-    // bench_g2s,
-    // bench_p3,
-    // bench_g3,
-    // bench_p4,
-    // bench_g4s,
-    // bench_p8,
-    // bench_g8s,
-    // bench_pjstr,
-    // bench_gjstr,
-    // bench_psmart_1,
-    // bench_gsmart_1,
-    // bench_psmart_2,
-    // bench_gsmart_2,
-    // bench_psmarts_1,
-    // bench_gsmarts_1,
-    // bench_psmarts_2,
-    // bench_gsmarts_2,
-    // bench_pdata,
-    // bench_gdata
+    bench_gbit,
+    bench_p1,
+    bench_g1,
+    bench_g1s,
+    bench_p2,
+    bench_g2,
+    bench_g2s,
+    bench_p3,
+    bench_g3,
+    bench_p4,
+    bench_g4s,
+    bench_p8,
+    bench_g8s,
+    bench_pjstr,
+    bench_gjstr,
+    bench_psmart_1,
+    bench_gsmart_1,
+    bench_psmart_2,
+    bench_gsmart_2,
+    bench_psmarts_1,
+    bench_gsmarts_1,
+    bench_psmarts_2,
+    bench_gsmarts_2,
+    bench_pdata,
+    bench_gdata
 );
 
 criterion_main!(benches);

@@ -844,7 +844,7 @@ pub struct ScriptProvider {
 }
 
 impl ScriptProvider {
-    pub fn io(dir: &str) -> ScriptProvider {
+    pub fn io(dir: &str, compiler_version: String) -> ScriptProvider {
         let start: Instant = Instant::now();
         let mut dat: Packet = Packet::io(format!("{}/server/script.dat", dir));
         let mut idx: Packet = Packet::io(format!("{}/server/script.idx", dir));
@@ -853,8 +853,7 @@ impl ScriptProvider {
         idx.pos += 2;
 
         let version: i32 = dat.g4s();
-        let compiler: &String = &std::env::var("COMPILER_VERSION").unwrap();
-        if !version.to_string().eq(compiler) {
+        if !version.to_string().eq(&compiler_version) {
             panic!("RuneScript compiler is out of date!");
         }
 
