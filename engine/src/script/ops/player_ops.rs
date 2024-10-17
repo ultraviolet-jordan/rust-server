@@ -16,7 +16,7 @@ impl PlayerOps {
         match code {
             ScriptOpcode::AllowDesign => Err("Not implemented".to_string()),
             ScriptOpcode::Anim => Err("Not implemented".to_string()),
-            ScriptOpcode::BasReadyAnim => Err("Not implemented".to_string()),
+            ScriptOpcode::BasReadyAnim => self.bas_readyanim(engine, state),
             ScriptOpcode::BasRunning => Err("Not implemented".to_string()),
             ScriptOpcode::BasTurnOnSpot => Err("Not implemented".to_string()),
             ScriptOpcode::BasWalkB => Err("Not implemented".to_string()),
@@ -143,5 +143,15 @@ impl PlayerOps {
             ScriptOpcode::LastCoord => Err("Not implemented".to_string()),
             _ => Err(format!("Unrecognised player ops code: {:?}", code)),
         }
+    }
+
+    #[rustfmt::skip]
+    #[inline(always)]
+    fn bas_readyanim(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        let seq: i32 = state.pop_int();
+        engine.on_player_mut(state.get_active_player(), |mut player| {
+            player.set_bas_readyanim(seq);
+        })?;
+        return Ok(());
     }
 }

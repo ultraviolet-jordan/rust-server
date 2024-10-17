@@ -1,4 +1,4 @@
-use cache::{ScriptOpcode, ScriptState};
+use cache::{ScriptEngine, ScriptOpcode, ScriptState};
 
 pub struct StringOps;
 
@@ -7,13 +7,18 @@ impl StringOps {
         return StringOps;
     }
 
-    pub fn push(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String> {
+    pub fn push(
+        &self,
+        engine: &impl ScriptEngine,
+        state: &mut ScriptState,
+        code: &ScriptOpcode,
+    ) -> Result<(), String> {
         match code {
             ScriptOpcode::AppendNum => self.append_num(state),
             ScriptOpcode::Append => self.append(state),
             ScriptOpcode::AppendSignNum => self.append_signnum(state),
             ScriptOpcode::Lowercase => self.lowercase(state),
-            ScriptOpcode::TextGender => self.text_gender(state),
+            ScriptOpcode::TextGender => self.text_gender(engine, state),
             ScriptOpcode::ToString => self.to_string(state),
             ScriptOpcode::Compare => self.compare(state),
             ScriptOpcode::TextSwitch => self.text_switch(state),
@@ -61,21 +66,19 @@ impl StringOps {
         return Ok(());
     }
 
+    #[rustfmt::skip]
     #[inline(always)]
-    fn text_gender(&self, state: &mut ScriptState) -> Result<(), String> {
+    fn text_gender(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let female: String = state.pop_string();
         let male: String = state.pop_string();
-        return match state.get_active_player() {
-            None => Err("Attempted to access no active_player.".to_string()),
-            Some(player) => {
-                if player.gender() == 0 {
-                    state.push_string(male);
-                } else {
-                    state.push_string(female);
-                }
-                return Ok(());
+        engine.on_player(state.get_active_player(), |player| {
+            if player.get_gender() == 0 {
+                state.push_string(male);
+            } else {
+                state.push_string(female);
             }
-        };
+        })?;
+        return Ok(());
     }
 
     #[inline(always)]

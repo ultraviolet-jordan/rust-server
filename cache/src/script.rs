@@ -1,3 +1,4 @@
+use std::cell::{Ref, RefMut};
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -1465,8 +1466,8 @@ pub struct ScriptState<'script> {
     pub int_locals: Vec<i32>,
     pub string_locals: Vec<String>,
     pointers: i32, // state pointers
-    active_player: Option<&'script dyn ScriptPlayer>,
-    active_player2: Option<&'script dyn ScriptPlayer>,
+    active_player: i32,
+    active_player2: i32,
 }
 
 impl<'script> ScriptState<'script> {
@@ -1519,8 +1520,8 @@ impl<'script> ScriptState<'script> {
             int_locals,
             string_locals,
             pointers: 0,
-            active_player: None,
-            active_player2: None,
+            active_player: -1,
+            active_player2: -1,
         }
     }
 
@@ -1541,8 +1542,8 @@ impl<'script> ScriptState<'script> {
             int_locals: Vec::new(),
             string_locals: Vec::new(),
             pointers: 0,
-            active_player: None,
-            active_player2: None,
+            active_player: -1,
+            active_player2: -1,
         };
     }
 
@@ -1970,15 +1971,15 @@ impl<'script> ScriptState<'script> {
         return self.pointer_print(self.pointers);
     }
 
-    pub fn set_active_player(&mut self, player: &'script dyn ScriptPlayer) {
+    pub fn set_active_player(&mut self, player: i32) {
         if self.int_operand() == 0 {
-            self.active_player = Some(player);
+            self.active_player = player;
         } else {
-            self.active_player2 = Some(player);
+            self.active_player2 = player;
         }
     }
 
-    pub fn get_active_player(&self) -> Option<&'script dyn ScriptPlayer> {
+    pub fn get_active_player(&self) -> i32 {
         return if self.int_operand() == 0 {
             self.active_player
         } else {
@@ -2002,8 +2003,15 @@ pub trait ScriptEngine {
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String>;
     fn line_of_sight(&self, from: i32, to: i32) -> bool;
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool;
+    fn on_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    where
+        F: FnOnce(RefMut<dyn ScriptPlayer>);
+    fn on_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    where
+        F: FnOnce(Ref<dyn ScriptPlayer>);
 }
 
 pub trait ScriptPlayer {
-    fn gender(&self) -> u8;
+    fn get_gender(&self) -> u8;
+    fn set_bas_readyanim(&mut self, seq: i32);
 }

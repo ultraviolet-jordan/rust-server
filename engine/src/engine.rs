@@ -1,12 +1,17 @@
+use std::cell::{Ref, RefCell, RefMut};
+
 use cache::{
-    CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptRunner, ScriptState,
+    CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
+    ScriptState,
 };
 
+use crate::entity::player::Player;
 use crate::script::script::Ops;
 
 pub struct Engine {
     pub cache: CacheProvider,
     pub ops: Ops,
+    pub players: Vec<Option<RefCell<Player>>>,
 }
 
 impl Engine {
@@ -14,6 +19,7 @@ impl Engine {
         return Engine {
             cache,
             ops: Ops::new(),
+            players: vec![None; 2048],
         };
     }
 
@@ -21,7 +27,22 @@ impl Engine {
         return Engine {
             cache: CacheProvider::mock(),
             ops: Ops::new(),
+            players: vec![None; 2048],
         };
+    }
+
+    pub fn add_player(&mut self, uid: i32, player: Player) {
+        if let Some(slot) = self.players.get_mut(uid as usize) {
+            *slot = Some(RefCell::new(player));
+        }
+    }
+
+    pub fn get_player(&self, uid: i32) -> Result<Ref<Player>, String> {
+        match self.players.get(uid as usize) {
+            None => Err(format!("Player with uid {} not found in engine", uid)),
+            Some(None) => Err(format!("Player with uid {} not initialized", uid)),
+            Some(Some(player)) => Ok(player.borrow()),
+        }
     }
 }
 
@@ -44,6 +65,38 @@ impl ScriptEngine for Engine {
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool {
         // TODO: zone stuff.
         return false;
+    }
+
+    fn on_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    where
+        F: FnOnce(RefMut<dyn ScriptPlayer>),
+    {
+        match self.players.get(uid as usize) {
+            None => Err(format!("Player with uid {} not found in engine", uid)),
+            Some(x) => match x {
+                None => Err(format!("Player with uid {} not initialized", uid)),
+                Some(player) => {
+                    on_found(player.borrow_mut());
+                    Ok(())
+                }
+            },
+        }
+    }
+
+    fn on_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    where
+        F: FnOnce(Ref<dyn ScriptPlayer>),
+    {
+        match self.players.get(uid as usize) {
+            None => Err(format!("Player with uid {} not found in engine", uid)),
+            Some(x) => match x {
+                None => Err(format!("Player with uid {} not initialized", uid)),
+                Some(player) => {
+                    on_found(player.borrow());
+                    Ok(())
+                }
+            },
+        }
     }
 }
 
@@ -407,7 +460,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::StringLength
             | ScriptOpcode::SubString
             | ScriptOpcode::StringIndexOfChar
-            | ScriptOpcode::StringIndexOfString => self.ops.string.push(state, code),
+            | ScriptOpcode::StringIndexOfString => self.ops.string.push(self, state, code),
             // Number ops (4600-4699)
             ScriptOpcode::Add
             | ScriptOpcode::Sub
