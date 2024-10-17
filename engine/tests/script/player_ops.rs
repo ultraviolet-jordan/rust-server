@@ -15,7 +15,7 @@ pub fn test_bas_readyanim() {
     let mut engine = Engine::mock();
     engine.add_player(0, Player::new());
     state.set_active_player(0);
-    let result = engine.push_script(&ScriptOpcode::BasReadyAnim, &mut state);
+    let result = engine.push_script(&mut state, &ScriptOpcode::BasReadyAnim);
     assert_eq!(69, engine.get_player(0).unwrap().bas_readyanim);
     assert!(result.is_ok());
 }

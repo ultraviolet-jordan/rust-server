@@ -1578,7 +1578,7 @@ impl<'script> ScriptState<'script> {
                         .as_ref()
                         .and_then(|codes| codes.get(self.pc as usize))
                     {
-                        if let Err(err) = runner.push_script(code, self) {
+                        if let Err(err) = runner.push_script(self, code) {
                             self.execution_state = ScriptExecutionState::Aborted;
                             return Err(err);
                         }
@@ -1991,8 +1991,8 @@ impl<'script> ScriptState<'script> {
 pub trait ScriptRunner: ScriptEngine {
     fn push_script<'script>(
         &'script self,
-        code: &ScriptOpcode,
         state: &mut ScriptState<'script>,
+        code: &ScriptOpcode,
     ) -> Result<(), String>;
 }
 

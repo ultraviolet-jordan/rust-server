@@ -7,8 +7,8 @@ fn test_to_string() {
     let mut state = ScriptState::mock(&file);
     state.push_int(420);
 
-    let mut engine = Engine::mock();
-    let result = engine.push_script(&ScriptOpcode::ToString, &mut state);
+    let engine = Engine::mock();
+    let result = engine.push_script(&mut state, &ScriptOpcode::ToString);
     assert_eq!("420", state.pop_string());
     assert!(result.is_ok());
 }

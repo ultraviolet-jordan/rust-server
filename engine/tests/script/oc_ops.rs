@@ -1,6 +1,5 @@
-use cache::{ObjType, ScriptFile, ScriptOpcode, ScriptState};
+use cache::{ObjType, ScriptFile, ScriptOpcode, ScriptRunner, ScriptState};
 use engine::engine::Engine;
-use engine::script::ops::oc_ops::OcOps;
 
 #[test]
 fn test_oc_name() {
@@ -11,7 +10,6 @@ fn test_oc_name() {
     state.pc += 1; // emulate starting the script program.
     state.push_int(0);
 
-    let ops = OcOps::new();
     let mut engine = Engine::mock();
     engine.cache.obj_provider.objs.push(Some(ObjType {
         id: 0,
@@ -60,7 +58,7 @@ fn test_oc_name() {
         params: None,
         debugname: None,
     }));
-    let result = ops.push(&engine, &mut state, &ScriptOpcode::OcName);
+    let result = engine.push_script(&mut state, &ScriptOpcode::OcName);
     assert_eq!("Hello World!", state.pop_string());
     assert!(result.is_ok());
 }

@@ -103,8 +103,8 @@ impl ScriptEngine for Engine {
 impl ScriptRunner for Engine {
     fn push_script<'script>(
         &'script self,
-        code: &ScriptOpcode,
         state: &mut ScriptState<'script>,
+        code: &ScriptOpcode,
     ) -> Result<(), String> {
         // println!("{:?}", code);
         match code {
