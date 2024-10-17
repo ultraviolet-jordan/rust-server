@@ -78,4 +78,13 @@ fn main() {
         },
         || {},
     );
+
+    engine.cache.script_provider.on_by_name(
+        "[proc,test_jump]",
+        |script| {
+            let mut state: ScriptState = ScriptState::new_with_args(script, Vec::new(), Vec::new());
+            let _ = state.execute(&engine, false);
+        },
+        || {},
+    );
 }

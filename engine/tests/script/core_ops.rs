@@ -215,7 +215,7 @@ fn test_return_running() {
 
     state.pc += 1; // emulate starting the script program.
     let script2 = ScriptFile::mock();
-    state.push_frame(&script2);
+    state.gosub_frame(&script2);
     assert_eq!(-1, state.pc);
     assert_eq!(1, state.fp);
 

@@ -1396,14 +1396,10 @@ struct GoSubFrame<'script> {
     string_locals: Vec<String>,
 }
 
-impl<'script> GoSubFrame<'script> {}
-
-struct JumpFrame<'script> {
+struct GoToFrame<'script> {
     script: &'script ScriptFile,
     pc: i32,
 }
-
-impl<'script> JumpFrame<'script> {}
 
 #[derive(PartialEq, Debug)]
 #[repr(i8)]
@@ -1460,6 +1456,8 @@ pub struct ScriptState<'script> {
     pub opcount: i32, // number of opcodes executed
     frame_stack: Vec<GoSubFrame<'script>>,
     pub fp: usize, // frame pointer
+    goto_frame_stack: Vec<GoToFrame<'script>>,
+    pub goto_fp: usize,
     pub int_stack: Vec<i32>,
     pub isp: usize, // integer stack pointer
     pub string_stack: Vec<String>,
@@ -1510,6 +1508,8 @@ impl<'script> ScriptState<'script> {
             opcount: 0,
             frame_stack: Vec::with_capacity(50),
             fp: 0,
+            goto_frame_stack: Vec::with_capacity(50),
+            goto_fp: 0,
             int_stack: vec![0; 1000],
             isp: 0,
             string_stack: vec![String::new(); 1000],
@@ -1528,6 +1528,8 @@ impl<'script> ScriptState<'script> {
             opcount: 0,
             frame_stack: Vec::with_capacity(5),
             fp: 0,
+            goto_frame_stack: Vec::with_capacity(5),
+            goto_fp: 0,
             int_stack: vec![0; 100],
             isp: 0,
             string_stack: vec![String::new(); 100],
@@ -1657,13 +1659,25 @@ impl<'script> ScriptState<'script> {
 
     // ---- frames
 
-    /// Pops the most recent frame from the frame stack and restores its state.
+    /// Pops the most recent subroutine frame from the frame stack and restores its state.
     ///
-    /// This method retrieves the last `GoSubFrame` from the stack, updates the script execution
-    /// context (including the program counter and local variables) back to that frame's state,
-    /// and decreases the frame pointer accordingly. It assumes that there is at least one frame
-    /// to pop.
-    #[inline(always)]
+    /// This method is used to return from a subroutine by restoring the execution context
+    /// from the most recent frame saved via `push_frame`. It retrieves the last `GoSubFrame`
+    /// from the `frame_stack` and updates the current script execution context, including
+    /// the program counter (`pc`) and local variables, to the state of the popped frame.
+    ///
+    /// After restoring the frame, the frame pointer (`fp`) is decremented, reflecting the
+    /// return to the previous frame.
+    ///
+    /// This method assumes that there is at least one frame in the stack to pop, meaning
+    /// it should only be called after a `push_frame` has occurred and control is expected
+    /// to return to a prior frame (i.e., during subroutine completion).
+    ///
+    /// # Behavior
+    ///
+    /// - Pops the most recent `GoSubFrame` from the `frame_stack`.
+    /// - Restores the script, program counter (`pc`), and local variables (`int_locals` and `string_locals`) from the popped frame.
+    /// - Decrements the frame pointer (`fp`) to reflect returning to the previous frame.
     pub fn pop_frame(&mut self) {
         let frame: GoSubFrame = self.frame_stack.pop().unwrap();
         self.fp -= 1;
@@ -1673,19 +1687,33 @@ impl<'script> ScriptState<'script> {
         self.string_locals = frame.string_locals;
     }
 
-    /// Pushes a new frame onto the frame stack for the given script.
+    /// Pushes a new subroutine frame onto the frame stack for the given script.
     ///
-    /// This method saves the current execution context (including the script, program counter,
-    /// and local variables) into a new `GoSubFrame`, pushes it onto the frame stack, and then
-    /// sets the program counter to -1 to prepare for the new frame's execution. It also populates
-    /// local variables with values from the integer and string stacks based on the argument counts
-    /// specified in the `ScriptFile`.
+    /// This method saves the current execution context, including the current script, program counter (PC),
+    /// and local variables, into a new `GoSubFrame`. The frame is then pushed onto the `frame_stack`, allowing
+    /// the current frame to be resumed later when the subroutine completes. This is akin to a `GOSUB` routine
+    /// in traditional programming, where the control flow is expected to return.
+    ///
+    /// After saving the current frame, the program counter (`pc`) is set to -1 to prepare for execution
+    /// in the new subroutine frame. Local variables are populated from the integer and string stacks based
+    /// on the argument counts (`int_arg_count` and `string_arg_count`) specified in the provided `ScriptFile`.
+    ///
+    /// Unlike `goto_frame`, which discards the current frame and does not allow returning, `push_frame`
+    /// preserves the current frame and enables returning to it later, making it suitable for subroutine
+    /// execution where a return point is necessary.
     ///
     /// # Parameters
     ///
-    /// - `script`: A reference to the `ScriptFile` to execute in the new frame.
-    #[inline(always)]
-    pub fn push_frame(&mut self, script: &'script ScriptFile) {
+    /// - `script`: A reference to the `ScriptFile` to execute in the new subroutine frame.
+    ///
+    /// # Behavior
+    ///
+    /// - Saves the current script, program counter, and local variables in a `GoSubFrame`.
+    /// - Pushes this `GoSubFrame` onto the `frame_stack`, allowing the current frame to be resumed later.
+    /// - Increments the frame pointer (`fp`) to reflect the new frame.
+    /// - Resets the program counter (`pc`) to -1 to prepare for execution in the new subroutine.
+    /// - Initializes local integer and string variables by popping them from the respective stacks.
+    pub fn gosub_frame(&mut self, script: &'script ScriptFile) {
         self.frame_stack.push(GoSubFrame {
             script: self.script,
             pc: self.pc,
@@ -1696,12 +1724,66 @@ impl<'script> ScriptState<'script> {
         self.fp += 1;
         self.pc = -1;
 
-        for i in (0..script.int_arg_count as usize).rev() {
-            self.int_locals[i] = self.pop_int();
+        if script.int_arg_count > 0 {
+            for i in (0..script.int_arg_count as usize).rev() {
+                self.int_locals[i] = self.pop_int();
+            }
         }
 
-        for i in (0..script.string_arg_count as usize).rev() {
-            self.string_locals[i] = self.pop_string();
+        if script.string_arg_count > 0 {
+            for i in (0..script.string_arg_count as usize).rev() {
+                self.string_locals[i] = self.pop_string();
+            }
+        }
+
+        self.script = script;
+    }
+
+    /// Jumps to a new goto frame without saving the current frame's context.
+    ///
+    /// This method is used to jump to a new frame in the execution stack, discarding the current frame's context.
+    /// It saves the current script and program counter (PC) into the `goto_frame_stack`, then clears the frame stack,
+    /// sets the current frame pointer (`fp`) to 0, and resets the program counter to -1.
+    ///
+    /// The local integer and string variables for the new frame are populated by popping values from their respective
+    /// stacks, based on the argument counts (`int_arg_count` and `string_arg_count`) specified in the provided `ScriptFile`.
+    ///
+    /// This function differs from a typical subroutine frame push (like in `push_frame`) because it clears the
+    /// frame stack, meaning that control flow does not return to the previous state.
+    ///
+    /// # Parameters
+    ///
+    /// - `script`: A reference to the `ScriptFile` for the new frame to jump to.
+    ///
+    /// # Behavior
+    ///
+    /// - Pushes the current script and program counter onto the `goto_frame_stack`.
+    /// - Increments the `goto_fp` (GoTo Frame Pointer) by 1.
+    /// - Clears the `frame_stack`, discarding any previously saved frames.
+    /// - Resets the frame pointer (`fp`) and program counter (`pc`).
+    /// - Initializes local integer and string variables by popping them from the respective stacks.
+    pub fn goto_frame(&mut self, script: &'script ScriptFile) {
+        self.goto_frame_stack.push(GoToFrame {
+            script: self.script,
+            pc: self.pc,
+        });
+
+        self.goto_fp += 1;
+        self.frame_stack.truncate(0);
+
+        self.fp = 0;
+        self.pc = -1;
+
+        if script.int_arg_count > 0 {
+            for i in (0..script.int_arg_count as usize).rev() {
+                self.int_locals[i] = self.pop_int();
+            }
+        }
+
+        if script.string_arg_count > 0 {
+            for i in (0..script.string_arg_count as usize).rev() {
+                self.string_locals[i] = self.pop_string();
+            }
         }
 
         self.script = script;

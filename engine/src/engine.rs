@@ -252,7 +252,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::PAnimProtect
             | ScriptOpcode::RunEnergy
             | ScriptOpcode::Weight
-            | ScriptOpcode::LastCoord => Err("Not implemented".to_string()),
+            | ScriptOpcode::LastCoord => self.ops.player.push(self, state, code),
             // Npc ops (2500-2999)
             ScriptOpcode::NpcAdd
             | ScriptOpcode::NpcAnim

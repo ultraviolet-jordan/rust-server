@@ -28,8 +28,8 @@ impl CoreOps {
             ScriptOpcode::PushVars => self.push_vars(engine, state),
             ScriptOpcode::PopVars => self.pop_vars(engine, state),
             ScriptOpcode::Return => self._return(state),
-            ScriptOpcode::GoSub => self.gosub(state),
-            ScriptOpcode::Jump => self.jump(state),
+            ScriptOpcode::GoSub => self.gosub(engine, state),
+            ScriptOpcode::Jump => self.jump(engine, state),
             ScriptOpcode::Switch => self.switch(state),
             ScriptOpcode::PushVarbit => self.push_varbit(engine, state),
             ScriptOpcode::PopVarbit => self.pop_varbit(engine, state),
@@ -152,18 +152,41 @@ impl CoreOps {
     }
 
     #[inline(always)]
-    fn gosub(&self, _: &mut ScriptState) -> Result<(), String> {
-        return Err("Not implemented".to_string());
+    fn gosub<'script>(
+        &self,
+        engine: &'script impl ScriptEngine,
+        state: &mut ScriptState<'script>,
+    ) -> Result<(), String> {
+        if state.fp >= 50 {
+            return Err("stack overflow!".to_string());
+        }
+        let script: i32 = state.pop_int();
+        state.gosub_frame(engine.pop_script(script)?);
+        return Ok(());
     }
 
     #[inline(always)]
-    fn jump(&self, _: &mut ScriptState) -> Result<(), String> {
-        return Err("Not implemented".to_string());
+    fn jump<'script>(
+        &self,
+        engine: &'script impl ScriptEngine,
+        state: &mut ScriptState<'script>,
+    ) -> Result<(), String> {
+        let script: i32 = state.pop_int();
+        state.goto_frame(engine.pop_script(script)?);
+        return Ok(());
     }
 
     #[inline(always)]
-    fn switch(&self, _: &mut ScriptState) -> Result<(), String> {
-        return Err("Not implemented".to_string());
+    fn switch(&self, state: &mut ScriptState) -> Result<(), String> {
+        if let Some(result) = state
+            .script
+            .switch_table
+            .as_ref()
+            .and_then(|table| table.get(&state.pop_int()))
+        {
+            state.pc += result;
+        }
+        return Ok(());
     }
 
     #[inline(always)]
@@ -248,17 +271,21 @@ impl CoreOps {
         engine: &'script impl ScriptEngine,
         state: &mut ScriptState<'script>,
     ) -> Result<(), String> {
-        state.push_frame(engine.pop_script(state.int_operand())?);
+        if state.fp >= 50 {
+            return Err("stack overflow!".to_string());
+        }
+        state.gosub_frame(engine.pop_script(state.int_operand())?);
         return Ok(());
     }
 
     #[inline(always)]
     fn jump_with_params<'script>(
         &self,
-        _: &'script impl ScriptEngine,
-        _: &mut ScriptState<'script>,
+        engine: &'script impl ScriptEngine,
+        state: &mut ScriptState<'script>,
     ) -> Result<(), String> {
-        return Err("Not implemented".to_string());
+        state.goto_frame(engine.pop_script(state.int_operand())?);
+        return Ok(());
     }
 
     #[inline(always)]
