@@ -62,8 +62,20 @@ impl StringOps {
     }
 
     #[inline(always)]
-    fn text_gender(&self, _: &mut ScriptState) -> Result<(), String> {
-        return Err("Not implemented".to_string());
+    fn text_gender(&self, state: &mut ScriptState) -> Result<(), String> {
+        let female: String = state.pop_string();
+        let male: String = state.pop_string();
+        return match state.get_active_player() {
+            None => Err("Attempted to access no active_player.".to_string()),
+            Some(player) => {
+                if player.gender() == 0 {
+                    state.push_string(male);
+                } else {
+                    state.push_string(female);
+                }
+                return Ok(());
+            }
+        };
     }
 
     #[inline(always)]

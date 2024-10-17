@@ -1465,6 +1465,8 @@ pub struct ScriptState<'script> {
     pub int_locals: Vec<i32>,
     pub string_locals: Vec<String>,
     pointers: i32, // state pointers
+    active_player: Option<&'script dyn ScriptPlayer>,
+    active_player2: Option<&'script dyn ScriptPlayer>,
 }
 
 impl<'script> ScriptState<'script> {
@@ -1517,6 +1519,8 @@ impl<'script> ScriptState<'script> {
             int_locals,
             string_locals,
             pointers: 0,
+            active_player: None,
+            active_player2: None,
         }
     }
 
@@ -1537,6 +1541,8 @@ impl<'script> ScriptState<'script> {
             int_locals: Vec::new(),
             string_locals: Vec::new(),
             pointers: 0,
+            active_player: None,
+            active_player2: None,
         };
     }
 
@@ -1963,6 +1969,22 @@ impl<'script> ScriptState<'script> {
     pub fn pointer_debug(&self) -> String {
         return self.pointer_print(self.pointers);
     }
+
+    pub fn set_active_player(&mut self, player: &'script dyn ScriptPlayer) {
+        if self.int_operand() == 0 {
+            self.active_player = Some(player);
+        } else {
+            self.active_player2 = Some(player);
+        }
+    }
+
+    pub fn get_active_player(&self) -> Option<&'script dyn ScriptPlayer> {
+        return if self.int_operand() == 0 {
+            self.active_player
+        } else {
+            self.active_player2
+        };
+    }
 }
 
 pub trait ScriptRunner: ScriptEngine {
@@ -1980,4 +2002,8 @@ pub trait ScriptEngine {
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String>;
     fn line_of_sight(&self, from: i32, to: i32) -> bool;
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool;
+}
+
+pub trait ScriptPlayer {
+    fn gender(&self) -> u8;
 }

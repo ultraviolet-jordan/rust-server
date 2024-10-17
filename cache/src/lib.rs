@@ -8,6 +8,7 @@ pub use script::ScriptExecutionState;
 pub use script::ScriptFile;
 pub use script::ScriptInfo;
 pub use script::ScriptOpcode;
+pub use script::ScriptPlayer;
 pub use script::ScriptPointer;
 pub use script::ScriptProvider;
 pub use script::ScriptRunner;
