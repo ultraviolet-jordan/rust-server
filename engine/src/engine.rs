@@ -80,6 +80,10 @@ impl Engine {
         // TODO load maps
         println!("World ready!");
 
+        let mut player = Player::new();
+        player.uid = 0;
+        self.add_player(player.uid, player);
+
         if start_cycle {
             self.cycle();
         }
@@ -182,7 +186,7 @@ impl Engine {
                 self.stats[EngineStat::Cycle as usize]
             );
             println!("----");
-            
+
             sleep(self.tick_rate.saturating_sub(Instant::now() - start));
         }
     }
@@ -203,16 +207,14 @@ impl Engine {
         let start: Instant = Instant::now();
         // - decode packets
         for player in &self.players {
-            if let Some(ref player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
+            if let Some(ref cell) = player {
+                Player::resume_script(cell, self);
             }
         }
         // - process pathfinding/following
         for player in &self.players {
             if let Some(ref player) = player {
                 let _: Ref<Player> = player.borrow();
-                // TODO
             }
         }
         self.stats[EngineStat::ClientsIn as usize] = Instant::now() - start
