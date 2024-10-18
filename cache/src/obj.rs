@@ -152,7 +152,7 @@ impl ObjProvider {
     ///
     /// The time complexity of this function is O(1), as it performs a direct lookup
     /// on the `objs` vector using the index.
-    pub fn on_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
+    pub fn with_script_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ObjType),
         E: FnOnce(),
@@ -241,13 +241,13 @@ impl ObjProvider {
     ///
     /// This function performs two lookups: one in the `names` map and another in the `objs` list. If the name does not exist,
     /// it performs minimal work. The time complexity is O(1) for both lookups.
-    pub fn on_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
+    pub fn with_script_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ObjType),
         E: FnOnce(),
     {
         if let Some(&id) = self.names.get(name) {
-            self.on_by_id(id, on_found, on_not_found);
+            self.with_script_id(id, on_found, on_not_found);
         } else {
             on_not_found();
         }

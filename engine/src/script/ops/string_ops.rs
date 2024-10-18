@@ -71,14 +71,13 @@ impl StringOps {
     fn text_gender(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let female: String = state.pop_string();
         let male: String = state.pop_string();
-        engine.on_player(state.get_active_player(), |player| {
+        return engine.with_player(state.get_active_player(), |player| {
             if player.get_gender() == 0 {
                 state.push_string(male);
             } else {
                 state.push_string(female);
             }
-        })?;
-        return Ok(());
+        });
     }
 
     #[inline(always)]

@@ -15,7 +15,9 @@ impl PlayerOps {
     ) -> Result<(), String> {
         match code {
             ScriptOpcode::AllowDesign => Err("Not implemented".to_string()),
-            ScriptOpcode::Anim => Err("Not implemented".to_string()),
+            ScriptOpcode::Anim => state.protect(&ScriptState::ACTIVE_PLAYER, |state| {
+                self.anim(engine, state)
+            }),
             ScriptOpcode::BasReadyAnim => self.bas_readyanim(engine, state),
             ScriptOpcode::BasRunning => Err("Not implemented".to_string()),
             ScriptOpcode::BasTurnOnSpot => Err("Not implemented".to_string()),
@@ -38,7 +40,7 @@ impl PlayerOps {
             ScriptOpcode::Damage => Err("Not implemented".to_string()),
             ScriptOpcode::Displayname => Err("Not implemented".to_string()),
             ScriptOpcode::FaceSquare => Err("Not implemented".to_string()),
-            ScriptOpcode::FindUid => Err("Not implemented".to_string()),
+            ScriptOpcode::FindUid => self.find_uid(engine, state),
             ScriptOpcode::Gender => Err("Not implemented".to_string()),
             ScriptOpcode::GetQueue => Err("Not implemented".to_string()),
             ScriptOpcode::StatAdvance => Err("Not implemented".to_string()),
@@ -145,13 +147,36 @@ impl PlayerOps {
         }
     }
 
+    // https://x.com/JagexAsh/status/1806246992797921391
+    #[inline(always)]
+    fn anim(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        let delay: i32 = state.pop_int();
+        let seq: i32 = state.pop_int();
+        return engine.with_player_mut(state.get_active_player(), |mut player| {
+            player.play_animation(seq, delay);
+        });
+    }
+
     #[rustfmt::skip]
     #[inline(always)]
     fn bas_readyanim(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let seq: i32 = state.pop_int();
-        engine.on_player_mut(state.get_active_player(), |mut player| {
+        return engine.with_player_mut(state.get_active_player(), |mut player| {
             player.set_bas_readyanim(seq);
-        })?;
-        return Ok(());
+        });
+    }
+
+    #[rustfmt::skip]
+    #[inline(always)]
+    fn find_uid(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        let uid: i32 = state.pop_int();
+        return engine.with_player(uid, |player| {
+            state.set_active_player(uid);
+            state.pointer_add(ScriptState::ACTIVE_PLAYER[state.int_operand() as usize]);
+            state.push_int(1);
+        }).or_else(|_| {
+            state.push_int(0);
+            Ok(())
+        });
     }
 }

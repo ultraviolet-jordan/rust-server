@@ -67,35 +67,35 @@ impl ScriptEngine for Engine {
         return false;
     }
 
-    fn on_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    fn with_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
     where
         F: FnOnce(RefMut<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            None => Err(format!("Player with uid {} not found in engine", uid)),
-            Some(x) => match x {
-                None => Err(format!("Player with uid {} not initialized", uid)),
-                Some(player) => {
-                    on_found(player.borrow_mut());
-                    Ok(())
-                }
-            },
+            Some(Some(player)) => {
+                on_found(player.borrow_mut()); // Call the closure on the found player
+                Ok(())
+            }
+            _ => Err(format!(
+                "Player with uid {} not found or not initialized",
+                uid
+            )),
         }
     }
 
-    fn on_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+    fn with_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
     where
         F: FnOnce(Ref<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            None => Err(format!("Player with uid {} not found in engine", uid)),
-            Some(x) => match x {
-                None => Err(format!("Player with uid {} not initialized", uid)),
-                Some(player) => {
-                    on_found(player.borrow());
-                    Ok(())
-                }
-            },
+            Some(Some(player)) => {
+                on_found(player.borrow()); // Call the closure on the found player
+                Ok(())
+            }
+            _ => Err(format!(
+                "Player with uid {} not found or not initialized",
+                uid
+            )),
         }
     }
 }

@@ -18,7 +18,7 @@ fn bench_fib(c: &mut Criterion) {
         b.iter_batched(
             || script_provider.clone(),
             |provider| {
-                provider.on_by_name(
+                provider.with_script_name(
                     "[proc,fib]",
                     |script| {
                         let mut state: ScriptState =

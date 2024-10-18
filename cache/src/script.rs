@@ -944,7 +944,7 @@ impl ScriptProvider {
     ///
     /// The time complexity of this function is O(1), as it performs a direct lookup
     /// on the `scripts` vector using the index.
-    pub fn on_by_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
+    pub fn with_script_id<F, E>(&self, id: usize, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ScriptFile),
         E: FnOnce(),
@@ -1033,13 +1033,13 @@ impl ScriptProvider {
     ///
     /// This function performs two lookups: one in the `names` map and another in the `scripts` collection. If the name does not exist,
     /// it performs minimal work. The time complexity is O(1) for both lookups.
-    pub fn on_by_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
+    pub fn with_script_name<F, E>(&self, name: &str, on_found: F, on_not_found: E)
     where
         F: FnOnce(&ScriptFile),
         E: FnOnce(),
     {
         if let Some(&id) = self.names.get(name) {
-            self.on_by_id(id, on_found, on_not_found);
+            self.with_script_id(id, on_found, on_not_found);
         } else {
             on_not_found();
         }
@@ -1471,6 +1471,23 @@ pub struct ScriptState<'script> {
 }
 
 impl<'script> ScriptState<'script> {
+    pub const ACTIVE_NPC: [ScriptPointer; 2] =
+        [ScriptPointer::ActiveNpc, ScriptPointer::ActiveNpc2];
+
+    pub const ACTIVE_LOC: [ScriptPointer; 2] =
+        [ScriptPointer::ActiveLoc, ScriptPointer::ActiveLoc2];
+
+    pub const ACTIVE_OBJ: [ScriptPointer; 2] =
+        [ScriptPointer::ActiveObj, ScriptPointer::ActiveObj2];
+
+    pub const ACTIVE_PLAYER: [ScriptPointer; 2] =
+        [ScriptPointer::ActivePlayer, ScriptPointer::ActivePlayer2];
+
+    pub const PROTECTED_ACTIVE_PLAYER: [ScriptPointer; 2] = [
+        ScriptPointer::ProtectedActivePlayer,
+        ScriptPointer::ProtectedActivePlayer2,
+    ];
+
     /// Creates a new `ScriptState` instance with specified `i32` and `String` arguments.
     ///
     /// This method initializes a `ScriptState` for a given `ScriptFile` and sets up local
@@ -1918,11 +1935,9 @@ impl<'script> ScriptState<'script> {
     ///
     /// - This function may panic and terminate the execution if required pointers are not found.
     #[inline(always)]
-    pub fn pointer_check(&self, pointers: &[ScriptPointer]) -> bool {
-        return pointers.iter().all(|&pointer| {
-            let flag: i32 = 1 << pointer as i32;
-            self.pointers & flag == flag
-        });
+    pub fn pointer_check(&self, pointer: ScriptPointer) -> bool {
+        let flag: i32 = 1 << pointer as i32;
+        return self.pointers & flag == flag;
     }
 
     /// Converts the specified flags into a readable string representation of active pointers.
@@ -1971,6 +1986,64 @@ impl<'script> ScriptState<'script> {
         return self.pointer_print(self.pointers);
     }
 
+    /// Protects the execution flow based on pointer validation and executes a callback on success.
+    ///
+    /// This method checks if the script state contains the required pointer based on the current operand.
+    /// If the pointer is valid, the provided `on_success` callback is executed with the script state.
+    /// Otherwise, an error is returned detailing the missing pointer.
+    ///
+    /// # Parameters
+    ///
+    /// - `pointers`: A slice of `ScriptPointer` values representing valid pointers for the current state.
+    /// - `on_success`: A closure that is executed if the required pointer is valid. It receives a mutable reference
+    ///   to the current `ScriptState` and returns a `Result<(), String>`.
+    ///
+    /// # Return
+    ///
+    /// Returns `Ok(())` if the pointer check succeeds and the `on_success` closure executes successfully.
+    /// If the pointer is invalid or the closure returns an error, a `Result::Err` with a descriptive error message is returned.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic, but it assumes that `pointers` has valid indices, which depends on the
+    /// operand value returned by `self.int_operand()`. Out-of-bounds indexing on `pointers` will result in a panic.
+    ///
+    /// # Side Effects
+    ///
+    /// - The state may be modified by the `on_success` closure. The closure has full access to the mutable state.
+    /// - The method does not alter any state if the pointer check fails or if an error is returned.
+    pub fn protect<F>(&mut self, pointers: &[ScriptPointer], on_success: F) -> Result<(), String>
+    where
+        F: FnOnce(&mut ScriptState) -> Result<(), String>,
+    {
+        let pointer: ScriptPointer = pointers[self.int_operand() as usize];
+        if self.pointer_check(pointer) {
+            return on_success(self);
+        }
+        return Err(format!(
+            "Required pointer: {}, current: {}",
+            self.pointer_print(1 << pointer as i32),
+            self.pointer_print(self.pointers)
+        ));
+    }
+
+    /// Sets the active player in the script state based on the current operand.
+    ///
+    /// This method updates either `active_player` or `active_player2` based on the result of `self.int_operand()`.
+    /// If the operand is `0`, `active_player` is set; otherwise, `active_player2` is set.
+    ///
+    /// # Parameters
+    ///
+    /// - `player`: An `i32` representing the player ID to be set as the active player.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic.
+    ///
+    /// # Side Effects
+    ///
+    /// - Modifies the internal state of the `ScriptState` by setting either `active_player` or `active_player2`
+    ///   depending on the operand value.
     pub fn set_active_player(&mut self, player: i32) {
         if self.int_operand() == 0 {
             self.active_player = player;
@@ -1979,6 +2052,23 @@ impl<'script> ScriptState<'script> {
         }
     }
 
+    /// Retrieves the active player from the script state based on the current operand.
+    ///
+    /// This method returns either `active_player` or `active_player2` based on the result of `self.int_operand()`.
+    /// If the operand is `0`, `active_player` is returned; otherwise, `active_player2` is returned.
+    ///
+    /// # Return
+    ///
+    /// Returns an `i32` representing the ID of the active player, which can be either `active_player` or `active_player2`
+    /// depending on the operand value.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic.
+    ///
+    /// # Side Effects
+    ///
+    /// - This function does not modify the internal state; it only reads the current state.
     pub fn get_active_player(&self) -> i32 {
         return if self.int_operand() == 0 {
             self.active_player
@@ -1999,19 +2089,146 @@ pub trait ScriptRunner: ScriptEngine {
 /// It is important to note that these are not commands.
 /// This is specifically for interfacing commands<->engine.
 pub trait ScriptEngine {
+    /// Retrieves an object type (`ObjType`) by its ID from the cache.
+    ///
+    /// This method attempts to retrieve an object (`ObjType`) from the engine's cache using the provided `id`.
+    /// The `id` corresponds to the unique identifier of the object. If the object is found, it is returned as a reference.
+    /// If the object is not found, an error message is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `id`: An `i32` representing the unique identifier of the object to retrieve from the cache.
+    ///
+    /// # Return
+    ///
+    /// Returns `Ok(&ObjType)` if the object is successfully found in the cache. Otherwise, returns `Err(String)` with an error message
+    /// if the object could not be found.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation but assumes that the `id` is a valid integer. Ensure the `id` is within the
+    /// expected bounds to avoid unintended behavior.
+    ///
+    /// # Side Effects
+    ///
+    /// - This method does not modify any state. It only retrieves and returns a reference to the object from the cache.
+    /// - If the object is not found, the cache's internal state remains unaffected, and no changes are made.
+    ///
+    /// # Performance
+    ///
+    /// - **Lookup overhead**: This method performs a lookup in the object provider using `get_by_id`, which typically runs in `O(1)` time.
+    /// - The function is highly efficient for retrieving objects.
     fn pop_obj(&self, id: i32) -> Result<&ObjType, String>;
+
+    /// Retrieves a script file (`ScriptFile`) by its ID from the cache.
+    ///
+    /// This method attempts to retrieve a script (`ScriptFile`) from the engine's cache using the provided `id`.
+    /// The `id` corresponds to the unique identifier of the script. If the script is found, it is returned as a reference.
+    /// If the script is not found, an error message is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `id`: An `i32` representing the unique identifier of the script to retrieve from the cache.
+    ///
+    /// # Return
+    ///
+    /// Returns `Ok(&ScriptFile)` if the script is successfully found in the cache. Otherwise, returns `Err(String)` with an error message
+    /// if the script could not be found.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic under normal operation but assumes that the `id` is a valid integer. Ensure the `id` is within the
+    /// expected bounds to avoid unintended behavior.
+    ///
+    /// # Side Effects
+    ///
+    /// - This method does not modify any state. It only retrieves and returns a reference to the script from the cache.
+    /// - If the script is not found, the cache's internal state remains unaffected, and no changes are made.
+    ///
+    /// # Performance
+    ///
+    /// - **Lookup overhead**: This method performs a lookup in the script provider using `get_by_id`, which typically runs in `O(1)` time.
+    /// - The function is efficient for retrieving scripts.
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String>;
+
     fn line_of_sight(&self, from: i32, to: i32) -> bool;
+
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool;
-    fn on_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+
+    /// Executes a closure on a mutable reference to a player if found, or returns an error if not.
+    ///
+    /// This method attempts to find a player by its `uid` in the engine. If the player is found and initialized,
+    /// the provided closure `on_found` is executed with a mutable reference to the player (`RefMut<dyn ScriptPlayer>`).
+    /// If the player is not found or not initialized, an error is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `uid`: An `i32` representing the unique identifier of the player to be found.
+    /// - `on_found`: A closure that takes a mutable reference (`RefMut<dyn ScriptPlayer>`) to the player and performs operations on it.
+    ///
+    /// # Return
+    ///
+    /// Returns `Ok(())` if the player is found and the closure executes successfully. If the player is not found or is not initialized,
+    /// a `Result::Err` is returned with a descriptive error message.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic. However, ensure the `uid` corresponds to a valid player in the engine to avoid unintended behavior.
+    ///
+    /// # Side Effects
+    ///
+    /// - This method can modify the internal state of the player through the provided closure.
+    /// - The engine's internal player storage remains unchanged unless modified within the closure.
+    ///
+    /// # Performance
+    ///
+    /// - **Lookup overhead**: The function performs a lookup in the `players` vector using `get`. Depending on the size of the vector,
+    ///   this can be an `O(1)` operation for direct indexing, but the cost of checking whether the player is initialized adds a small
+    ///   constant overhead.
+    /// - **Borrowing cost**: The `RefCell::borrow_mut()` call on the player adds some runtime overhead due to borrow checking. The cost
+    ///   is generally low.
+    fn with_player_mut<F>(&self, uid: i32, on_found: F) -> Result<(), String>
     where
         F: FnOnce(RefMut<dyn ScriptPlayer>);
-    fn on_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
+
+    /// Executes a closure on an immutable reference to a player if found, or returns an error if not.
+    ///
+    /// This method attempts to find a player by its `uid` in the engine. If the player is found and initialized,
+    /// the provided closure `on_found` is executed with an immutable reference to the player (`Ref<dyn ScriptPlayer>`).
+    /// If the player is not found or not initialized, an error is returned.
+    ///
+    /// # Parameters
+    ///
+    /// - `uid`: An `i32` representing the unique identifier of the player to be found.
+    /// - `on_found`: A closure that takes an immutable reference (`Ref<dyn ScriptPlayer>`) to the player and performs operations on it.
+    ///
+    /// # Return
+    ///
+    /// Returns `Ok(())` if the player is found and the closure executes successfully. If the player is not found or is not initialized,
+    /// a `Result::Err` is returned with a descriptive error message.
+    ///
+    /// # Panics
+    ///
+    /// This function does not panic. However, ensure the `uid` corresponds to a valid player in the engine to avoid unintended behavior.
+    ///
+    /// # Side Effects
+    ///
+    /// - This method allows read-only access to the player's state. It does not modify the player or engine state.
+    /// - The player's internal state can be read but cannot be modified unless the closure itself performs further operations.
+    ///
+    /// # Performance
+    ///
+    /// - **Lookup overhead**: Similar to `with_player_mut`, this function performs a lookup in the `players` vector, which is generally
+    ///   an `O(1)` operation. Checking whether the player is initialized adds a small constant overhead.
+    /// - **Borrowing cost**: The `RefCell::borrow()` call introduces a slight runtime cost for borrow checking, but it is relatively
+    ///   cheap and typically incurs less overhead than mutable borrowing (`borrow_mut`).
+    fn with_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
     where
         F: FnOnce(Ref<dyn ScriptPlayer>);
 }
 
 pub trait ScriptPlayer {
     fn get_gender(&self) -> u8;
+    fn play_animation(&mut self, seq: i32, delay: i32);
     fn set_bas_readyanim(&mut self, seq: i32);
 }

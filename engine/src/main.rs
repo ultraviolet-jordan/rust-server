@@ -14,7 +14,7 @@ fn main() {
         std::env::var("MEMBERS").unwrap() == "true",
     ));
 
-    engine.cache.obj_provider.on_by_name(
+    engine.cache.obj_provider.with_script_name(
         "christmas_cracker",
         |obj| {
             if let Some(desc) = &obj.desc {
@@ -24,7 +24,7 @@ fn main() {
         || {},
     );
 
-    engine.cache.script_provider.on_by_name(
+    engine.cache.script_provider.with_script_name(
         "[proc,fib]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
@@ -54,10 +54,10 @@ fn main() {
         || {},
     );
 
-    engine.cache.script_provider.on_by_name(
+    engine.cache.script_provider.with_script_name(
         "[proc,get_obj_name]",
         |script| {
-            engine.cache.obj_provider.on_by_name(
+            engine.cache.obj_provider.with_script_name(
                 "christmas_cracker",
                 |obj| {
                     let mut state: ScriptState =
@@ -79,7 +79,7 @@ fn main() {
         || {},
     );
 
-    engine.cache.script_provider.on_by_name(
+    engine.cache.script_provider.with_script_name(
         "[proc,test_jump]",
         |script| {
             let mut state: ScriptState = ScriptState::new_with_args(script, Vec::new(), Vec::new());
