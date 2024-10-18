@@ -8,7 +8,7 @@ fn main() {
     // ----
     dotenv().ok();
 
-    let engine: Engine = Engine::new(CacheProvider::new(
+    let mut engine: Engine = Engine::new(CacheProvider::new(
         "./data/pack",
         std::env::var("COMPILER_VERSION").unwrap(),
         std::env::var("MEMBERS").unwrap() == "true",
@@ -87,4 +87,6 @@ fn main() {
         },
         || {},
     );
+
+    engine.start(true);
 }

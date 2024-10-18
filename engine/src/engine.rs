@@ -1,4 +1,6 @@
 use std::cell::{Ref, RefCell, RefMut};
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
 use cache::{
     CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
@@ -8,27 +10,321 @@ use cache::{
 use crate::entity::player::Player;
 use crate::script::script::Ops;
 
+#[repr(u8)]
+pub enum EngineStat {
+    Cycle,
+    World,
+    ClientsIn,
+    Npcs,
+    Players,
+    Logouts,
+    Logins,
+    Zones,
+    ClientsOut,
+    Cleanup,
+    BandwidthIn,
+    BandwidthOut,
+}
+
+pub struct EngineTick {
+    pub current_tick: i32,
+}
+
+impl EngineTick {
+    pub fn new() -> EngineTick {
+        return EngineTick { current_tick: 0 };
+    }
+
+    pub fn increment(&mut self) {
+        self.current_tick += 1;
+    }
+}
+
 pub struct Engine {
+    pub tick: EngineTick,
+    pub tick_rate: Duration,
     pub cache: CacheProvider,
     pub ops: Ops,
     pub players: Vec<Option<RefCell<Player>>>,
+    pub stats: Vec<Duration>,
+    pub last_stats: Vec<Duration>,
 }
 
 impl Engine {
     pub fn new(cache: CacheProvider) -> Engine {
         return Engine {
+            tick: EngineTick::new(),
+            tick_rate: Duration::from_millis(600),
             cache,
             ops: Ops::new(),
             players: vec![None; 2048],
+            stats: vec![Duration::new(0, 0); 12],
+            last_stats: vec![Duration::new(0, 0); 12],
         };
     }
 
     pub fn mock() -> Engine {
         return Engine {
+            tick: EngineTick::new(),
+            tick_rate: Duration::from_millis(600),
             cache: CacheProvider::mock(),
             ops: Ops::new(),
             players: vec![None; 2048],
+            stats: vec![Duration::new(0, 0); 12],
+            last_stats: vec![Duration::new(0, 0); 12],
         };
+    }
+
+    pub fn start(&mut self, start_cycle: bool) {
+        println!("Starting world...");
+        // TODO load maps
+        println!("World ready!");
+
+        if start_cycle {
+            self.cycle();
+        }
+    }
+
+    #[rustfmt::skip]
+    fn cycle(&mut self) {
+        loop {
+            let start: Instant = Instant::now();
+
+            // world processing
+            // - world queue
+            // - calculate afk event readiness
+            // - npc spawn scripts
+            // - npc hunt
+            self.process_world();
+
+            // client input
+            // - decode packets
+            // - process pathfinding/following
+            self.process_in();
+
+            // npc processing (if npc is not busy)
+            // - resume suspended script
+            // - stat regen
+            // - timer
+            // - queue
+            // - movement
+            // - modes
+            self.process_npcs();
+
+            // player processing
+            // - resume suspended script
+            // - primary queue
+            // - weak queue
+            // - timers
+            // - soft timers
+            // - engine queue
+            // - interactions
+            // - movement
+            // - close interface if attempting to logout
+            self.process_players();
+
+            // player logout
+            self.process_logouts();
+
+            // player login, good spot for it (before packets so they immediately load but after processing so nothing hits them)
+            self.process_logins();
+
+            // process zones
+            // - build list of active zones around players
+            // - loc/obj despawn/respawn
+            // - compute shared buffer
+            self.process_zones();
+
+            // process movement directions
+            // - convert player movements
+            // - convert npc movements
+            self.process_movement_dirs();
+
+            // client output
+            // - map update
+            // - player info
+            // - npc info
+            // - zone updates
+            // - inv changes
+            // - stat changes
+            // - afk zones changes
+            // - flush packets
+            self.process_out();
+
+            // cleanup
+            // - reset zones
+            // - reset players
+            // - reset npcs
+            // - reset invs
+            self.process_cleanup();
+
+            // cycle the world now
+            self.tick.increment();
+            self.stats[EngineStat::Cycle as usize] = Instant::now() - start;
+
+            // update stats
+            self.last_stats[EngineStat::Cycle as usize] = self.stats[EngineStat::Cycle as usize];
+            self.last_stats[EngineStat::World as usize] = self.stats[EngineStat::World as usize];
+            self.last_stats[EngineStat::ClientsIn as usize] = self.stats[EngineStat::ClientsIn as usize];
+            self.last_stats[EngineStat::Npcs as usize] = self.stats[EngineStat::Npcs as usize];
+            self.last_stats[EngineStat::Players as usize] = self.stats[EngineStat::Players as usize];
+            self.last_stats[EngineStat::Logouts as usize] = self.stats[EngineStat::Logouts as usize];
+            self.last_stats[EngineStat::Logins as usize] = self.stats[EngineStat::Logins as usize];
+            self.last_stats[EngineStat::Zones as usize] = self.stats[EngineStat::Zones as usize];
+            self.last_stats[EngineStat::ClientsOut as usize] = self.stats[EngineStat::ClientsOut as usize];
+            self.last_stats[EngineStat::Cleanup as usize] = self.stats[EngineStat::Cleanup as usize];
+            self.last_stats[EngineStat::BandwidthIn as usize] = self.stats[EngineStat::BandwidthIn as usize];
+            self.last_stats[EngineStat::BandwidthOut as usize] = self.stats[EngineStat::BandwidthOut as usize];
+
+            println!(
+                "tick {} took {:?}",
+                self.tick.current_tick,
+                self.stats[EngineStat::Cycle as usize]
+            );
+            println!("----");
+            
+            sleep(self.tick_rate.saturating_sub(Instant::now() - start));
+        }
+    }
+
+    // - world queue
+    // - calculate afk event readiness
+    // - npc spawn scripts
+    // - npc hunt
+    fn process_world(&mut self) {
+        let start: Instant = Instant::now();
+        // TODO
+        self.stats[EngineStat::World as usize] = Instant::now() - start
+    }
+
+    // - decode packets
+    // - process pathfinding/following
+    fn process_in(&mut self) {
+        let start: Instant = Instant::now();
+        // - decode packets
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        // - process pathfinding/following
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        self.stats[EngineStat::ClientsIn as usize] = Instant::now() - start
+    }
+
+    // - resume suspended script
+    // - stat regen
+    // - timer
+    // - queue
+    // - movement
+    // - modes
+    fn process_npcs(&mut self) {
+        let start: Instant = Instant::now();
+        // TODO
+        self.stats[EngineStat::Npcs as usize] = Instant::now() - start
+    }
+
+    // - resume suspended script
+    // - primary queue
+    // - weak queue
+    // - timers
+    // - soft timers
+    // - engine queue
+    // - interactions
+    // - movement
+    // - close interface if attempting to logout
+    fn process_players(&mut self) {
+        let start: Instant = Instant::now();
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        self.stats[EngineStat::Players as usize] = Instant::now() - start
+    }
+
+    fn process_logouts(&mut self) {
+        let start: Instant = Instant::now();
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        self.stats[EngineStat::Logouts as usize] = Instant::now() - start
+    }
+
+    fn process_logins(&mut self) {
+        let start: Instant = Instant::now();
+        // TODO
+        self.stats[EngineStat::Logins as usize] = Instant::now() - start
+    }
+
+    // - build list of active zones around players
+    // - loc/obj despawn/respawn
+    // - compute shared buffer
+    fn process_zones(&mut self) {
+        let start: Instant = Instant::now();
+        // TODO
+        self.stats[EngineStat::Zones as usize] = Instant::now() - start
+    }
+
+    // - convert player movements
+    // - convert npc movements
+    fn process_movement_dirs(&self) {
+        // TODO: benchmark this?
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        // TODO
+    }
+
+    // - map update
+    // - player info
+    // - npc info
+    // - zone updates
+    // - inv changes
+    // - stat changes
+    // - afk zones changes
+    // - flush packets
+    fn process_out(&mut self) {
+        let start: Instant = Instant::now();
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        self.stats[EngineStat::ClientsOut as usize] = Instant::now() - start
+    }
+
+    // - reset zones
+    // - reset players
+    // - reset npcs
+    // - reset invs
+    fn process_cleanup(&mut self) {
+        let start: Instant = Instant::now();
+        // - reset zones
+        // - reset players
+        for player in &self.players {
+            if let Some(ref player) = player {
+                let _: Ref<Player> = player.borrow();
+                // TODO
+            }
+        }
+        // - reset npcs
+        // - reset invs
+        self.stats[EngineStat::Cleanup as usize] = Instant::now() - start
     }
 
     pub fn add_player(&mut self, uid: i32, player: Player) {
@@ -72,7 +368,7 @@ impl ScriptEngine for Engine {
         F: FnOnce(RefMut<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            Some(Some(player)) => {
+            Some(Some(ref player)) => {
                 on_found(player.borrow_mut()); // Call the closure on the found player
                 Ok(())
             }
@@ -88,7 +384,7 @@ impl ScriptEngine for Engine {
         F: FnOnce(Ref<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            Some(Some(player)) => {
+            Some(Some(ref player)) => {
                 on_found(player.borrow()); // Call the closure on the found player
                 Ok(())
             }
