@@ -80,6 +80,7 @@ impl Engine {
         // TODO load maps
         println!("World ready!");
 
+        // this is just for testing player script running.
         let mut player: Player = Player::new();
         player.uid = 0;
         let script = self
@@ -213,13 +214,13 @@ impl Engine {
         let start: Instant = Instant::now();
         // - decode packets
         for player in &self.players {
-            if let Some(ref cell) = player {
+            if let Some(cell) = player {
                 Player::resume_script(cell, self); // just testing
             }
         }
         // - process pathfinding/following
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let player: Ref<Player> = player.borrow(); // just testing
                 if player.uid == 0 {
                     assert_eq!(69, player.bas_readyanim);
@@ -255,7 +256,7 @@ impl Engine {
     fn process_players(&mut self) {
         let start: Instant = Instant::now();
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let _: Ref<Player> = player.borrow();
                 // TODO
             }
@@ -266,7 +267,7 @@ impl Engine {
     fn process_logouts(&mut self) {
         let start: Instant = Instant::now();
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let _: Ref<Player> = player.borrow();
                 // TODO
             }
@@ -294,7 +295,7 @@ impl Engine {
     fn process_movement_dirs(&self) {
         // TODO: benchmark this?
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let _: Ref<Player> = player.borrow();
                 // TODO
             }
@@ -313,7 +314,7 @@ impl Engine {
     fn process_out(&mut self) {
         let start: Instant = Instant::now();
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let _: Ref<Player> = player.borrow();
                 // TODO
             }
@@ -330,7 +331,7 @@ impl Engine {
         // - reset zones
         // - reset players
         for player in &self.players {
-            if let Some(ref player) = player {
+            if let Some(player) = player {
                 let _: Ref<Player> = player.borrow();
                 // TODO
             }
@@ -381,7 +382,7 @@ impl ScriptEngine for Engine {
         F: FnOnce(RefMut<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            Some(Some(ref player)) => {
+            Some(Some(player)) => {
                 on_found(player.borrow_mut()); // Call the closure on the found player
                 Ok(())
             }
@@ -397,7 +398,7 @@ impl ScriptEngine for Engine {
         F: FnOnce(Ref<dyn ScriptPlayer>),
     {
         match self.players.get(uid as usize) {
-            Some(Some(ref player)) => {
+            Some(Some(player)) => {
                 on_found(player.borrow()); // Call the closure on the found player
                 Ok(())
             }
