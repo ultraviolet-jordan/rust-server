@@ -1,6 +1,6 @@
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
 
-use cache::{ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner, ScriptState};
+use cache::{ScriptEngine, ScriptExecutionState, ScriptPlayer, ScriptRunner, ScriptState};
 
 #[derive(Clone)]
 pub struct Player {
@@ -11,6 +11,7 @@ pub struct Player {
     pub anim_delay: i32,
     pub anim_protect: bool,
     pub bas_readyanim: i32,
+    pub active_script: Option<ScriptState>,
 }
 
 impl Player {
@@ -34,32 +35,32 @@ impl Player {
             anim_delay: -1,
             anim_protect: false,
             bas_readyanim: -1,
+            active_script: None,
         };
     }
 
     pub fn resume_script(cell: &RefCell<Player>, engine: &(impl ScriptEngine + ScriptRunner)) {
-        let mut file = ScriptFile::mock();
-        file.int_operands.push(0);
-        let mut state = ScriptState::mock(&file);
-        state.pc += 1; // emulate starting the script program.
-        state.push_int(10);
-        state.set_active_player(0);
+        let mut player: RefMut<Player> = cell.borrow_mut();
+        if let Some(mut state) = player.active_script.take() {
+            // just testing
+            state.pc = 0; // reset program.
+            state.push_int(69); // bas_anim id.
+            state.active_player = 0; // active player uid.
 
-        let result = engine.push_script(&mut state, &ScriptOpcode::BasReadyAnim);
-        assert!(result.is_ok());
+            drop(player); // drop the borrow before running.
+            let result: Result<(), String> = state.execute(engine, true);
 
-        let player = cell.borrow();
-        assert_eq!(10, player.bas_readyanim);
-        drop(player);
-
-        let mut player = cell.borrow_mut();
-        player.bas_readyanim = 69;
-        assert_eq!(69, player.bas_readyanim);
-        drop(player);
-
-        let player = cell.borrow();
-        assert_eq!(0, player.uid);
-        drop(player);
+            match result {
+                Ok(()) => {
+                    let mut player: RefMut<Player> = cell.borrow_mut(); // reborrow and check.
+                    assert_eq!(69, player.bas_readyanim);
+                    if state.execution_state == ScriptExecutionState::Running {
+                        player.active_script = Some(state); // put it back on the player.
+                    }
+                }
+                Err(s) => println!("{}", s),
+            }
+        }
     }
 }
 

@@ -5,7 +5,7 @@ use engine::engine::Engine;
 fn test_push_constant_int() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -20,7 +20,7 @@ fn test_push_constant_int() {
 fn test_push_constant_string() {
     let mut file = ScriptFile::mock();
     file.string_operands.push("Hello World!".to_string());
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -35,7 +35,7 @@ fn test_push_constant_string() {
 fn test_branch() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -50,7 +50,7 @@ fn test_branch() {
 fn test_branch_not_1() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -66,7 +66,7 @@ fn test_branch_not_1() {
 #[test]
 fn test_branch_not_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -82,7 +82,7 @@ fn test_branch_not_0() {
 #[test]
 fn test_branch_equals_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -99,7 +99,7 @@ fn test_branch_equals_0() {
 fn test_branch_equals_1() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -116,7 +116,7 @@ fn test_branch_equals_1() {
 fn test_branch_less_than_1() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -132,7 +132,7 @@ fn test_branch_less_than_1() {
 #[test]
 fn test_branch_less_than_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -148,7 +148,7 @@ fn test_branch_less_than_0() {
 #[test]
 fn test_branch_greater_than_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -165,7 +165,7 @@ fn test_branch_greater_than_0() {
 fn test_branch_greater_than_1() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -181,7 +181,7 @@ fn test_branch_greater_than_1() {
 #[test]
 fn test_return_finished() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -197,12 +197,12 @@ fn test_return_finished() {
 fn test_return_running() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
     let script2 = ScriptFile::mock();
-    state.gosub_frame(&script2);
+    state.gosub_frame(script2);
     assert_eq!(-1, state.pc);
     assert_eq!(1, state.fp);
 
@@ -217,7 +217,7 @@ fn test_return_running() {
 fn test_branch_less_than_or_equals_1() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -233,7 +233,7 @@ fn test_branch_less_than_or_equals_1() {
 #[test]
 fn test_branch_less_than_or_equals_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -249,7 +249,7 @@ fn test_branch_less_than_or_equals_0() {
 #[test]
 fn test_branch_greater_than_or_equals_1() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -266,7 +266,7 @@ fn test_branch_greater_than_or_equals_1() {
 fn test_branch_greater_than_or_equals_0() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -283,7 +283,7 @@ fn test_branch_greater_than_or_equals_0() {
 fn test_push_int_local() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.int_locals.push(1);
@@ -299,7 +299,7 @@ fn test_push_int_local() {
 fn test_pop_int_local() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.int_locals.push(0);
@@ -316,7 +316,7 @@ fn test_pop_int_local() {
 fn test_join_string() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(2);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.

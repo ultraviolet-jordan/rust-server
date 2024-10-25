@@ -4,7 +4,7 @@ use engine::engine::Engine;
 #[test]
 fn test_oc_name() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.

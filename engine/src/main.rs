@@ -27,7 +27,8 @@ fn main() {
     engine.cache.script_provider.with_script_name(
         "[proc,fib]",
         |script| {
-            let mut state: ScriptState = ScriptState::new_with_args(script, vec![45], Vec::new());
+            let mut state: ScriptState =
+                ScriptState::new_with_args(script.clone(), vec![45], Vec::new());
             state.pointer_add(ScriptPointer::ProtectedActivePlayer);
             match state.execute(&engine, false) {
                 Ok(()) => {
@@ -61,7 +62,7 @@ fn main() {
                 "christmas_cracker",
                 |obj| {
                     let mut state: ScriptState =
-                        ScriptState::new_with_args(script, vec![obj.id as i32], Vec::new());
+                        ScriptState::new_with_args(script.clone(), vec![obj.id as i32], Vec::new());
                     match state.execute(&engine, false) {
                         Ok(()) => {
                             println!(
@@ -82,7 +83,8 @@ fn main() {
     engine.cache.script_provider.with_script_name(
         "[proc,test_jump]",
         |script| {
-            let mut state: ScriptState = ScriptState::new_with_args(script, Vec::new(), Vec::new());
+            let mut state: ScriptState =
+                ScriptState::new_with_args(script.clone(), Vec::new(), Vec::new());
             let _ = state.execute(&engine, false);
         },
         || {},

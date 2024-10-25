@@ -6,7 +6,7 @@ use engine::entity::player::Player;
 pub fn test_bas_readyanim() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -24,7 +24,7 @@ pub fn test_bas_readyanim() {
 pub fn test_anim_no_access() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(1);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -38,7 +38,7 @@ pub fn test_anim_no_access() {
 pub fn test_anim_with_access() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -57,7 +57,7 @@ pub fn test_anim_with_access() {
 pub fn test_find_uid_true() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.
@@ -75,7 +75,7 @@ pub fn test_find_uid_true() {
 pub fn test_find_uid_false() {
     let mut file = ScriptFile::mock();
     file.int_operands.push(0);
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     assert_eq!(-1, state.pc);
 
     state.pc += 1; // emulate starting the script program.

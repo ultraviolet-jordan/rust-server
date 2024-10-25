@@ -80,8 +80,14 @@ impl Engine {
         // TODO load maps
         println!("World ready!");
 
-        let mut player = Player::new();
+        let mut player: Player = Player::new();
         player.uid = 0;
+        let script = self
+            .cache
+            .script_provider
+            .get_by_name("[proc,testbas]")
+            .unwrap();
+        player.active_script = Some(ScriptState::new_with_args(script.clone(), vec![], vec![]));
         self.add_player(player.uid, player);
 
         if start_cycle {
@@ -208,13 +214,18 @@ impl Engine {
         // - decode packets
         for player in &self.players {
             if let Some(ref cell) = player {
-                Player::resume_script(cell, self);
+                Player::resume_script(cell, self); // just testing
             }
         }
         // - process pathfinding/following
         for player in &self.players {
             if let Some(ref player) = player {
-                let _: Ref<Player> = player.borrow();
+                let player: Ref<Player> = player.borrow(); // just testing
+                if player.uid == 0 {
+                    assert_eq!(69, player.bas_readyanim);
+                } else {
+                    assert_eq!(-1, player.bas_readyanim);
+                }
             }
         }
         self.stats[EngineStat::ClientsIn as usize] = Instant::now() - start
@@ -399,11 +410,7 @@ impl ScriptEngine for Engine {
 }
 
 impl ScriptRunner for Engine {
-    fn push_script<'script>(
-        &'script self,
-        state: &mut ScriptState<'script>,
-        code: &ScriptOpcode,
-    ) -> Result<(), String> {
+    fn push_script(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String> {
         // println!("{:?}", code);
         match code {
             // Core language ops (0-99)

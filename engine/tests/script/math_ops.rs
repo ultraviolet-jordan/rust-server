@@ -4,7 +4,7 @@ use engine::script::ops::math_ops::MathOps;
 #[test]
 fn test_add() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(1);
     state.push_int(2);
 
@@ -17,7 +17,7 @@ fn test_add() {
 #[test]
 fn test_sub() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(1);
     state.push_int(2);
 
@@ -30,7 +30,7 @@ fn test_sub() {
 #[test]
 fn test_multiply() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(1);
     state.push_int(2);
 
@@ -43,7 +43,7 @@ fn test_multiply() {
 #[test]
 fn test_divide() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(50);
     state.push_int(5);
 
@@ -56,7 +56,7 @@ fn test_divide() {
 #[test]
 fn test_random() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(100);
 
     let ops = MathOps::new();
@@ -69,7 +69,7 @@ fn test_random() {
 #[test]
 fn test_randominc() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(100);
 
     let ops = MathOps::new();
@@ -82,7 +82,7 @@ fn test_randominc() {
 #[test]
 fn test_addpercent() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(50);
     state.push_int(6);
 
@@ -95,7 +95,7 @@ fn test_addpercent() {
 #[test]
 fn test_setbit() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(11);
     state.push_int(2);
 
@@ -108,7 +108,7 @@ fn test_setbit() {
 #[test]
 fn test_clearbit() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(15);
     state.push_int(2);
 
@@ -121,7 +121,7 @@ fn test_clearbit() {
 #[test]
 fn test_testbit_1() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(15);
     state.push_int(2);
 
@@ -134,7 +134,7 @@ fn test_testbit_1() {
 #[test]
 fn test_testbit_0() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(11);
     state.push_int(2);
 
@@ -147,7 +147,7 @@ fn test_testbit_0() {
 #[test]
 fn test_modulo() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(41);
     state.push_int(6);
 
@@ -160,7 +160,7 @@ fn test_modulo() {
 #[test]
 fn test_pow() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(100);
     state.push_int(2);
 
@@ -173,7 +173,7 @@ fn test_pow() {
 #[test]
 fn test_invpow() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(100);
     state.push_int(2);
 
@@ -186,7 +186,7 @@ fn test_invpow() {
 #[test]
 fn test_and() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(46);
     state.push_int(33);
 
@@ -199,7 +199,7 @@ fn test_and() {
 #[test]
 fn test_or() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(46);
     state.push_int(533);
 
@@ -212,7 +212,7 @@ fn test_or() {
 #[test]
 fn test_min() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(46);
     state.push_int(533);
 
@@ -225,7 +225,7 @@ fn test_min() {
 #[test]
 fn test_max() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(46);
     state.push_int(533);
 
@@ -238,7 +238,7 @@ fn test_max() {
 #[test]
 fn test_scale() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(46);
     state.push_int(533);
     state.push_int(69);
@@ -252,7 +252,7 @@ fn test_scale() {
 #[test]
 fn test_bitcount() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(15);
 
     let ops = MathOps::new();
@@ -264,7 +264,7 @@ fn test_bitcount() {
 #[test]
 fn test_togglebit() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(11);
     state.push_int(2);
 
@@ -277,7 +277,7 @@ fn test_togglebit() {
 #[test]
 fn test_setbit_range() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(0);
     state.push_int(1);
     state.push_int(3);
@@ -291,7 +291,7 @@ fn test_setbit_range() {
 #[test]
 fn test_clearbit_range() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(15);
     state.push_int(1);
     state.push_int(3);
@@ -305,7 +305,7 @@ fn test_clearbit_range() {
 #[test]
 fn test_getbit_range() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(15);
     state.push_int(0);
     state.push_int(2);
@@ -319,7 +319,7 @@ fn test_getbit_range() {
 #[test]
 fn test_setbit_range_toint() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(0);
     state.push_int(3);
     state.push_int(1);
@@ -334,7 +334,7 @@ fn test_setbit_range_toint() {
 #[test]
 fn test_sin_deg() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(std::f64::consts::PI as i32);
 
     let ops = MathOps::new();
@@ -346,7 +346,7 @@ fn test_sin_deg() {
 #[test]
 fn test_cos_deg() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(std::f64::consts::PI as i32);
 
     let ops = MathOps::new();
@@ -358,7 +358,7 @@ fn test_cos_deg() {
 #[test]
 fn test_atan2_deg() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(-1);
     state.push_int(1);
 
@@ -371,7 +371,7 @@ fn test_atan2_deg() {
 #[test]
 fn test_abs() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(-136);
 
     let ops = MathOps::new();

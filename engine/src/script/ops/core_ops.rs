@@ -7,10 +7,10 @@ impl CoreOps {
         return CoreOps;
     }
 
-    pub fn push<'script>(
+    pub fn push(
         &self,
-        engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
+        engine: &impl ScriptEngine,
+        state: &mut ScriptState,
         code: &ScriptOpcode,
     ) -> Result<(), String> {
         match code {
@@ -155,13 +155,13 @@ impl CoreOps {
     fn gosub<'script>(
         &self,
         engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
+        state: &mut ScriptState,
     ) -> Result<(), String> {
         if state.fp >= 50 {
             return Err("stack overflow!".to_string());
         }
         let script: i32 = state.pop_int();
-        state.gosub_frame(engine.pop_script(script)?);
+        state.gosub_frame(engine.pop_script(script)?.clone());
         return Ok(());
     }
 
@@ -169,20 +169,21 @@ impl CoreOps {
     fn jump<'script>(
         &self,
         engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
+        state: &mut ScriptState,
     ) -> Result<(), String> {
         let script: i32 = state.pop_int();
-        state.goto_frame(engine.pop_script(script)?);
+        state.goto_frame(engine.pop_script(script)?.clone());
         return Ok(());
     }
 
     #[inline(always)]
     fn switch(&self, state: &mut ScriptState) -> Result<(), String> {
+        let switch: i32 = state.pop_int();
         if let Some(result) = state
             .script
             .switch_table
             .as_ref()
-            .and_then(|table| table.get(&state.pop_int()))
+            .and_then(|table| table.get(&switch))
         {
             state.pc += result;
         }
@@ -269,12 +270,12 @@ impl CoreOps {
     fn gosub_with_params<'script>(
         &self,
         engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
+        state: &mut ScriptState,
     ) -> Result<(), String> {
         if state.fp >= 50 {
             return Err("stack overflow!".to_string());
         }
-        state.gosub_frame(engine.pop_script(state.int_operand())?);
+        state.gosub_frame(engine.pop_script(state.int_operand())?.clone());
         return Ok(());
     }
 
@@ -282,9 +283,9 @@ impl CoreOps {
     fn jump_with_params<'script>(
         &self,
         engine: &'script impl ScriptEngine,
-        state: &mut ScriptState<'script>,
+        state: &mut ScriptState,
     ) -> Result<(), String> {
-        state.goto_frame(engine.pop_script(state.int_operand())?);
+        state.goto_frame(engine.pop_script(state.int_operand())?.clone());
         return Ok(());
     }
 

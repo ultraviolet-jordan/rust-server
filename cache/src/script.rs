@@ -1390,19 +1390,21 @@ impl ScriptFile {
     }
 }
 
-struct GoSubFrame<'script> {
-    script: &'script ScriptFile,
+#[derive(Clone)]
+struct GoSubFrame {
+    script: ScriptFile,
     pc: i32, // program counter
     int_locals: Vec<i32>,
     string_locals: Vec<String>,
 }
 
-struct GoToFrame<'script> {
-    script: &'script ScriptFile,
+#[derive(Clone)]
+struct GoToFrame {
+    script: ScriptFile,
     pc: i32,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 #[repr(i8)]
 pub enum ScriptExecutionState {
     Aborted = -1,
@@ -1450,14 +1452,15 @@ impl From<i32> for ScriptPointer {
     }
 }
 
-pub struct ScriptState<'script> {
-    pub script: &'script ScriptFile,
+#[derive(Clone)]
+pub struct ScriptState {
+    pub script: ScriptFile,
     pub execution_state: ScriptExecutionState,
     pub pc: i32,      // program counter
     pub opcount: i32, // number of opcodes executed
-    frame_stack: Vec<GoSubFrame<'script>>,
+    frame_stack: Vec<GoSubFrame>,
     pub fp: usize, // frame pointer
-    goto_frame_stack: Vec<GoToFrame<'script>>,
+    goto_frame_stack: Vec<GoToFrame>,
     pub goto_fp: usize,
     pub int_stack: Vec<i32>,
     pub isp: usize, // integer stack pointer
@@ -1466,11 +1469,11 @@ pub struct ScriptState<'script> {
     pub int_locals: Vec<i32>,
     pub string_locals: Vec<String>,
     pointers: i32, // state pointers
-    active_player: i32,
-    active_player2: i32,
+    pub active_player: i32,
+    pub active_player2: i32,
 }
 
-impl<'script> ScriptState<'script> {
+impl ScriptState {
     pub const ACTIVE_NPC: [ScriptPointer; 2] =
         [ScriptPointer::ActiveNpc, ScriptPointer::ActiveNpc2];
 
@@ -1511,7 +1514,7 @@ impl<'script> ScriptState<'script> {
     /// undefined behavior.
     #[rustfmt::skip]
     pub fn new_with_args(
-        script: &ScriptFile,
+        script: ScriptFile,
         int_args: Vec<i32>,
         string_args: Vec<String>,
     ) -> ScriptState {
@@ -1542,9 +1545,9 @@ impl<'script> ScriptState<'script> {
         }
     }
 
-    pub fn mock(file: &ScriptFile) -> ScriptState {
+    pub fn mock(script: ScriptFile) -> ScriptState {
         return ScriptState {
-            script: file,
+            script,
             execution_state: ScriptExecutionState::Running,
             pc: -1,
             opcount: 0,
@@ -1564,11 +1567,7 @@ impl<'script> ScriptState<'script> {
         };
     }
 
-    pub fn execute(
-        &mut self,
-        runner: &'script impl ScriptRunner,
-        benchmark: bool,
-    ) -> Result<(), String> {
+    pub fn execute(&mut self, runner: &impl ScriptRunner, benchmark: bool) -> Result<(), String> {
         self.execution_state = ScriptExecutionState::Running;
 
         let start: Instant = Instant::now();
@@ -1589,13 +1588,9 @@ impl<'script> ScriptState<'script> {
                     self.opcount += 1;
                     self.pc += 1;
 
-                    if let Some(Some(code)) = self
-                        .script
-                        .codes
-                        .as_ref()
-                        .and_then(|codes| codes.get(self.pc as usize))
-                    {
-                        if let Err(err) = runner.push_script(self, code) {
+                    if let Some(Some(code)) = codes.get(self.pc as usize) {
+                        let code = code.clone();
+                        if let Err(err) = runner.push_script(self, &code) {
                             self.execution_state = ScriptExecutionState::Aborted;
                             return Err(err);
                         }
@@ -1737,9 +1732,9 @@ impl<'script> ScriptState<'script> {
     /// - Increments the frame pointer (`fp`) to reflect the new frame.
     /// - Resets the program counter (`pc`) to -1 to prepare for execution in the new subroutine.
     /// - Initializes local integer and string variables by popping them from the respective stacks.
-    pub fn gosub_frame(&mut self, script: &'script ScriptFile) {
+    pub fn gosub_frame(&mut self, script: ScriptFile) {
         self.frame_stack.push(GoSubFrame {
-            script: self.script,
+            script: self.script.clone(),
             pc: self.pc,
             int_locals: self.int_locals.clone(),
             string_locals: self.string_locals.clone(),
@@ -1786,9 +1781,9 @@ impl<'script> ScriptState<'script> {
     /// - Clears the `frame_stack`, discarding any previously saved frames.
     /// - Resets the frame pointer (`fp`) and program counter (`pc`).
     /// - Initializes local integer and string variables by popping them from the respective stacks.
-    pub fn goto_frame(&mut self, script: &'script ScriptFile) {
+    pub fn goto_frame(&mut self, script: ScriptFile) {
         self.goto_frame_stack.push(GoToFrame {
-            script: self.script,
+            script: self.script.clone(),
             pc: self.pc,
         });
 
@@ -2079,11 +2074,7 @@ impl<'script> ScriptState<'script> {
 }
 
 pub trait ScriptRunner: ScriptEngine {
-    fn push_script<'script>(
-        &'script self,
-        state: &mut ScriptState<'script>,
-        code: &ScriptOpcode,
-    ) -> Result<(), String>;
+    fn push_script(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String>;
 }
 
 /// It is important to note that these are not commands.

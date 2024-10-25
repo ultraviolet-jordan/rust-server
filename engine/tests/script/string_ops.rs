@@ -4,7 +4,7 @@ use engine::engine::Engine;
 #[test]
 fn test_to_string() {
     let file = ScriptFile::mock();
-    let mut state = ScriptState::mock(&file);
+    let mut state = ScriptState::mock(file);
     state.push_int(420);
 
     let engine = Engine::mock();
