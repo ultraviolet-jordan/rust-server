@@ -676,9 +676,9 @@ dependencies = [
 
 [[package]]
 name = "rsmod-pathfinder"
-version = "5.0.3"
+version = "5.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07f7c8bdb38626c0ad6200f1458e28b2aaa9488e6c3eac659b5f7e8acf16bf30"
+checksum = "9e009ff790fa115317240b005ef942128637e1c610765c3f65224162a001829b"
 dependencies = [
  "getrandom",
  "once_cell",
