@@ -7,6 +7,7 @@ use cache::{
     ScriptOpcode, ScriptPlayer, ScriptRunner, ScriptState,
 };
 
+use crate::coordgrid::CoordGrid;
 use crate::entity::npc::Npc;
 use crate::entity::player::Player;
 use crate::script::script::Ops;
@@ -42,6 +43,7 @@ impl EngineTick {
 }
 
 pub struct Engine {
+    pub members: bool,
     pub tick: EngineTick,
     pub tick_rate: Duration,
     pub cache: CacheProvider,
@@ -56,8 +58,9 @@ impl Engine {
     const MAX_PLAYERS: usize = 2048;
     const MAX_NPCS: usize = 8192;
 
-    pub fn new(cache: CacheProvider) -> Engine {
+    pub fn new(cache: CacheProvider, members: bool) -> Engine {
         return Engine {
+            members,
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache,
@@ -71,6 +74,7 @@ impl Engine {
 
     pub fn mock() -> Engine {
         return Engine {
+            members: true,
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache: CacheProvider::mock(),
@@ -82,7 +86,7 @@ impl Engine {
         };
     }
 
-    pub fn start(&mut self, start_cycle: bool, map: MapProvider, members: bool) {
+    pub fn start(&mut self, start_cycle: bool, map: MapProvider) {
         println!("Starting world...");
 
         // ----
@@ -98,14 +102,14 @@ impl Engine {
         self.add_player(player.uid, player);
         // ----
 
-        self.load_map(map, members);
+        self.load_map(map);
         println!("World ready!");
         if start_cycle {
             self.cycle();
         }
     }
 
-    fn load_map(&mut self, mut map: MapProvider, members: bool) {
+    fn load_map(&mut self, mut map: MapProvider) {
         for mapsquare in map.mapsquares.values_mut() {
             while let Some(npc) = mapsquare.npcs.pop() {
                 // TODO add static npc/members
@@ -450,8 +454,51 @@ impl ScriptEngine for Engine {
     }
 
     fn line_of_sight(&self, from: i32, to: i32) -> bool {
-        // TODO: rsmod stuff.
-        return false;
+        let from: CoordGrid = CoordGrid::new(from as u32);
+        let to: CoordGrid = CoordGrid::new(to as u32);
+
+        if from.y() != to.y() {
+            return false;
+        }
+
+        unsafe {
+            return rsmod::hasLineOfSight(
+                from.y() as i32,
+                from.x() as i32,
+                from.z() as i32,
+                to.x() as i32,
+                to.z() as i32,
+                1,
+                1,
+                1,
+                1,
+                0,
+            );
+        }
+    }
+
+    fn line_of_walk(&self, from: i32, to: i32) -> bool {
+        let from: CoordGrid = CoordGrid::new(from as u32);
+        let to: CoordGrid = CoordGrid::new(to as u32);
+
+        if from.y() != to.y() {
+            return false;
+        }
+
+        unsafe {
+            return rsmod::hasLineOfWalk(
+                from.y() as i32,
+                from.x() as i32,
+                from.z() as i32,
+                to.x() as i32,
+                to.z() as i32,
+                1,
+                1,
+                1,
+                1,
+                0,
+            );
+        }
     }
 
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool {
@@ -489,6 +536,10 @@ impl ScriptEngine for Engine {
                 uid
             )),
         }
+    }
+
+    fn map_members(&self) -> bool {
+        return self.members;
     }
 }
 
@@ -569,7 +620,7 @@ impl ScriptRunner for Engine {
             | ScriptOpcode::ZonesCount
             | ScriptOpcode::LocsCount
             | ScriptOpcode::ObjsCount
-            | ScriptOpcode::MapMulti => Err("Not implemented".to_string()),
+            | ScriptOpcode::MapMulti => self.ops.server.push(self, state, code),
             // Player ops (2000-2499)
             ScriptOpcode::AllowDesign
             | ScriptOpcode::Anim

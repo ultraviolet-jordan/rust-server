@@ -13,7 +13,7 @@ impl OcOps {
         state: &mut ScriptState,
         code: &ScriptOpcode,
     ) -> Result<(), String> {
-        match code {
+        return match code {
             ScriptOpcode::OcCategory => panic!("Not implemented"),
             ScriptOpcode::OcCert => panic!("Not implemented"),
             ScriptOpcode::OcCost => panic!("Not implemented"),
@@ -32,7 +32,7 @@ impl OcOps {
             ScriptOpcode::OcWearPos => panic!("Not implemented"),
             ScriptOpcode::OcWeight => panic!("Not implemented"),
             _ => Err(format!("Unrecognised oc ops code: {:?}", code)),
-        }
+        };
     }
 
     #[inline(always)]

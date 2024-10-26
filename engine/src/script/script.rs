@@ -2,6 +2,7 @@ use crate::script::ops::core_ops::CoreOps;
 use crate::script::ops::math_ops::MathOps;
 use crate::script::ops::oc_ops::OcOps;
 use crate::script::ops::player_ops::PlayerOps;
+use crate::script::ops::server_ops::ServerOps;
 use crate::script::ops::string_ops::StringOps;
 
 pub struct Ops {
@@ -10,6 +11,7 @@ pub struct Ops {
     pub oc: OcOps,
     pub player: PlayerOps,
     pub string: StringOps,
+    pub server: ServerOps,
 }
 
 impl Ops {
@@ -20,6 +22,7 @@ impl Ops {
             oc: OcOps::new(),
             player: PlayerOps::new(),
             string: StringOps::new(),
+            server: ServerOps::new(),
         };
     }
 }

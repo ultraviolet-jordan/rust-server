@@ -16,7 +16,7 @@ fn main() {
         CacheProvider::io(data, std::env::var("COMPILER_VERSION").unwrap(), members);
 
     // create engine
-    let mut engine: Engine = Engine::new(cache_provider);
+    let mut engine: Engine = Engine::new(cache_provider, members);
 
     engine.cache.obj_provider.with_script_name(
         "christmas_cracker",
@@ -95,5 +95,5 @@ fn main() {
     );
 
     // start engine
-    engine.start(true, MapProvider::io(data), members);
+    engine.start(true, MapProvider::io(data));
 }

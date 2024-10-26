@@ -13,7 +13,7 @@ impl CoreOps {
         state: &mut ScriptState,
         code: &ScriptOpcode,
     ) -> Result<(), String> {
-        match code {
+        return match code {
             ScriptOpcode::PushConstantInt => self.push_constant_int(state),
             ScriptOpcode::PushVarp => self.push_varp(engine, state),
             ScriptOpcode::PopVarp => self.pop_varp(engine, state),
@@ -50,7 +50,7 @@ impl CoreOps {
             ScriptOpcode::PushArrayInt => self.push_array_int(state),
             ScriptOpcode::PopArrayInt => self.pop_array_int(state),
             _ => Err(format!("Unrecognised core ops code: {:?}", code)),
-        }
+        };
     }
 
     #[inline(always)]
@@ -152,11 +152,7 @@ impl CoreOps {
     }
 
     #[inline(always)]
-    fn gosub<'script>(
-        &self,
-        engine: &'script impl ScriptEngine,
-        state: &mut ScriptState,
-    ) -> Result<(), String> {
+    fn gosub(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         if state.fp >= 50 {
             return Err("stack overflow!".to_string());
         }
@@ -166,11 +162,7 @@ impl CoreOps {
     }
 
     #[inline(always)]
-    fn jump<'script>(
-        &self,
-        engine: &'script impl ScriptEngine,
-        state: &mut ScriptState,
-    ) -> Result<(), String> {
+    fn jump(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let script: i32 = state.pop_int();
         state.goto_frame(engine.pop_script(script)?.clone());
         return Ok(());
@@ -267,9 +259,9 @@ impl CoreOps {
     }
 
     #[inline(always)]
-    fn gosub_with_params<'script>(
+    fn gosub_with_params(
         &self,
-        engine: &'script impl ScriptEngine,
+        engine: &impl ScriptEngine,
         state: &mut ScriptState,
     ) -> Result<(), String> {
         if state.fp >= 50 {
@@ -280,9 +272,9 @@ impl CoreOps {
     }
 
     #[inline(always)]
-    fn jump_with_params<'script>(
+    fn jump_with_params(
         &self,
-        engine: &'script impl ScriptEngine,
+        engine: &impl ScriptEngine,
         state: &mut ScriptState,
     ) -> Result<(), String> {
         state.goto_frame(engine.pop_script(state.int_operand())?.clone());

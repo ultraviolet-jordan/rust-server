@@ -13,7 +13,7 @@ impl PlayerOps {
         state: &mut ScriptState,
         code: &ScriptOpcode,
     ) -> Result<(), String> {
-        match code {
+        return match code {
             ScriptOpcode::AllowDesign => Err("Not implemented".to_string()),
             ScriptOpcode::Anim => state.protect(&ScriptState::ACTIVE_PLAYER, |state| {
                 self.anim(engine, state)
@@ -144,7 +144,7 @@ impl PlayerOps {
             ScriptOpcode::Weight => Err("Not implemented".to_string()),
             ScriptOpcode::LastCoord => Err("Not implemented".to_string()),
             _ => Err(format!("Unrecognised player ops code: {:?}", code)),
-        }
+        };
     }
 
     // https://x.com/JagexAsh/status/1806246992797921391

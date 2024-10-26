@@ -18,7 +18,7 @@ impl MathOps {
     }
 
     pub fn push(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String> {
-        match code {
+        return match code {
             ScriptOpcode::Add => self.add(state),
             ScriptOpcode::Sub => self.sub(state),
             ScriptOpcode::Multiply => self.multiply(state),
@@ -49,7 +49,7 @@ impl MathOps {
             ScriptOpcode::Atan2Deg => self.atan2_deg(state),
             ScriptOpcode::Abs => self.abs(state),
             _ => Err(format!("Unrecognised math ops code: {:?}", code)),
-        }
+        };
     }
 
     #[inline(always)]

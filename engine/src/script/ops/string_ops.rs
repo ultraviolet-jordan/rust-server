@@ -13,7 +13,7 @@ impl StringOps {
         state: &mut ScriptState,
         code: &ScriptOpcode,
     ) -> Result<(), String> {
-        match code {
+        return match code {
             ScriptOpcode::AppendNum => self.append_num(state),
             ScriptOpcode::Append => self.append(state),
             ScriptOpcode::AppendSignNum => self.append_signnum(state),
@@ -28,7 +28,7 @@ impl StringOps {
             ScriptOpcode::StringIndexOfChar => self.string_indexof_char(state),
             ScriptOpcode::StringIndexOfString => self.string_indexof_string(state),
             _ => Err(format!("Unrecognised string ops code: {:?}", code)),
-        }
+        };
     }
 
     #[inline(always)]

@@ -2143,6 +2143,7 @@ pub trait ScriptEngine {
     fn pop_script(&self, id: i32) -> Result<&ScriptFile, String>;
 
     fn line_of_sight(&self, from: i32, to: i32) -> bool;
+    fn line_of_walk(&self, from: i32, to: i32) -> bool;
 
     fn add_obj(&self, coord: i32, id: i32, count: i32, duration: i32) -> bool;
 
@@ -2216,6 +2217,8 @@ pub trait ScriptEngine {
     fn with_player<F>(&self, uid: i32, on_found: F) -> Result<(), String>
     where
         F: FnOnce(Ref<dyn ScriptPlayer>);
+
+    fn map_members(&self) -> bool;
 }
 
 pub trait ScriptPlayer {
