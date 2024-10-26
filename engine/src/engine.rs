@@ -47,7 +47,6 @@ pub struct Engine {
     pub tick: EngineTick,
     pub tick_rate: Duration,
     pub cache: CacheProvider,
-    pub map: MapProvider,
     pub ops: Ops,
     pub stats: Vec<Duration>,
     pub last_stats: Vec<Duration>,
@@ -59,12 +58,11 @@ impl Engine {
     const MAX_PLAYERS: usize = 2048;
     const MAX_NPCS: usize = 8192;
 
-    pub fn new(cache: CacheProvider, map: MapProvider) -> Engine {
+    pub fn new(cache: CacheProvider) -> Engine {
         return Engine {
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache,
-            map,
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
@@ -78,7 +76,6 @@ impl Engine {
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache: CacheProvider::mock(),
-            map: MapProvider::mock(),
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
@@ -87,7 +84,7 @@ impl Engine {
         };
     }
 
-    pub fn start(&mut self, start_cycle: bool, members: bool) {
+    pub fn start(&mut self, start_cycle: bool, map: MapProvider, members: bool) {
         println!("Starting world...");
 
         // ----
@@ -103,15 +100,15 @@ impl Engine {
         self.add_player(player.uid, player);
         // ----
 
-        self.load_map(members);
+        self.load_map(map, members);
         println!("World ready!");
         if start_cycle {
             self.cycle();
         }
     }
 
-    fn load_map(&mut self, members: bool) {
-        for mapsquare in self.map.mapsquares.values_mut() {
+    fn load_map(&mut self, mut map: MapProvider, members: bool) {
+        for mapsquare in map.mapsquares.values_mut() {
             while let Some(npc) = mapsquare.npcs.pop() {
                 // TODO add static npc/members
             }
@@ -180,7 +177,7 @@ impl Engine {
             mapsquare.locs.clear();
         }
         // discard
-        self.map.mapsquares.clear();
+        map.mapsquares.clear();
     }
 
     #[rustfmt::skip]
