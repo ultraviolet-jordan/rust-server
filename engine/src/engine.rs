@@ -2,6 +2,8 @@ use std::cell::{Ref, RefCell, RefMut};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
+use rsmod::rsmod::collision_flag::CollisionFlag;
+
 use cache::{
     CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
     ScriptState,
@@ -216,6 +218,11 @@ impl Engine {
         for player in &self.players {
             if let Some(cell) = player {
                 Player::resume_script(cell, self); // just testing
+
+                unsafe {
+                    rsmod::changeLoc(0, 0, 0, 1, 1, true, false, true);
+                    assert!(rsmod::isFlagged(0, 0, 0, CollisionFlag::LOC));
+                }
             }
         }
         // - process pathfinding/following
