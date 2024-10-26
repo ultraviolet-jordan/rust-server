@@ -259,7 +259,7 @@ impl MapSquare {
 
     const SIZE: usize = MapSquare::X * MapSquare::Y * MapSquare::Z;
 
-    pub fn unpack_coord(packed: u16) -> (u8, u8, u8) {
+    fn unpack_coord(packed: u16) -> (u8, u8, u8) {
         let z: u8 = (packed & 0x3f) as u8;
         let x: u8 = ((packed >> 6) & 0x3f) as u8;
         let y: u8 = ((packed >> 12) & 0x3) as u8;
