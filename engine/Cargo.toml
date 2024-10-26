@@ -9,9 +9,9 @@ criterion = "0.5.1"
 [dependencies]
 dotenv = "0.15.0"
 rand = "0.8.5"
+rsmod-pathfinder = "5.0.3"
 cache = { path = "../cache" }
 math = { path = "../math" }
-rsmod-pathfinder = "1.0.0-SNAPSHOT"
 
 [[bench]]
 name = "fib"
