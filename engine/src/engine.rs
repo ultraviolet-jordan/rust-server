@@ -5,10 +5,11 @@ use std::time::{Duration, Instant};
 use rsmod::rsmod::collision_flag::CollisionFlag;
 
 use cache::{
-    CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
-    ScriptState,
+    CacheProvider, MapProvider, MapSquare, MapSquareLand, ObjType, ScriptEngine, ScriptFile,
+    ScriptOpcode, ScriptPlayer, ScriptRunner, ScriptState,
 };
 
+use crate::entity::npc::Npc;
 use crate::entity::player::Player;
 use crate::script::script::Ops;
 
@@ -46,22 +47,29 @@ pub struct Engine {
     pub tick: EngineTick,
     pub tick_rate: Duration,
     pub cache: CacheProvider,
+    pub map: MapProvider,
     pub ops: Ops,
-    pub players: Vec<Option<RefCell<Player>>>,
     pub stats: Vec<Duration>,
     pub last_stats: Vec<Duration>,
+    pub players: Vec<Option<RefCell<Player>>>,
+    pub npcs: Vec<Option<RefCell<Npc>>>,
 }
 
 impl Engine {
-    pub fn new(cache: CacheProvider) -> Engine {
+    const MAX_PLAYERS: usize = 2048;
+    const MAX_NPCS: usize = 8192;
+
+    pub fn new(cache: CacheProvider, map: MapProvider) -> Engine {
         return Engine {
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache,
+            map,
             ops: Ops::new(),
-            players: vec![None; 2048],
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
+            players: vec![None; Engine::MAX_PLAYERS - 1],
+            npcs: vec![None; Engine::MAX_NPCS - 1],
         };
     }
 
@@ -70,18 +78,19 @@ impl Engine {
             tick: EngineTick::new(),
             tick_rate: Duration::from_millis(600),
             cache: CacheProvider::mock(),
+            map: MapProvider::mock(),
             ops: Ops::new(),
-            players: vec![None; 2048],
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
+            players: vec![None; Engine::MAX_PLAYERS - 1],
+            npcs: vec![None; Engine::MAX_NPCS - 1],
         };
     }
 
-    pub fn start(&mut self, start_cycle: bool) {
+    pub fn start(&mut self, start_cycle: bool, members: bool) {
         println!("Starting world...");
-        // TODO load maps
-        println!("World ready!");
 
+        // ----
         // this is just for testing player script running.
         let mut player: Player = Player::new();
         player.uid = 0;
@@ -92,10 +101,86 @@ impl Engine {
             .unwrap();
         player.active_script = Some(ScriptState::new_with_args(script.clone(), vec![], vec![]));
         self.add_player(player.uid, player);
+        // ----
 
+        self.load_map(members);
+        println!("World ready!");
         if start_cycle {
             self.cycle();
         }
+    }
+
+    fn load_map(&mut self, members: bool) {
+        for mapsquare in self.map.mapsquares.values_mut() {
+            while let Some(npc) = mapsquare.npcs.pop() {
+                // TODO add static npc/members
+            }
+            while let Some(obj) = mapsquare.objs.pop() {
+                // TODO add static obj/members
+            }
+            for y in 0..MapSquare::Y {
+                for x in 0..MapSquare::X {
+                    for z in 0..MapSquare::Z {
+                        if let Some(land) = &mapsquare.lands[MapSquare::pack_coord(x, z, y)] {
+                            unsafe {
+                                if x % 7 == 0 && z % 7 == 0 {
+                                    rsmod::allocateIfAbsent(
+                                        land.x as i32,
+                                        land.z as i32,
+                                        land.y as i32,
+                                    );
+                                }
+
+                                if (land.flag & MapSquareLand::ROOF) != MapSquareLand::OPEN {
+                                    rsmod::changeRoof(
+                                        land.x as i32,
+                                        land.z as i32,
+                                        land.y as i32,
+                                        true,
+                                    );
+                                }
+
+                                if (land.flag & MapSquareLand::BLOCKED) != MapSquareLand::BLOCKED {
+                                    continue;
+                                }
+
+                                let bridged: bool = if y == 1 {
+                                    land.flag & MapSquareLand::BRIDGE
+                                } else {
+                                    match &mapsquare.lands[MapSquare::pack_coord(x, z, 1)] {
+                                        None => continue,
+                                        Some(land) => land.flag & MapSquareLand::BRIDGE,
+                                    }
+                                } == MapSquareLand::BRIDGE;
+
+                                let level: i8 = if bridged { y as i8 - 1 } else { y as i8 };
+                                if level < 0 {
+                                    continue;
+                                }
+
+                                rsmod::changeFloor(
+                                    land.x as i32,
+                                    land.z as i32,
+                                    land.y as i32,
+                                    true,
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            while let Some(loc) = mapsquare.locs.pop() {
+                // TODO add static loc/members/collision
+            }
+
+            // redundant discard?
+            mapsquare.objs.clear();
+            mapsquare.lands.clear();
+            mapsquare.npcs.clear();
+            mapsquare.locs.clear();
+        }
+        // discard
+        self.map.mapsquares.clear();
     }
 
     #[rustfmt::skip]

@@ -10,7 +10,7 @@ fn bench_fib(c: &mut Criterion) {
     // Define the throughput in operations (you can use 1 if it's per operation)
     group.throughput(Throughput::Elements(1)); // Measure as ops/second
 
-    let engine: Engine = Engine::new(CacheProvider::new("../data/pack", "19".to_string(), true));
+    let engine: Engine = Engine::new(CacheProvider::io("../data/pack", "19".to_string(), true));
 
     let script_provider: ScriptProvider = ScriptProvider::io("../data/pack", "19".to_string());
 

@@ -1,4 +1,10 @@
 pub use cache::CacheProvider;
+pub use map::MapProvider;
+pub use map::MapSquare;
+pub use map::MapSquareLand;
+pub use map::MapSquareLoc;
+pub use map::MapSquareNpc;
+pub use map::MapSquareObj;
 pub use obj::ObjProvider;
 pub use obj::ObjType;
 pub use param::decode_params;
@@ -15,6 +21,7 @@ pub use script::ScriptRunner;
 pub use script::ScriptState;
 
 mod cache;
+mod map;
 mod obj;
 mod param;
 mod script;

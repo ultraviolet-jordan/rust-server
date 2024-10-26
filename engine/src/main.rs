@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 
-use cache::{CacheProvider, ScriptPointer, ScriptState};
+use cache::{CacheProvider, MapProvider, ScriptPointer, ScriptState};
 use engine::engine::Engine;
 
 fn main() {
@@ -8,11 +8,18 @@ fn main() {
     // ----
     dotenv().ok();
 
-    let mut engine: Engine = Engine::new(CacheProvider::new(
-        "./data/pack",
-        std::env::var("COMPILER_VERSION").unwrap(),
-        std::env::var("MEMBERS").unwrap() == "true",
-    ));
+    let data: &str = "./data/pack";
+    let members: bool = std::env::var("MEMBERS").unwrap() == "true";
+
+    // io load cache
+    let cache_provider: CacheProvider =
+        CacheProvider::io(data, std::env::var("COMPILER_VERSION").unwrap(), members);
+
+    // io load game map
+    let game_map: MapProvider = MapProvider::io(data);
+
+    // create engine
+    let mut engine: Engine = Engine::new(cache_provider, game_map);
 
     engine.cache.obj_provider.with_script_name(
         "christmas_cracker",
@@ -90,5 +97,6 @@ fn main() {
         || {},
     );
 
-    engine.start(true);
+    // start engine
+    engine.start(true, members);
 }
