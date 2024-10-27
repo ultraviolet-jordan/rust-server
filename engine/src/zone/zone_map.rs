@@ -9,7 +9,7 @@ pub struct ZoneMap {
 
 impl ZoneMap {
     #[inline(always)]
-    pub fn zone_index(x: u16, z: u16, y: u8) -> u32 {
+    pub fn zone_index(x: u16, y: u8, z: u16) -> u32 {
         return (((x >> 3) & 0x7ff) as u32)
             | ((((z >> 3) & 0x7ff) as u32) << 11)
             | (((y & 0x3) as u32) << 22);
@@ -29,8 +29,8 @@ impl ZoneMap {
         };
     }
 
-    pub fn zone(&mut self, x: u16, z: u16, y: u8) -> &mut Zone {
-        let zone_index: u32 = ZoneMap::zone_index(x, z, y);
+    pub fn zone(&mut self, x: u16, y: u8, z: u16) -> &mut Zone {
+        let zone_index: u32 = ZoneMap::zone_index(x, y, z);
         return self
             .zones
             .entry(zone_index)

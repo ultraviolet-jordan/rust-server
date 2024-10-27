@@ -34,7 +34,7 @@ impl ScriptZone for Zone {
         return self.index;
     }
 
-    fn anim_map(&mut self, x: u16, y: u8, z: u16, spotanim: u16, height: i32, delay: u32) {
+    fn anim_map(&mut self, x: u16, z: u16, spotanim: u16, height: i32, delay: u32) {
         self.events.push(ZoneEvent {
             zone_event_type: ZoneEventType::Enclosed,
             receiver_id: -1,

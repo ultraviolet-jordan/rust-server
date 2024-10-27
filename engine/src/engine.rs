@@ -537,7 +537,7 @@ impl ScriptEngine for Engine {
     where
         F: FnOnce(&mut dyn ScriptZone),
     {
-        on_zone(self.game_map.zone_map.borrow_mut().zone(x, z, y))
+        on_zone(self.game_map.zone_map.borrow_mut().zone(x, y, z))
     }
 
     fn track_zone(&self, tick: u32, zone: u32) {
