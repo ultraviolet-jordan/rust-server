@@ -2223,7 +2223,7 @@ pub trait ScriptEngine {
     fn map_blocked(&self, coord: i32) -> bool;
     fn map_indoors(&self, coord: i32) -> bool;
 
-    fn with_zone<F>(&self, x: u16, y: u8, z: u16, on_zone: F)
+    fn with_zone_mut<F>(&self, x: u16, y: u8, z: u16, on_zone: F)
     where
         F: FnOnce(&mut dyn ScriptZone);
 

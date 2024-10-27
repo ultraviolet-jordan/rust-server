@@ -198,8 +198,8 @@ impl ServerOps {
         let y: u8 = coord.y();
         let z: u16 = coord.z();
 
-        engine.with_zone(x, y, z, |zone| {
-            zone.anim_map(x, y, z, spotanim as u16, height, delay as u32);
+        engine.with_zone_mut(x, y, z, |zone| {
+            zone.anim_map(x, z, spotanim as u16, height, delay as u32);
             engine.track_zone(engine.map_clock(), zone.index());
         });
 

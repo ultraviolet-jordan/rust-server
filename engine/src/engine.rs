@@ -533,7 +533,7 @@ impl ScriptEngine for Engine {
         }
     }
 
-    fn with_zone<F>(&self, x: u16, y: u8, z: u16, on_zone: F)
+    fn with_zone_mut<F>(&self, x: u16, y: u8, z: u16, on_zone: F)
     where
         F: FnOnce(&mut dyn ScriptZone),
     {
