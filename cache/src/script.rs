@@ -2219,6 +2219,7 @@ pub trait ScriptEngine {
         F: FnOnce(Ref<dyn ScriptPlayer>);
 
     fn map_members(&self) -> bool;
+    fn map_clock(&self) -> u32;
 }
 
 pub trait ScriptPlayer {

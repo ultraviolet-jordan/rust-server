@@ -29,7 +29,7 @@ pub enum EngineStat {
 }
 
 pub struct EngineTick {
-    pub current_tick: i32,
+    pub current_tick: u32,
 }
 
 impl EngineTick {
@@ -540,6 +540,10 @@ impl ScriptEngine for Engine {
 
     fn map_members(&self) -> bool {
         return self.members;
+    }
+
+    fn map_clock(&self) -> u32 {
+        return self.tick.current_tick;
     }
 }
 
