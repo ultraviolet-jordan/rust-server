@@ -22,7 +22,7 @@ impl ServerOps {
             ScriptOpcode::Distance => self.distance(state),
             ScriptOpcode::HuntAll => Err("Not implemented".to_string()),
             ScriptOpcode::HuntNext => Err("Not implemented".to_string()),
-            ScriptOpcode::InZone => Err("Not implemented".to_string()),
+            ScriptOpcode::InZone => self.inzone(state),
             ScriptOpcode::LineOfSight => self.line_of_sight(engine, state),
             ScriptOpcode::LineOfWalk => self.line_of_walk(engine, state),
             ScriptOpcode::MapBlocked => self.map_blocked(engine, state),
@@ -58,22 +58,22 @@ impl ServerOps {
 
     #[inline(always)]
     fn coord_x(&self, state: &mut ScriptState) -> Result<(), String> {
-        let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
-        state.push_int(coord.x() as i32);
+        let a: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        state.push_int(a.x() as i32);
         return Ok(());
     }
 
     #[inline(always)]
     fn coord_y(&self, state: &mut ScriptState) -> Result<(), String> {
-        let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
-        state.push_int(coord.y() as i32);
+        let a: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        state.push_int(a.y() as i32);
         return Ok(());
     }
 
     #[inline(always)]
     fn coord_z(&self, state: &mut ScriptState) -> Result<(), String> {
-        let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
-        state.push_int(coord.z() as i32);
+        let a: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        state.push_int(a.z() as i32);
         return Ok(());
     }
 
@@ -82,6 +82,24 @@ impl ServerOps {
         let b: CoordGrid = CoordGrid::new(state.pop_int() as u32);
         let a: CoordGrid = CoordGrid::new(state.pop_int() as u32);
         state.push_int(a.distance(b) as i32);
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn inzone(&self, state: &mut ScriptState) -> Result<(), String> {
+        let c: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        let b: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        let a: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+
+        if c.x() < a.x() || c.x() > b.x() {
+            state.push_int(0);
+        } else if c.y() < a.y() || c.y() > b.y() {
+            state.push_int(0);
+        } else if c.z() < a.z() || c.z() > b.z() {
+            state.push_int(0);
+        } else {
+            state.push_int(1);
+        }
         return Ok(());
     }
 
