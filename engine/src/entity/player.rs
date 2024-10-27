@@ -1,14 +1,25 @@
 use std::cell::{RefCell, RefMut};
 
+use crate::coord_grid::CoordGrid;
+use crate::entity::block_walk::BlockWalk;
+use crate::entity::entity::Entity;
+use crate::entity::lifetime::EntityLifetime;
+use crate::entity::move_restrict::MoveRestrict;
+use crate::entity::move_strategy::MoveStrategy;
 use cache::{ScriptEngine, ScriptExecutionState, ScriptPlayer, ScriptRunner, ScriptState};
 use io::Packet;
 use packet::out::outgoing::{OutgoingMessage, ZoneMessage};
 use packet::out::priority::ServerProtPriority;
 
-#[derive(Clone)]
 pub struct Player {
-    pub uid: i32,
+    // perm
+    pub entity: Entity,
+    pub move_restrict: MoveRestrict,
+    pub block_walk: BlockWalk,
+    pub move_strategy: MoveStrategy,
     pub gender: u8,
+    // temp
+    pub uid: i32,
     pub mask: i32,
     pub anim_id: i32,
     pub anim_delay: i32,
@@ -29,10 +40,19 @@ impl Player {
     const SPOTANIM: i32 = 0x100;
     const EXACT_MOVE: i32 = 0x200;
 
-    pub fn new() -> Player {
+    pub fn new(coord: CoordGrid, gender: u8) -> Player {
         return Player {
+            entity: Entity {
+                coord,
+                width: 1,
+                length: 1,
+                lifetime: EntityLifetime::Forever,
+            },
+            move_restrict: MoveRestrict::Normal,
+            block_walk: BlockWalk::Npc,
+            move_strategy: MoveStrategy::Smart,
+            gender,
             uid: -1,
-            gender: 0,
             mask: 0,
             anim_id: -1,
             anim_delay: -1,

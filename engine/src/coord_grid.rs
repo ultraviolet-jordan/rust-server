@@ -9,7 +9,7 @@ impl CoordGrid {
     }
 
     #[inline(always)]
-    pub fn from(y: u8, x: u16, z: u16) -> CoordGrid {
+    pub fn from(x: u16, y: u8, z: u16) -> CoordGrid {
         return CoordGrid {
             coord: ((z & 0x3fff) as u32)
                 | (((x & 0x3fff) as u32) << 14)
@@ -39,8 +39,30 @@ impl CoordGrid {
 
     #[inline(always)]
     pub fn distance(&self, other: CoordGrid) -> u16 {
-        let dx: u16 = (self.x() as i16 - other.x() as i16).unsigned_abs();
-        let dz: u16 = (self.z() as i16 - other.z() as i16).unsigned_abs();
+        let dx: u16 = (self.x() as i16)
+            .wrapping_sub(other.x() as i16)
+            .unsigned_abs();
+        let dz: u16 = (self.z() as i16)
+            .wrapping_sub(other.z() as i16)
+            .unsigned_abs();
         return dx.max(dz);
+    }
+
+    #[inline(always)]
+    pub fn movecoord(&self, x: u16, y: u8, z: u16) -> CoordGrid {
+        return CoordGrid::from(
+            self.x().wrapping_add(x),
+            self.y().wrapping_add(y),
+            self.z().wrapping_add(z),
+        );
+    }
+
+    #[inline(always)]
+    pub fn movecoord_other(&self, other: CoordGrid) -> CoordGrid {
+        return CoordGrid::from(
+            self.x().wrapping_add(other.x()),
+            self.y().wrapping_add(other.y()),
+            self.z().wrapping_add(other.z()),
+        );
     }
 }

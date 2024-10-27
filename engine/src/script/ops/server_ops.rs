@@ -172,14 +172,7 @@ impl ServerOps {
         let y: i32 = state.pop_int();
         let x: i32 = state.pop_int();
         let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
-        state.push_int(
-            CoordGrid::from(
-                coord.y().wrapping_add(y as u8),
-                coord.x().wrapping_add(x as u16),
-                coord.z().wrapping_add(z as u16),
-            )
-            .coord as i32,
-        );
+        state.push_int(coord.movecoord(x as u16, y as u8, z as u16).coord as i32);
         return Ok(());
     }
 

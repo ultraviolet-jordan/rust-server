@@ -71,8 +71,8 @@ impl Engine {
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
-            players: vec![None; Engine::MAX_PLAYERS - 1],
-            npcs: vec![None; Engine::MAX_NPCS - 1],
+            players: Vec::with_capacity(Engine::MAX_PLAYERS - 1),
+            npcs: Vec::with_capacity(Engine::MAX_NPCS - 1),
             game_map: GameMap::new(),
             zones_tracking: RefCell::new(HashMap::new()),
         };
@@ -87,8 +87,8 @@ impl Engine {
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
-            players: vec![None; Engine::MAX_PLAYERS - 1],
-            npcs: vec![None; Engine::MAX_NPCS - 1],
+            players: Vec::with_capacity(Engine::MAX_PLAYERS - 1),
+            npcs: Vec::with_capacity(Engine::MAX_NPCS - 1),
             game_map: GameMap::new(),
             zones_tracking: RefCell::new(HashMap::new()),
         };
@@ -99,7 +99,7 @@ impl Engine {
 
         // ----
         // this is just for testing player script running.
-        let mut player: Player = Player::new();
+        let mut player: Player = Player::new(CoordGrid::from(3094, 0, 3106), 0);
         player.uid = 0;
         let script = self
             .cache

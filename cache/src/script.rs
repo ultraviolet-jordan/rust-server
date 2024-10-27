@@ -1390,7 +1390,6 @@ impl ScriptFile {
     }
 }
 
-#[derive(Clone)]
 struct GoSubFrame {
     script: ScriptFile,
     pc: i32, // program counter
@@ -1398,13 +1397,12 @@ struct GoSubFrame {
     string_locals: Vec<String>,
 }
 
-#[derive(Clone)]
 struct GoToFrame {
     script: ScriptFile,
     pc: i32,
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug)]
 #[repr(i8)]
 pub enum ScriptExecutionState {
     Aborted = -1,
@@ -1452,7 +1450,6 @@ impl From<i32> for ScriptPointer {
     }
 }
 
-#[derive(Clone)]
 pub struct ScriptState {
     pub script: ScriptFile,
     pub execution_state: ScriptExecutionState,

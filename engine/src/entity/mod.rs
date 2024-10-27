@@ -1,2 +1,9 @@
+pub mod block_walk;
+pub mod entity;
+pub mod lifetime;
+pub mod loc;
+pub mod move_restrict;
+pub mod move_strategy;
 pub mod npc;
+pub mod obj;
 pub mod player;

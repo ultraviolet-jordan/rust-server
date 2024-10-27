@@ -1,0 +1,34 @@
+use crate::coord_grid::CoordGrid;
+use crate::entity::entity::Entity;
+use crate::entity::lifetime::EntityLifetime;
+
+pub struct Obj {
+    pub entity: Entity,
+    pub id: u16,
+    pub count: u32,
+}
+
+impl Obj {
+    /// The number of ticks for an obj to reveal.
+    pub const REVEAL: u8 = 100;
+
+    pub fn new(
+        coord: CoordGrid,
+        width: u8,
+        length: u8,
+        lifetime: EntityLifetime,
+        id: u16,
+        count: u32,
+    ) -> Obj {
+        return Obj {
+            entity: Entity {
+                coord,
+                width,
+                length,
+                lifetime,
+            },
+            id,
+            count,
+        };
+    }
+}
