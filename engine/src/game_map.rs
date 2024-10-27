@@ -1,3 +1,7 @@
+use crate::coord_grid::CoordGrid;
+use crate::entity::lifetime::EntityLifetime;
+use crate::entity::loc::Loc;
+use crate::entity::obj::Obj;
 use crate::zone::zone_map::ZoneMap;
 use cache::{MapProvider, MapSquare, MapSquareLand};
 use std::cell::RefCell;
@@ -26,7 +30,16 @@ impl GameMap {
             }
 
             for obj in &mapsquare.objs {
-                // TODO add static obj/members
+                // TODO members
+                self.zone_map
+                    .borrow_mut()
+                    .zone(obj.x, obj.y, obj.z)
+                    .add_static_obj(Obj::new(
+                        CoordGrid::from(obj.x, obj.y, obj.z),
+                        EntityLifetime::Respawn,
+                        obj.id,
+                        obj.count as u32,
+                    ));
             }
 
             for y in 0..MapSquare::Y {
@@ -82,7 +95,19 @@ impl GameMap {
             }
 
             for loc in &mapsquare.locs {
-                // TODO add static loc/members/collision
+                // TODO members/collision
+                self.zone_map
+                    .borrow_mut()
+                    .zone(loc.x, loc.y, loc.z)
+                    .add_static_loc(Loc::new(
+                        CoordGrid::from(loc.x, loc.y, loc.z),
+                        1, // TODO
+                        1, // TODO
+                        EntityLifetime::Respawn,
+                        loc.id,
+                        loc.shape,
+                        loc.angle,
+                    ));
             }
         }
     }

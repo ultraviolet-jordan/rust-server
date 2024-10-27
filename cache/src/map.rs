@@ -170,12 +170,12 @@ impl MapProvider {
 
                 let bridged: bool = if y == 1 {
                     match &lands[coord as usize] {
-                        None => continue,
+                        None => 0,
                         Some(land) => land.flag & MapSquareLand::BRIDGE,
                     }
                 } else {
                     match &lands[MapSquare::pack_coord(x as usize, z as usize, 1)] {
-                        None => continue,
+                        None => 0,
                         Some(land) => land.flag & MapSquareLand::BRIDGE,
                     }
                 } == MapSquareLand::BRIDGE;

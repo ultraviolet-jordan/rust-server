@@ -22,7 +22,7 @@ pub struct Zone {
     pub entity_events: HashMap<Rc<Loc>, Vec<Rc<ZoneEvent>>>,
     pub events: HashSet<Rc<ZoneEvent>>,
     pub total_locs: u16,
-    pub total_objs: u8,
+    pub total_objs: u16,
 }
 
 impl Zone {
