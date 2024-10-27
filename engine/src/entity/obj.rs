@@ -15,19 +15,12 @@ impl Obj {
     /// The number of ticks for an obj to reveal.
     pub const REVEAL: u8 = 100;
 
-    pub fn new(
-        coord: CoordGrid,
-        width: u8,
-        length: u8,
-        lifetime: EntityLifetime,
-        id: u16,
-        count: u32,
-    ) -> Obj {
+    pub fn new(coord: CoordGrid, lifetime: EntityLifetime, id: u16, count: u32) -> Obj {
         return Obj {
             entity: Entity {
                 coord,
-                width,
-                length,
+                width: 1,
+                length: 1,
                 lifetime,
             },
             id,
