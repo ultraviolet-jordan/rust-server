@@ -1,7 +1,7 @@
 use cache::{ScriptEngine, ScriptExecutionState, ScriptOpcode, ScriptState};
 use rand::random;
 
-use crate::coordgrid::CoordGrid;
+use crate::coord_grid::CoordGrid;
 
 pub struct ServerOps;
 

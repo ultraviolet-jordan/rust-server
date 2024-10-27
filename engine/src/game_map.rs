@@ -1,4 +1,4 @@
-use crate::zone::zonemap::ZoneMap;
+use crate::zone::zone_map::ZoneMap;
 use cache::{MapProvider, MapSquare, MapSquareLand};
 use std::cell::RefCell;
 

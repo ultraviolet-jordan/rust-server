@@ -1,7 +1,7 @@
-use crate::coordgrid::CoordGrid;
+use crate::coord_grid::CoordGrid;
 use crate::entity::npc::Npc;
 use crate::entity::player::Player;
-use crate::gamemap::GameMap;
+use crate::game_map::GameMap;
 use crate::script::script::Ops;
 use cache::{
     CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,

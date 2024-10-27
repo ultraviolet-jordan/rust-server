@@ -1,4 +1,4 @@
-use crate::zone::zoneevent::{ZoneEvent, ZoneEventType};
+use crate::zone::zone_event::{ZoneEvent, ZoneEventType};
 use cache::ScriptZone;
 use std::collections::HashSet;
 
