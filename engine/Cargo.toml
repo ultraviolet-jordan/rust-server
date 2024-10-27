@@ -11,7 +11,9 @@ dotenv = "0.15.0"
 rand = "0.8.5"
 rsmod-pathfinder = "5.0.4"
 cache = { path = "../cache" }
+io = { path = "../io" }
 math = { path = "../math" }
+packet = { path = "../packet" }
 
 [[bench]]
 name = "fib"

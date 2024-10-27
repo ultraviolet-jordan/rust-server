@@ -3,6 +3,7 @@ members = [
     "cache",
     "engine",
     "io",
-    "math"
+    "math",
+    "packet"
 ]
 resolver = "2"

@@ -1,6 +1,9 @@
 use std::cell::{RefCell, RefMut};
 
 use cache::{ScriptEngine, ScriptExecutionState, ScriptPlayer, ScriptRunner, ScriptState};
+use io::Packet;
+use packet::out::outgoing::{OutgoingMessage, ZoneMessage};
+use packet::out::priority::ServerProtPriority;
 
 #[derive(Clone)]
 pub struct Player {
@@ -60,6 +63,19 @@ impl Player {
                 Err(s) => println!("{}", s),
             }
         }
+    }
+
+    pub fn write_message(&self, message: impl OutgoingMessage) {
+        let prio: ServerProtPriority = message.priority();
+        let mut buf: Packet = Packet::new(6);
+        message.encode(&mut buf);
+        println!("{:?}, {:?}", prio, buf.data);
+    }
+
+    pub fn write_zone_message(&self, message: impl ZoneMessage) {
+        let prio: ServerProtPriority = message.priority();
+        let bytes: Vec<u8> = message.enclose();
+        println!("{:?}, {:?}", prio, bytes);
     }
 }
 
