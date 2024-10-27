@@ -6,6 +6,9 @@ pub struct Obj {
     pub entity: Entity,
     pub id: u16,
     pub count: u32,
+    pub receiver_id: i32,
+    pub reveal: i32,
+    pub last_change: i32,
 }
 
 impl Obj {
@@ -29,6 +32,9 @@ impl Obj {
             },
             id,
             count,
+            receiver_id: -1,
+            reveal: -1,
+            last_change: -1,
         };
     }
 }
