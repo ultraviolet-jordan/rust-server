@@ -1,6 +1,6 @@
 pub struct Zone {
     pub index: u32,
-    pub total_locs: u8,
+    pub total_locs: u16,
     pub total_objs: u8,
 }
 

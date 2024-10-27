@@ -45,22 +45,22 @@ impl ZoneMap {
         return self.grids.entry(y).or_insert(ZoneGrid::new());
     }
 
-    pub fn zone_count(&self) -> usize {
-        return self.zones.len();
+    pub fn zone_count(&self) -> u32 {
+        return self.zones.len() as u32;
     }
 
-    pub fn loc_count(&self) -> u8 {
-        let mut total = 0;
+    pub fn loc_count(&self) -> u32 {
+        let mut total: u32 = 0;
         for zone in self.zones.values() {
-            total += zone.total_locs;
+            total += zone.total_locs as u32;
         }
         return total;
     }
 
-    pub fn obj_count(&self) -> u8 {
-        let mut total = 0;
+    pub fn obj_count(&self) -> u32 {
+        let mut total: u32 = 0;
         for zone in self.zones.values() {
-            total += zone.total_objs;
+            total += zone.total_objs as u32;
         }
         return total;
     }
