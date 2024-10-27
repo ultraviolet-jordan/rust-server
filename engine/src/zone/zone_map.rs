@@ -15,6 +15,14 @@ impl ZoneMap {
             | (((y & 0x3) as u32) << 22);
     }
 
+    #[inline(always)]
+    pub fn unpack_index(index: u32) -> (u16, u8, u16) {
+        let x: u16 = ((index & 0x7ff) << 3) as u16;
+        let z: u16 = (((index >> 11) & 0x7ff) << 3) as u16;
+        let y: u8 = (index >> 22) as u8;
+        return (x, y, z);
+    }
+
     pub fn new() -> ZoneMap {
         return ZoneMap {
             zones: HashMap::new(),

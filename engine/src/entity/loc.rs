@@ -2,6 +2,7 @@ use crate::coord_grid::CoordGrid;
 use crate::entity::entity::Entity;
 use crate::entity::lifetime::EntityLifetime;
 
+#[derive(Eq, Hash, PartialEq)]
 pub struct Loc {
     pub entity: Entity,
     pub info: u32,

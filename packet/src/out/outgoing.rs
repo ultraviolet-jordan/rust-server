@@ -1,6 +1,7 @@
 use crate::out::priority::ServerProtPriority;
 use crate::out::prot::ServerProt;
 use io::Packet;
+use std::hash::Hash;
 
 pub trait OutgoingMessage {
     fn priority(&self) -> ServerProtPriority;

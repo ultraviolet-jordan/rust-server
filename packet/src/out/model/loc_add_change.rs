@@ -4,28 +4,27 @@ use crate::out::prot::ServerProt;
 use io::Packet;
 
 #[derive(Eq, Hash, PartialEq)]
-pub struct MapAnim {
+pub struct LocAddChange {
     pub coord: u8,
-    pub spotanim: u16,
-    pub height: i32,
-    pub delay: u32,
+    pub id: u16,
+    pub shape: u8,
+    pub angle: u8,
 }
 
-impl OutgoingMessage for MapAnim {
+impl OutgoingMessage for LocAddChange {
     fn priority(&self) -> ServerProtPriority {
         return ServerProtPriority::Immediate;
     }
 
     fn prot(&self) -> ServerProt {
-        return ServerProt::MAP_ANIM;
+        return ServerProt::LOC_ADD_CHANGE;
     }
 
     fn encode(&self, buf: &mut Packet) {
         buf.p1(self.coord as i32);
-        buf.p2(self.spotanim as i32);
-        buf.p1(self.height);
-        buf.p2(self.delay as i32);
+        buf.p1(((self.shape << 2) | (self.angle & 0x3)) as i32);
+        buf.p2(self.id as i32);
     }
 }
 
-impl ZoneMessage for MapAnim {}
+impl ZoneMessage for LocAddChange {}

@@ -2241,4 +2241,15 @@ pub trait ScriptPlayer {
 pub trait ScriptZone {
     fn index(&self) -> u32;
     fn anim_map(&mut self, x: u16, z: u16, spotanim: u16, height: i32, delay: u32);
+    fn add_loc(
+        &mut self,
+        x: u16,
+        y: u8,
+        z: u16,
+        width: u8,
+        height: u8,
+        id: u16,
+        shape: u8,
+        angle: u8,
+    );
 }
