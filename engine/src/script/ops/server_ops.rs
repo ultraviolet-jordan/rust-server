@@ -51,7 +51,7 @@ impl ServerOps {
             ScriptOpcode::NpcsCount => Err("Not implemented".to_string()),
             ScriptOpcode::ZonesCount => self.zonecount(engine, state),
             ScriptOpcode::LocsCount => self.loccount(engine, state),
-            ScriptOpcode::ObjsCount => Err("Not implemented".to_string()),
+            ScriptOpcode::ObjsCount => self.objcount(engine, state),
             ScriptOpcode::MapMulti => Err("Not implemented".to_string()),
             _ => Err(format!("Unrecognised server ops code: {:?}", code)),
         };
@@ -215,6 +215,12 @@ impl ServerOps {
     #[inline(always)]
     fn loccount(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         state.push_int(engine.loccount() as i32);
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn objcount(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        state.push_int(engine.objcount() as i32);
         return Ok(());
     }
 }
