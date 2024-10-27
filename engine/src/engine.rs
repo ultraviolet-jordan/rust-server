@@ -8,7 +8,6 @@ use cache::{
     CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,
     ScriptRunner, ScriptState, ScriptZone,
 };
-use packet::out::model::map_anim::MapAnim;
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
 use std::collections::{HashMap, HashSet};
@@ -237,20 +236,6 @@ impl Engine {
         for player in &self.players {
             if let Some(cell) = player {
                 Player::resume_script(cell, self); // just testing
-
-                cell.borrow().write_message(MapAnim {
-                    coord: 69,
-                    spotanim: 420,
-                    height: -5,
-                    delay: 6,
-                });
-
-                cell.borrow().write_zone_message(MapAnim {
-                    coord: 69,
-                    spotanim: 420,
-                    height: -5,
-                    delay: 6,
-                });
             }
         }
         // - process pathfinding/following

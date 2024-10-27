@@ -65,14 +65,14 @@ impl Player {
         }
     }
 
-    pub fn write_message(&self, message: impl OutgoingMessage) {
+    pub fn write_message(&self, message: &dyn OutgoingMessage) {
         let prio: ServerProtPriority = message.priority();
         let mut buf: Packet = Packet::new(6);
         message.encode(&mut buf);
         println!("{:?}, {:?}", prio, buf.data);
     }
 
-    pub fn write_zone_message(&self, message: impl ZoneMessage) {
+    pub fn write_zone_message(&self, message: &dyn ZoneMessage) {
         let prio: ServerProtPriority = message.priority();
         let bytes: Vec<u8> = message.enclose();
         println!("{:?}, {:?}", prio, bytes);
