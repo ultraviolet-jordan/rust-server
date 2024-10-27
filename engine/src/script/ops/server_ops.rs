@@ -1,4 +1,4 @@
-use cache::{ScriptEngine, ScriptOpcode, ScriptState};
+use cache::{ScriptEngine, ScriptExecutionState, ScriptOpcode, ScriptState};
 use rand::random;
 
 use crate::coordgrid::CoordGrid;
@@ -47,7 +47,7 @@ impl ServerOps {
             ScriptOpcode::SpotAnimMap => Err("Not implemented".to_string()),
             ScriptOpcode::StatRandom => self.stat_random(state),
             ScriptOpcode::StructParam => Err("Not implemented".to_string()),
-            ScriptOpcode::WorldDelay => Err("Not implemented".to_string()),
+            ScriptOpcode::WorldDelay => self.world_delay(state),
             ScriptOpcode::NpcsCount => Err("Not implemented".to_string()),
             ScriptOpcode::ZonesCount => Err("Not implemented".to_string()),
             ScriptOpcode::LocsCount => Err("Not implemented".to_string()),
@@ -194,6 +194,15 @@ impl ServerOps {
             ((low * (99 - level) / 98) + (high * (level - 1) / 98) + 1
                 > (random::<f64>() * 256.0) as i32) as i32,
         );
+        return Ok(());
+    }
+
+    // https://x.com/JagexAsh/status/1730321158858276938
+    // https://x.com/JagexAsh/status/1814230119411540058
+    #[inline(always)]
+    fn world_delay(&self, state: &mut ScriptState) -> Result<(), String> {
+        // arg is popped elsewhere
+        state.execution_state = ScriptExecutionState::WorldSuspended;
         return Ok(());
     }
 }
