@@ -43,9 +43,9 @@ impl Player {
         let mut player: RefMut<Player> = cell.borrow_mut();
         if let Some(mut state) = player.active_script.take() {
             // just testing
-            state.pc = 0; // reset program.
-            state.push_int(69); // bas_anim id.
-            state.active_player = 0; // active player uid.
+            // state.pc = 0; // reset program.
+            // state.push_int(69); // bas_anim id.
+            // state.active_player = 0; // active player uid.
 
             drop(player); // drop the borrow before running.
             let result: Result<(), String> = state.execute(engine, true);
@@ -53,7 +53,6 @@ impl Player {
             match result {
                 Ok(()) => {
                     let mut player: RefMut<Player> = cell.borrow_mut(); // reborrow and check.
-                    assert_eq!(69, player.bas_readyanim);
                     if state.execution_state == ScriptExecutionState::Running {
                         player.active_script = Some(state); // put it back on the player.
                     }

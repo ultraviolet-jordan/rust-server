@@ -100,7 +100,7 @@ impl Engine {
         let script = self
             .cache
             .script_provider
-            .get_by_name("[proc,testbas]")
+            .get_by_name("[proc,testspotanim]")
             .unwrap();
         player.active_script = Some(ScriptState::new_with_args(script.clone(), vec![], vec![]));
         self.add_player(player.uid, player);
@@ -238,12 +238,7 @@ impl Engine {
         // - process pathfinding/following
         for player in &self.players {
             if let Some(player) = player {
-                let player: Ref<Player> = player.borrow(); // just testing
-                if player.uid == 0 {
-                    assert_eq!(69, player.bas_readyanim);
-                } else {
-                    assert_eq!(-1, player.bas_readyanim);
-                }
+                let _: Ref<Player> = player.borrow(); // just testing
             }
         }
         self.stats[EngineStat::ClientsIn as usize] = Instant::now() - start
