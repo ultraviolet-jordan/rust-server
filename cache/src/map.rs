@@ -112,7 +112,7 @@ impl MapProvider {
     }
 
     fn load_ground(mut buf: Packet, mx: u16, mz: u16) -> Vec<Option<MapSquareLand>> {
-        let mut lands: Vec<Option<MapSquareLand>> = vec![None; 64 * 64 * 4];
+        let mut lands: Vec<Option<MapSquareLand>> = vec![None; MapSquare::SIZE];
         for y in 0..MapSquare::Y {
             for x in 0..MapSquare::X {
                 let coord_x: u16 = mx + x as u16;

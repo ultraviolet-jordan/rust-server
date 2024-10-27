@@ -2220,6 +2220,7 @@ pub trait ScriptEngine {
 
     fn map_members(&self) -> bool;
     fn map_clock(&self) -> u32;
+    fn map_blocked(&self, coord: i32) -> bool;
 }
 
 pub trait ScriptPlayer {

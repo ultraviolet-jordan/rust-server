@@ -1,11 +1,11 @@
-use std::cell::{Ref, RefCell, RefMut};
-use std::thread::sleep;
-use std::time::{Duration, Instant};
-
 use cache::{
     CacheProvider, MapProvider, MapSquare, MapSquareLand, ObjType, ScriptEngine, ScriptFile,
     ScriptOpcode, ScriptPlayer, ScriptRunner, ScriptState,
 };
+use rsmod::rsmod::collision_flag::CollisionFlag;
+use std::cell::{Ref, RefCell, RefMut};
+use std::thread::sleep;
+use std::time::{Duration, Instant};
 
 use crate::coordgrid::CoordGrid;
 use crate::entity::npc::Npc;
@@ -544,6 +544,18 @@ impl ScriptEngine for Engine {
 
     fn map_clock(&self) -> u32 {
         return self.tick.current_tick;
+    }
+
+    fn map_blocked(&self, coord: i32) -> bool {
+        let coord: CoordGrid = CoordGrid::new(coord as u32);
+        unsafe {
+            return rsmod::isFlagged(
+                coord.x() as i32,
+                coord.z() as i32,
+                coord.y() as i32,
+                CollisionFlag::WALK_BLOCKED as u32,
+            );
+        }
     }
 }
 
