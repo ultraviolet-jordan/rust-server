@@ -26,7 +26,7 @@ impl ServerOps {
             ScriptOpcode::LineOfSight => self.line_of_sight(engine, state),
             ScriptOpcode::LineOfWalk => self.line_of_walk(engine, state),
             ScriptOpcode::MapBlocked => self.map_blocked(engine, state),
-            ScriptOpcode::MapIndoors => Err("Not implemented".to_string()),
+            ScriptOpcode::MapIndoors => self.map_indoors(engine, state),
             ScriptOpcode::MapClock => self.map_clock(engine, state),
             ScriptOpcode::MapLocAddUnsafe => Err("Not implemented".to_string()),
             ScriptOpcode::MapMembers => self.map_members(engine, state),
@@ -117,6 +117,17 @@ impl ServerOps {
     ) -> Result<(), String> {
         let a: i32 = state.pop_int();
         state.push_int(engine.map_blocked(a) as i32);
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn map_indoors(
+        &self,
+        engine: &impl ScriptEngine,
+        state: &mut ScriptState,
+    ) -> Result<(), String> {
+        let a: i32 = state.pop_int();
+        state.push_int(engine.map_indoors(a) as i32);
         return Ok(());
     }
 

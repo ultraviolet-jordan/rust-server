@@ -557,6 +557,18 @@ impl ScriptEngine for Engine {
             );
         }
     }
+
+    fn map_indoors(&self, coord: i32) -> bool {
+        let coord: CoordGrid = CoordGrid::new(coord as u32);
+        unsafe {
+            return rsmod::isFlagged(
+                coord.x() as i32,
+                coord.z() as i32,
+                coord.y() as i32,
+                CollisionFlag::ROOF as u32,
+            );
+        }
+    }
 }
 
 impl ScriptRunner for Engine {
