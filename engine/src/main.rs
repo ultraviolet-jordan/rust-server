@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 
-use cache::{CacheProvider, MapProvider};
+use cache::CacheProvider;
 use engine::engine::Engine;
 
 fn main() {
@@ -19,5 +19,5 @@ fn main() {
     let mut engine: Engine = Engine::new(cache_provider, members);
 
     // start engine
-    engine.start(true, MapProvider::io(data));
+    engine.start(true);
 }

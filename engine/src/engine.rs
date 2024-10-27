@@ -5,8 +5,8 @@ use crate::game_map::GameMap;
 use crate::script::script::Ops;
 use crate::zone::zone_map::ZoneMap;
 use cache::{
-    CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,
-    ScriptRunner, ScriptState, ScriptZone,
+    CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
+    ScriptState, ScriptZone,
 };
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
@@ -94,7 +94,7 @@ impl Engine {
         };
     }
 
-    pub fn start(&mut self, start_cycle: bool, map: MapProvider) {
+    pub fn start(&mut self, start_cycle: bool) {
         println!("Starting world...");
 
         // ----
@@ -110,7 +110,7 @@ impl Engine {
         self.add_player(player.uid, player);
         // ----
 
-        self.game_map.load_map(map);
+        self.game_map.load_map(&self.cache.map_provider);
         println!("World ready!");
         if start_cycle {
             self.cycle();

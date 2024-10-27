@@ -19,14 +19,16 @@ impl GameMap {
         };
     }
 
-    pub fn load_map(&mut self, mut map: MapProvider) {
-        for mapsquare in map.mapsquares.values_mut() {
-            while let Some(npc) = mapsquare.npcs.pop() {
+    pub fn load_map(&mut self, map: &MapProvider) {
+        for mapsquare in map.mapsquares.values() {
+            for npc in &mapsquare.npcs {
                 // TODO add static npc/members
             }
-            while let Some(obj) = mapsquare.objs.pop() {
+
+            for obj in &mapsquare.objs {
                 // TODO add static obj/members
             }
+
             for y in 0..MapSquare::Y {
                 for x in 0..MapSquare::X {
                     for z in 0..MapSquare::Z {
@@ -78,17 +80,10 @@ impl GameMap {
                     }
                 }
             }
-            while let Some(loc) = mapsquare.locs.pop() {
+
+            for loc in &mapsquare.locs {
                 // TODO add static loc/members/collision
             }
-
-            // redundant discard?
-            mapsquare.objs.clear();
-            mapsquare.lands.clear();
-            mapsquare.npcs.clear();
-            mapsquare.locs.clear();
         }
-        // discard
-        map.mapsquares.clear();
     }
 }
