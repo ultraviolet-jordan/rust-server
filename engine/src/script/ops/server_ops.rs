@@ -32,7 +32,7 @@ impl ServerOps {
             ScriptOpcode::MapMembers => self.map_members(engine, state),
             ScriptOpcode::MapPlayerCount => Err("Not implemented".to_string()),
             ScriptOpcode::MapFindSquare => Err("Not implemented".to_string()),
-            ScriptOpcode::MoveCoord => Err("Not implemented".to_string()),
+            ScriptOpcode::MoveCoord => self.movecoord(state),
             ScriptOpcode::PlayerCount => Err("Not implemented".to_string()),
             ScriptOpcode::ProjAnimMap => Err("Not implemented".to_string()),
             ScriptOpcode::ProjAnimNpc => Err("Not implemented".to_string()),
@@ -162,6 +162,23 @@ impl ServerOps {
         state: &mut ScriptState,
     ) -> Result<(), String> {
         state.push_int(engine.map_members() as i32);
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn movecoord(&self, state: &mut ScriptState) -> Result<(), String> {
+        let z: i32 = state.pop_int();
+        let y: i32 = state.pop_int();
+        let x: i32 = state.pop_int();
+        let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        state.push_int(
+            CoordGrid::from(
+                coord.y() + y as u8,
+                coord.x() + x as u16,
+                coord.z() + z as u16,
+            )
+            .coord as i32,
+        );
         return Ok(());
     }
 }
