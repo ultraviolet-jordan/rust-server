@@ -194,16 +194,15 @@ impl ServerOps {
         let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
         let spotanim: i32 = state.pop_int();
 
-        engine.with_zone(coord.y(), coord.x(), coord.z(), |zone| {
-            zone.anim_map(
-                coord.y(),
-                coord.x(),
-                coord.z(),
-                spotanim as u16,
-                height,
-                delay as u32,
-            );
+        let x: u16 = coord.x();
+        let y: u8 = coord.y();
+        let z: u16 = coord.z();
+
+        engine.with_zone(x, y, z, |zone| {
+            zone.anim_map(x, y, z, spotanim as u16, height, delay as u32);
+            engine.track_zone(engine.map_clock(), zone.index());
         });
+
         return Ok(());
     }
 

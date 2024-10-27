@@ -37,12 +37,12 @@ impl ZoneMap {
             .or_insert(Zone::new(zone_index));
     }
 
-    pub fn zone_by_index(&mut self, index: u32) -> &Zone {
+    pub fn zone_by_index(&mut self, index: u32) -> &mut Zone {
         return self.zones.entry(index).or_insert(Zone::new(index));
     }
 
     pub fn grid(&mut self, y: u8) -> &mut ZoneGrid {
-        return self.grids.entry(y).or_insert(ZoneGrid::new());
+        return self.grids.entry(y).or_insert_with(ZoneGrid::new);
     }
 
     pub fn zone_count(&self) -> u32 {

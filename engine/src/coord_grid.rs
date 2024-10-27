@@ -18,6 +18,11 @@ impl CoordGrid {
     }
 
     #[inline(always)]
+    pub fn zone_coord(x: u16, z: u16) -> u8 {
+        return (((x & 0x7) as u8) << 4) | ((z & 0x7) as u8);
+    }
+
+    #[inline(always)]
     pub fn y(&self) -> u8 {
         return ((self.coord >> 28) & 0x3) as u8;
     }

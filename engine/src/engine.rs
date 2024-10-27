@@ -3,6 +3,7 @@ use crate::entity::npc::Npc;
 use crate::entity::player::Player;
 use crate::game_map::GameMap;
 use crate::script::script::Ops;
+use crate::zone::zone_map::ZoneMap;
 use cache::{
     CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,
     ScriptRunner, ScriptState, ScriptZone,
@@ -10,6 +11,7 @@ use cache::{
 use packet::out::model::map_anim::MapAnim;
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
+use std::collections::{HashMap, HashSet};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
@@ -54,6 +56,7 @@ pub struct Engine {
     pub players: Vec<Option<RefCell<Player>>>,
     pub npcs: Vec<Option<RefCell<Npc>>>,
     pub game_map: GameMap,
+    pub zones_tracking: RefCell<HashMap<u32, HashSet<u32>>>,
 }
 
 impl Engine {
@@ -72,6 +75,7 @@ impl Engine {
             players: vec![None; Engine::MAX_PLAYERS - 1],
             npcs: vec![None; Engine::MAX_NPCS - 1],
             game_map: GameMap::new(),
+            zones_tracking: RefCell::new(HashMap::new()),
         };
     }
 
@@ -87,6 +91,7 @@ impl Engine {
             players: vec![None; Engine::MAX_PLAYERS - 1],
             npcs: vec![None; Engine::MAX_NPCS - 1],
             game_map: GameMap::new(),
+            zones_tracking: RefCell::new(HashMap::new()),
         };
     }
 
@@ -186,11 +191,8 @@ impl Engine {
             // - reset invs
             self.process_cleanup();
 
-            // cycle the world now
-            self.tick.increment();
-            self.stats[EngineStat::Cycle as usize] = Instant::now() - start;
-
             // update stats
+            self.stats[EngineStat::Cycle as usize] = start.elapsed();;
             self.last_stats[EngineStat::Cycle as usize] = self.stats[EngineStat::Cycle as usize];
             self.last_stats[EngineStat::World as usize] = self.stats[EngineStat::World as usize];
             self.last_stats[EngineStat::ClientsIn as usize] = self.stats[EngineStat::ClientsIn as usize];
@@ -205,13 +207,15 @@ impl Engine {
             self.last_stats[EngineStat::BandwidthOut as usize] = self.stats[EngineStat::BandwidthOut as usize];
 
             println!(
-                "tick {} took {:?}",
+                "tick {} took {:?}\n----",
                 self.tick.current_tick,
                 self.stats[EngineStat::Cycle as usize]
             );
-            println!("----");
 
-            sleep(self.tick_rate.saturating_sub(Instant::now() - start));
+            // cycle the world now
+            self.tick.increment();
+
+            sleep(self.tick_rate.saturating_sub(start.elapsed()));
         }
     }
 
@@ -222,7 +226,7 @@ impl Engine {
     fn process_world(&mut self) {
         let start: Instant = Instant::now();
         // TODO
-        self.stats[EngineStat::World as usize] = Instant::now() - start
+        self.stats[EngineStat::World as usize] = start.elapsed();
     }
 
     // - decode packets
@@ -255,7 +259,7 @@ impl Engine {
                 let _: Ref<Player> = player.borrow(); // just testing
             }
         }
-        self.stats[EngineStat::ClientsIn as usize] = Instant::now() - start
+        self.stats[EngineStat::ClientsIn as usize] = start.elapsed();
     }
 
     // - resume suspended script
@@ -267,7 +271,7 @@ impl Engine {
     fn process_npcs(&mut self) {
         let start: Instant = Instant::now();
         // TODO
-        self.stats[EngineStat::Npcs as usize] = Instant::now() - start
+        self.stats[EngineStat::Npcs as usize] = start.elapsed();
     }
 
     // - resume suspended script
@@ -287,7 +291,7 @@ impl Engine {
                 // TODO
             }
         }
-        self.stats[EngineStat::Players as usize] = Instant::now() - start
+        self.stats[EngineStat::Players as usize] = start.elapsed();
     }
 
     fn process_logouts(&mut self) {
@@ -298,13 +302,13 @@ impl Engine {
                 // TODO
             }
         }
-        self.stats[EngineStat::Logouts as usize] = Instant::now() - start
+        self.stats[EngineStat::Logouts as usize] = start.elapsed();
     }
 
     fn process_logins(&mut self) {
         let start: Instant = Instant::now();
         // TODO
-        self.stats[EngineStat::Logins as usize] = Instant::now() - start
+        self.stats[EngineStat::Logins as usize] = start.elapsed();
     }
 
     // - build list of active zones around players
@@ -312,8 +316,15 @@ impl Engine {
     // - compute shared buffer
     fn process_zones(&mut self) {
         let start: Instant = Instant::now();
+        let tick: u32 = self.tick.current_tick;
+        let mut zone_map: RefMut<ZoneMap> = self.game_map.zone_map.borrow_mut();
+        for set in self.zones_tracking.borrow().values() {
+            for &index in set {
+                zone_map.zone_by_index(index).tick(tick)
+            }
+        }
         // TODO
-        self.stats[EngineStat::Zones as usize] = Instant::now() - start
+        self.stats[EngineStat::Zones as usize] = start.elapsed();
     }
 
     // - convert player movements
@@ -345,7 +356,7 @@ impl Engine {
                 // TODO
             }
         }
-        self.stats[EngineStat::ClientsOut as usize] = Instant::now() - start
+        self.stats[EngineStat::ClientsOut as usize] = start.elapsed();
     }
 
     // - reset zones
@@ -354,7 +365,19 @@ impl Engine {
     // - reset invs
     fn process_cleanup(&mut self) {
         let start: Instant = Instant::now();
+
+        let tick = self.tick.current_tick;
+
         // - reset zones
+        let mut zones: RefMut<HashMap<u32, HashSet<u32>>> = self.zones_tracking.borrow_mut();
+        let mut zone_map: RefMut<ZoneMap> = self.game_map.zone_map.borrow_mut();
+        for set in zones.values() {
+            for &index in set {
+                zone_map.zone_by_index(index).reset();
+            }
+        }
+        zones.remove(&tick);
+
         // - reset players
         for player in &self.players {
             if let Some(player) = player {
@@ -364,7 +387,7 @@ impl Engine {
         }
         // - reset npcs
         // - reset invs
-        self.stats[EngineStat::Cleanup as usize] = Instant::now() - start
+        self.stats[EngineStat::Cleanup as usize] = start.elapsed();
     }
 
     pub fn add_player(&mut self, uid: i32, player: Player) {
@@ -510,11 +533,19 @@ impl ScriptEngine for Engine {
         }
     }
 
-    fn with_zone<F>(&self, y: u8, x: u16, z: u16, on_zone: F)
+    fn with_zone<F>(&self, x: u16, y: u8, z: u16, on_zone: F)
     where
         F: FnOnce(&mut dyn ScriptZone),
     {
         on_zone(self.game_map.zone_map.borrow_mut().zone(x, z, y))
+    }
+
+    fn track_zone(&self, tick: u32, zone: u32) {
+        self.zones_tracking
+            .borrow_mut()
+            .entry(tick)
+            .or_insert_with(HashSet::new)
+            .insert(zone);
     }
 
     fn npccount(&self) -> u32 {
