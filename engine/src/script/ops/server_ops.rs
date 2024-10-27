@@ -1,4 +1,5 @@
 use cache::{ScriptEngine, ScriptOpcode, ScriptState};
+use rand::random;
 
 use crate::coordgrid::CoordGrid;
 
@@ -44,7 +45,7 @@ impl ServerOps {
             ScriptOpcode::SplitLineCount => Err("Not implemented".to_string()),
             ScriptOpcode::SplitPageCount => Err("Not implemented".to_string()),
             ScriptOpcode::SpotAnimMap => Err("Not implemented".to_string()),
-            ScriptOpcode::StatRandom => Err("Not implemented".to_string()),
+            ScriptOpcode::StatRandom => self.stat_random(state),
             ScriptOpcode::StructParam => Err("Not implemented".to_string()),
             ScriptOpcode::WorldDelay => Err("Not implemented".to_string()),
             ScriptOpcode::NpcsCount => Err("Not implemented".to_string()),
@@ -173,11 +174,25 @@ impl ServerOps {
         let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
         state.push_int(
             CoordGrid::from(
-                coord.y() + y as u8,
-                coord.x() + x as u16,
-                coord.z() + z as u16,
+                coord.y().wrapping_add(y as u8),
+                coord.x().wrapping_add(x as u16),
+                coord.z().wrapping_add(z as u16),
             )
             .coord as i32,
+        );
+        return Ok(());
+    }
+
+    // https://x.com/JagexAsh/status/1110604592138670083
+    #[inline(always)]
+    fn stat_random(&self, state: &mut ScriptState) -> Result<(), String> {
+        let high: i32 = state.pop_int();
+        let low: i32 = state.pop_int();
+        let level: i32 = state.pop_int();
+        // wrap this?
+        state.push_int(
+            ((low * (99 - level) / 98) + (high * (level - 1) / 98) + 1
+                > (random::<f64>() * 256.0) as i32) as i32,
         );
         return Ok(());
     }
