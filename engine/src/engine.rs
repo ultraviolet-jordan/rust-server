@@ -1,6 +1,6 @@
 use cache::{
-    CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile,
-    ScriptOpcode, ScriptPlayer, ScriptRunner, ScriptState,
+    CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,
+    ScriptRunner, ScriptState,
 };
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
@@ -499,6 +499,23 @@ impl ScriptEngine for Engine {
                 CollisionFlag::ROOF as u32,
             );
         }
+    }
+
+    fn npccount(&self) -> u32 {
+        // TODO: npc stuff
+        return 0;
+    }
+
+    fn zonecount(&self) -> u32 {
+        return self.game_map.zone_map.zone_count();
+    }
+
+    fn loccount(&self) -> u32 {
+        return self.game_map.zone_map.loc_count();
+    }
+
+    fn objcount(&self) -> u32 {
+        return self.game_map.zone_map.obj_count();
     }
 }
 

@@ -49,7 +49,7 @@ impl ServerOps {
             ScriptOpcode::StructParam => Err("Not implemented".to_string()),
             ScriptOpcode::WorldDelay => self.world_delay(state),
             ScriptOpcode::NpcsCount => Err("Not implemented".to_string()),
-            ScriptOpcode::ZonesCount => Err("Not implemented".to_string()),
+            ScriptOpcode::ZonesCount => self.zonecount(engine, state),
             ScriptOpcode::LocsCount => Err("Not implemented".to_string()),
             ScriptOpcode::ObjsCount => Err("Not implemented".to_string()),
             ScriptOpcode::MapMulti => Err("Not implemented".to_string()),
@@ -203,6 +203,12 @@ impl ServerOps {
     fn world_delay(&self, state: &mut ScriptState) -> Result<(), String> {
         // arg is popped elsewhere
         state.execution_state = ScriptExecutionState::WorldSuspended;
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn zonecount(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
+        state.push_int(engine.zonecount() as i32);
         return Ok(());
     }
 }

@@ -2222,6 +2222,10 @@ pub trait ScriptEngine {
     fn map_clock(&self) -> u32;
     fn map_blocked(&self, coord: i32) -> bool;
     fn map_indoors(&self, coord: i32) -> bool;
+    fn npccount(&self) -> u32;
+    fn zonecount(&self) -> u32;
+    fn loccount(&self) -> u32;
+    fn objcount(&self) -> u32;
 }
 
 pub trait ScriptPlayer {
