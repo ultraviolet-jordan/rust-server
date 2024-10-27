@@ -1,20 +1,21 @@
 use crate::zone::zonemap::ZoneMap;
 use cache::{MapProvider, MapSquare, MapSquareLand};
+use std::cell::RefCell;
 
 pub struct GameMap {
-    pub zone_map: ZoneMap,
+    pub zone_map: RefCell<ZoneMap>,
 }
 
 impl GameMap {
     pub fn new() -> GameMap {
         return GameMap {
-            zone_map: ZoneMap::new(),
+            zone_map: RefCell::new(ZoneMap::new()),
         };
     }
 
     pub fn mock() -> GameMap {
         return GameMap {
-            zone_map: ZoneMap::new(),
+            zone_map: RefCell::new(ZoneMap::new()),
         };
     }
 

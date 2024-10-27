@@ -1,6 +1,6 @@
 use cache::{
     CacheProvider, MapProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer,
-    ScriptRunner, ScriptState,
+    ScriptRunner, ScriptState, ScriptZone,
 };
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
@@ -501,21 +501,28 @@ impl ScriptEngine for Engine {
         }
     }
 
+    fn with_zone<F>(&self, y: u8, x: u16, z: u16, on_zone: F)
+    where
+        F: FnOnce(&mut dyn ScriptZone),
+    {
+        on_zone(self.game_map.zone_map.borrow_mut().zone(x, z, y))
+    }
+
     fn npccount(&self) -> u32 {
         // TODO: npc stuff
         return 0;
     }
 
     fn zonecount(&self) -> u32 {
-        return self.game_map.zone_map.zone_count();
+        return self.game_map.zone_map.borrow().zone_count();
     }
 
     fn loccount(&self) -> u32 {
-        return self.game_map.zone_map.loc_count();
+        return self.game_map.zone_map.borrow().loc_count();
     }
 
     fn objcount(&self) -> u32 {
-        return self.game_map.zone_map.obj_count();
+        return self.game_map.zone_map.borrow().obj_count();
     }
 }
 

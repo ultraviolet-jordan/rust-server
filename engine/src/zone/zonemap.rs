@@ -37,7 +37,7 @@ impl ZoneMap {
             .or_insert(Zone::new(zone_index));
     }
 
-    pub fn zone_by_index(&mut self, index: u32) -> &mut Zone {
+    pub fn zone_by_index(&mut self, index: u32) -> &Zone {
         return self.zones.entry(index).or_insert(Zone::new(index));
     }
 

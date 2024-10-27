@@ -19,6 +19,7 @@ pub use script::ScriptPointer;
 pub use script::ScriptProvider;
 pub use script::ScriptRunner;
 pub use script::ScriptState;
+pub use script::ScriptZone;
 
 mod cache;
 mod map;

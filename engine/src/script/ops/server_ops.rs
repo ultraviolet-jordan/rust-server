@@ -44,7 +44,7 @@ impl ServerOps {
             ScriptOpcode::SplitInit => Err("Not implemented".to_string()),
             ScriptOpcode::SplitLineCount => Err("Not implemented".to_string()),
             ScriptOpcode::SplitPageCount => Err("Not implemented".to_string()),
-            ScriptOpcode::SpotAnimMap => Err("Not implemented".to_string()),
+            ScriptOpcode::SpotAnimMap => self.spotanim_map(engine, state),
             ScriptOpcode::StatRandom => self.stat_random(state),
             ScriptOpcode::StructParam => Err("Not implemented".to_string()),
             ScriptOpcode::WorldDelay => self.world_delay(state),
@@ -180,6 +180,30 @@ impl ServerOps {
             )
             .coord as i32,
         );
+        return Ok(());
+    }
+
+    #[inline(always)]
+    fn spotanim_map(
+        &self,
+        engine: &impl ScriptEngine,
+        state: &mut ScriptState,
+    ) -> Result<(), String> {
+        let delay: i32 = state.pop_int();
+        let height: i32 = state.pop_int();
+        let coord: CoordGrid = CoordGrid::new(state.pop_int() as u32);
+        let spotanim: i32 = state.pop_int();
+
+        engine.with_zone(coord.y(), coord.x(), coord.z(), |zone| {
+            zone.anim_map(
+                coord.y(),
+                coord.x(),
+                coord.z(),
+                spotanim as u16,
+                height,
+                delay as u32,
+            );
+        });
         return Ok(());
     }
 

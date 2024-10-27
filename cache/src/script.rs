@@ -2222,6 +2222,11 @@ pub trait ScriptEngine {
     fn map_clock(&self) -> u32;
     fn map_blocked(&self, coord: i32) -> bool;
     fn map_indoors(&self, coord: i32) -> bool;
+
+    fn with_zone<F>(&self, y: u8, x: u16, z: u16, on_zone: F)
+    where
+        F: FnOnce(&mut dyn ScriptZone);
+
     fn npccount(&self) -> u32;
     fn zonecount(&self) -> u32;
     fn loccount(&self) -> u32;
@@ -2232,4 +2237,8 @@ pub trait ScriptPlayer {
     fn get_gender(&self) -> u8;
     fn play_animation(&mut self, seq: i32, delay: i32);
     fn set_bas_readyanim(&mut self, seq: i32);
+}
+
+pub trait ScriptZone {
+    fn anim_map(&mut self, y: u8, x: u16, z: u16, spotanim: u16, height: i32, delay: u32);
 }
