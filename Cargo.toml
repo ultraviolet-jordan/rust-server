@@ -4,6 +4,7 @@ members = [
     "engine",
     "io",
     "math",
-    "packet"
+    "packet",
+    "web",
 ]
 resolver = "2"

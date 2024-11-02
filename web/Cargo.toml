@@ -1,0 +1,14 @@
+[package]
+name = "web"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.41.0", features = ["full"] }
+warp = "0.3.7"
+sailfish = "0.9.0"
+io = { path = "../io" }
+
+[[bin]]
+name = "web-server"
+path = "src/main.rs"

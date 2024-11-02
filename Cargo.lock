@@ -364,9 +364,6 @@ dependencies = [
  "packet",
  "rand",
  "rsmod-pathfinder",
- "sailfish",
- "tokio",
- "warp",
 ]
 
 [[package]]
@@ -1743,6 +1740,16 @@ name = "wasm-bindgen-shared"
 version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65fc09f10666a9f147042251e0dda9c18f166ff7de300607007e96bdebc1068d"
+
+[[package]]
+name = "web"
+version = "0.1.0"
+dependencies = [
+ "io",
+ "sailfish",
+ "tokio",
+ "warp",
+]
 
 [[package]]
 name = "web-sys"

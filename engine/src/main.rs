@@ -20,7 +20,7 @@ fn main() {
     if let Err(e) = Command::new("cargo")
         .arg("run")
         .arg("--bin")
-        .arg("web_server")
+        .arg("web-server")
         .arg("--release")
         .spawn()
     {
