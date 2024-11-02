@@ -170,11 +170,13 @@ impl PlayerOps {
     #[inline(always)]
     fn find_uid(&self, engine: &impl ScriptEngine, state: &mut ScriptState) -> Result<(), String> {
         let uid: i32 = state.pop_int();
+        println!("{}" ,uid);
         return engine.with_player(uid, |player| {
             state.set_active_player(uid);
             state.pointer_add(ScriptState::ACTIVE_PLAYER[state.int_operand() as usize]);
             state.push_int(1);
         }).or_else(|_| {
+            println!("not found!");
             state.push_int(0);
             Ok(())
         });

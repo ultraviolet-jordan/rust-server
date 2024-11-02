@@ -52,8 +52,8 @@ pub struct Engine {
     pub ops: Ops,
     pub stats: Vec<Duration>,
     pub last_stats: Vec<Duration>,
-    pub players: Vec<Option<RefCell<Player>>>,
-    pub npcs: Vec<Option<RefCell<Npc>>>,
+    pub players: HashMap<i32, RefCell<Player>>,
+    pub npcs: HashMap<i32, RefCell<Npc>>,
     pub game_map: GameMap,
     pub zones_tracking: RefCell<HashMap<u32, HashSet<u32>>>,
 }
@@ -71,8 +71,8 @@ impl Engine {
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
-            players: Vec::with_capacity(Engine::MAX_PLAYERS - 1),
-            npcs: Vec::with_capacity(Engine::MAX_NPCS - 1),
+            players: HashMap::with_capacity(Engine::MAX_PLAYERS - 1),
+            npcs: HashMap::with_capacity(Engine::MAX_NPCS - 1),
             game_map: GameMap::new(),
             zones_tracking: RefCell::new(HashMap::new()),
         };
@@ -87,8 +87,8 @@ impl Engine {
             ops: Ops::new(),
             stats: vec![Duration::new(0, 0); 12],
             last_stats: vec![Duration::new(0, 0); 12],
-            players: Vec::with_capacity(Engine::MAX_PLAYERS - 1),
-            npcs: Vec::with_capacity(Engine::MAX_NPCS - 1),
+            players: HashMap::with_capacity(Engine::MAX_PLAYERS - 1),
+            npcs: HashMap::with_capacity(Engine::MAX_NPCS - 1),
             game_map: GameMap::new(),
             zones_tracking: RefCell::new(HashMap::new()),
         };
@@ -233,16 +233,12 @@ impl Engine {
     fn process_in(&mut self) {
         let start: Instant = Instant::now();
         // - decode packets
-        for player in &self.players {
-            if let Some(cell) = player {
-                Player::resume_script(cell, self); // just testing
-            }
+        for (_, player) in &self.players {
+            Player::resume_script(player, self); // just testing
         }
         // - process pathfinding/following
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow(); // just testing
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow(); // just testing
         }
         self.stats[EngineStat::ClientsIn as usize] = start.elapsed();
     }
@@ -270,22 +266,18 @@ impl Engine {
     // - close interface if attempting to logout
     fn process_players(&mut self) {
         let start: Instant = Instant::now();
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow();
+            // TODO
         }
         self.stats[EngineStat::Players as usize] = start.elapsed();
     }
 
     fn process_logouts(&mut self) {
         let start: Instant = Instant::now();
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow();
+            // TODO
         }
         self.stats[EngineStat::Logouts as usize] = start.elapsed();
     }
@@ -316,11 +308,9 @@ impl Engine {
     // - convert npc movements
     fn process_movement_dirs(&self) {
         // TODO: benchmark this?
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow();
+            // TODO
         }
         // TODO
     }
@@ -335,11 +325,9 @@ impl Engine {
     // - flush packets
     fn process_out(&mut self) {
         let start: Instant = Instant::now();
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow();
+            // TODO
         }
         self.stats[EngineStat::ClientsOut as usize] = start.elapsed();
     }
@@ -364,11 +352,9 @@ impl Engine {
         zones.remove(&tick);
 
         // - reset players
-        for player in &self.players {
-            if let Some(player) = player {
-                let _: Ref<Player> = player.borrow();
-                // TODO
-            }
+        for (_, player) in &self.players {
+            let _: Ref<Player> = player.borrow();
+            // TODO
         }
         // - reset npcs
         // - reset invs
@@ -376,16 +362,13 @@ impl Engine {
     }
 
     pub fn add_player(&mut self, uid: i32, player: Player) {
-        if let Some(slot) = self.players.get_mut(uid as usize) {
-            *slot = Some(RefCell::new(player));
-        }
+        self.players.insert(uid, RefCell::new(player));
     }
 
     pub fn get_player(&self, uid: i32) -> Result<Ref<Player>, String> {
-        match self.players.get(uid as usize) {
+        match self.players.get(&uid) {
             None => Err(format!("Player with uid {} not found in engine", uid)),
-            Some(None) => Err(format!("Player with uid {} not initialized", uid)),
-            Some(Some(player)) => Ok(player.borrow()),
+            Some(player_ref) => Ok(player_ref.borrow()),
         }
     }
 }
@@ -458,8 +441,8 @@ impl ScriptEngine for Engine {
     where
         F: FnOnce(RefMut<dyn ScriptPlayer>),
     {
-        match self.players.get(uid as usize) {
-            Some(Some(player)) => {
+        match self.players.get(&uid) {
+            Some(player) => {
                 on_found(player.borrow_mut()); // Call the closure on the found player
                 Ok(())
             }
@@ -474,8 +457,8 @@ impl ScriptEngine for Engine {
     where
         F: FnOnce(Ref<dyn ScriptPlayer>),
     {
-        match self.players.get(uid as usize) {
-            Some(Some(player)) => {
+        match self.players.get(&uid) {
+            Some(player) => {
                 on_found(player.borrow()); // Call the closure on the found player
                 Ok(())
             }

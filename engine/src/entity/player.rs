@@ -62,6 +62,28 @@ impl Player {
         };
     }
 
+    pub fn mock() -> Player {
+        return Player {
+            entity: Entity {
+                coord: CoordGrid::new(0),
+                width: 1,
+                length: 1,
+                lifetime: EntityLifetime::Forever,
+            },
+            move_restrict: MoveRestrict::Normal,
+            block_walk: BlockWalk::Npc,
+            move_strategy: MoveStrategy::Smart,
+            gender: 0,
+            uid: -1,
+            mask: 0,
+            anim_id: -1,
+            anim_delay: -1,
+            anim_protect: false,
+            bas_readyanim: -1,
+            active_script: None,
+        };
+    }
+
     pub fn resume_script(cell: &RefCell<Player>, engine: &(impl ScriptEngine + ScriptRunner)) {
         let mut player: RefMut<Player> = cell.borrow_mut();
         if let Some(mut state) = player.active_script.take() {
