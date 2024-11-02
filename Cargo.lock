@@ -1786,6 +1786,8 @@ name = "web"
 version = "0.1.0"
 dependencies = [
  "io",
+ "log",
+ "pretty_env_logger",
  "sailfish",
  "tokio",
  "warp",

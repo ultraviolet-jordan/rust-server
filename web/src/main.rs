@@ -1,6 +1,7 @@
 #![allow(unused)]
 
 use io::{Packet, CRC};
+use log::info;
 use sailfish::TemplateSimple;
 use std::collections::HashMap;
 use tokio::fs::File;
@@ -58,12 +59,17 @@ struct TeaVMClient {
 #[tokio::main]
 #[rustfmt::skip]
 async fn main() {
+    pretty_env_logger::init();
+    
+    let port: u16 = std::env::var("WEB_PORT").unwrap().parse().unwrap();
     let nodeid: String = std::env::var("NODE_ID").unwrap();
-    let portoff: String =(std::env::var("NODE_PORT").unwrap().parse::<i32>().unwrap() - 43594).to_string();
+    let portoff: String = (std::env::var("NODE_PORT").unwrap().parse::<i32>().unwrap() - 43594).to_string();
     let members: bool = std::env::var("NODE_MEMBERS").unwrap() == "true";
 
     // static assets (.js, .wasm, .sf2)
-    let assets = warp::path::full().and(warp::get()).and_then(assets);
+    let assets = warp::path::full()
+        .and(warp::get())
+        .and_then(assets);
 
     // game clients
     // http://localhost/rs2.cgi?lowmem=0&plugin=0
@@ -79,7 +85,7 @@ async fn main() {
                 members,
             )
         });
-
+    
     // cache
     let cache = warp::path::full()
         .and(warp::get())
@@ -95,7 +101,7 @@ async fn main() {
             .or(rs2cgi)
             .or(cache)
             .or(default)
-    ).run(([0, 0, 0, 0], 80)).await;
+    ).run(([0, 0, 0, 0], port)).await;
 }
 
 fn crcs() -> Vec<u8> {
