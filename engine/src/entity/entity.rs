@@ -1,5 +1,5 @@
-use crate::coord_grid::CoordGrid;
 use crate::entity::lifetime::EntityLifetime;
+use crate::grid::coord_grid::CoordGrid;
 
 #[derive(Eq, Hash, PartialEq)]
 pub struct Entity {

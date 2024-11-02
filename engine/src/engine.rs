@@ -1,9 +1,9 @@
-use crate::coord_grid::CoordGrid;
 use crate::entity::npc::Npc;
 use crate::entity::player::Player;
-use crate::game_map::GameMap;
+use crate::grid::coord_grid::CoordGrid;
+use crate::grid::game_map::GameMap;
+use crate::grid::zone::zone_map::ZoneMap;
 use crate::script::script::Ops;
-use crate::zone::zone_map::ZoneMap;
 use cache::{
     CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
     ScriptState, ScriptZone,

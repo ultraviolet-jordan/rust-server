@@ -1,9 +1,9 @@
-use crate::coord_grid::CoordGrid;
 use crate::entity::block_walk::BlockWalk;
 use crate::entity::entity::Entity;
 use crate::entity::lifetime::EntityLifetime;
 use crate::entity::move_restrict::MoveRestrict;
 use crate::entity::move_strategy::MoveStrategy;
+use crate::grid::coord_grid::CoordGrid;
 
 pub struct Npc {
     pub entity: Entity,

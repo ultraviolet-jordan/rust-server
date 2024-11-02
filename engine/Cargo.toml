@@ -10,6 +10,9 @@ criterion = "0.5.1"
 dotenv = "0.15.0"
 rand = "0.8.5"
 rsmod-pathfinder = "5.0.4"
+tokio = { version = "1.41.0", features = ["full"] }
+warp = "0.3.7"
+sailfish = "0.9.0"
 cache = { path = "../cache" }
 io = { path = "../io" }
 math = { path = "../math" }
@@ -18,3 +21,11 @@ packet = { path = "../packet" }
 [[bench]]
 name = "fib"
 harness = false
+
+[[bin]]
+name = "game_engine"
+path = "src/main.rs"
+
+[[bin]]
+name = "web_server"
+path = "src/web.rs"

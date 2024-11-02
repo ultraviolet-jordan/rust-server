@@ -1,5 +1,5 @@
-use crate::zone::zone::Zone;
-use crate::zone::zone_grid::ZoneGrid;
+use crate::grid::zone::zone::Zone;
+use crate::grid::zone::zone_grid::ZoneGrid;
 use std::collections::HashMap;
 
 pub struct ZoneMap {

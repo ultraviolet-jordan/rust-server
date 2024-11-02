@@ -1,8 +1,8 @@
-use crate::coord_grid::CoordGrid;
 use crate::entity::lifetime::EntityLifetime;
 use crate::entity::loc::Loc;
 use crate::entity::obj::Obj;
-use crate::zone::zone_map::ZoneMap;
+use crate::grid::coord_grid::CoordGrid;
+use crate::grid::zone::zone_map::ZoneMap;
 use cache::{MapProvider, MapSquare, MapSquareLand};
 use std::cell::RefCell;
 

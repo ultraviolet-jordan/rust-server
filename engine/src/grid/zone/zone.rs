@@ -1,9 +1,9 @@
-use crate::coord_grid::CoordGrid;
 use crate::entity::lifetime::EntityLifetime;
 use crate::entity::loc::Loc;
 use crate::entity::obj::Obj;
-use crate::zone::zone_event::{ZoneEvent, ZoneEventType, ZoneMessageType};
-use crate::zone::zone_map::ZoneMap;
+use crate::grid::coord_grid::CoordGrid;
+use crate::grid::zone::zone_event::{ZoneEvent, ZoneEventType, ZoneMessageType};
+use crate::grid::zone::zone_map::ZoneMap;
 use cache::ScriptZone;
 use packet::out::model::loc_add_change::LocAddChange;
 use packet::out::model::map_anim::MapAnim;

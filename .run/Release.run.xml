@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Release" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="run --release --package engine --bin engine" />
+    <option name="buildProfileId" value="release" />
+    <option name="command" value="run --package engine --bin game_engine --release" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
     <option name="emulateTerminal" value="true" />
