@@ -5,6 +5,7 @@ use crate::grid::coord_grid::CoordGrid;
 use crate::grid::zone::zone_event::{ZoneEvent, ZoneEventType, ZoneMessageType};
 use crate::grid::zone::zone_map::ZoneMap;
 use cache::ScriptZone;
+use log::info;
 use packet::out::model::loc_add_change::LocAddChange;
 use packet::out::model::map_anim::MapAnim;
 use std::collections::{HashMap, HashSet};
@@ -50,7 +51,7 @@ impl Zone {
 
     pub fn tick(&self, current_tick: u32) {
         // TODO
-        println!("zone: {}; tick {}", self.index, current_tick);
+        info!("zone: {}; tick {}", self.index, current_tick);
     }
 
     pub fn reset(&mut self) {

@@ -8,6 +8,7 @@ use cache::{
     CacheProvider, ObjType, ScriptEngine, ScriptFile, ScriptOpcode, ScriptPlayer, ScriptRunner,
     ScriptState, ScriptZone,
 };
+use log::info;
 use rsmod::rsmod::collision_flag::CollisionFlag;
 use std::cell::{Ref, RefCell, RefMut};
 use std::collections::{HashMap, HashSet};
@@ -95,7 +96,7 @@ impl Engine {
     }
 
     pub fn start(&mut self, start_cycle: bool) {
-        println!("Starting world...");
+        info!("Starting world...");
 
         // ----
         // this is just for testing player script running.
@@ -111,7 +112,7 @@ impl Engine {
         // ----
 
         self.game_map.load_map(&self.cache.map_provider);
-        println!("World ready!");
+        info!("World ready!");
         if start_cycle {
             self.cycle();
         }
@@ -205,7 +206,7 @@ impl Engine {
             self.last_stats[EngineStat::BandwidthIn as usize] = self.stats[EngineStat::BandwidthIn as usize];
             self.last_stats[EngineStat::BandwidthOut as usize] = self.stats[EngineStat::BandwidthOut as usize];
 
-            println!(
+            info!(
                 "tick {} took {:?}\n----",
                 self.tick.current_tick,
                 self.stats[EngineStat::Cycle as usize]
@@ -536,7 +537,7 @@ impl ScriptEngine for Engine {
 
 impl ScriptRunner for Engine {
     fn push_script(&self, state: &mut ScriptState, code: &ScriptOpcode) -> Result<(), String> {
-        // println!("{:?}", code);
+        // info!("{:?}", code);
         match code {
             // Core language ops (0-99)
             ScriptOpcode::PushConstantInt
